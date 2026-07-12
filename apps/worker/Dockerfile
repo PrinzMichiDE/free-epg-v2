@@ -31,7 +31,6 @@ ENV NODE_ENV=production
 RUN mkdir -p /data/epg
 COPY --from=builder /app/apps/worker/dist ./dist
 COPY --from=builder /app/node_modules ./node_modules
-COPY --from=builder /app/packages/db/dist ./packages/db/dist
-COPY --from=builder /app/packages/db/drizzle ./packages/db/drizzle
+COPY --from=builder /app/packages ./packages
 WORKDIR /app
 CMD ["node", "dist/index.js"]

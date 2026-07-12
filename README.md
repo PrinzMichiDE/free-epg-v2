@@ -21,6 +21,8 @@ docker compose up -d --build
 
 ## Prod (Docker Hub + Traefik)
 
+Deploy the stack from the **Git repository** (Portainer: Stack → Git repository), not only pasted compose text — `db-init` mounts `packages/db/drizzle/0000_init.sql` from the repo.
+
 ```bash
 cp stack.env.example stack.env
 # POSTGRES_PASSWORD, NEXTAUTH_SECRET, ADMIN_PASSWORD in stack.env setzen

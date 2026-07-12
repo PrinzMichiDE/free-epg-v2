@@ -9,6 +9,14 @@
     ".": {
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
+    },
+    "./migrate": {
+      "types": "./dist/docker-migrate.d.ts",
+      "import": "./dist/docker-migrate.js"
+    },
+    "./init": {
+      "types": "./dist/docker-init.d.ts",
+      "import": "./dist/docker-init.js"
     }
   },
   "scripts": {

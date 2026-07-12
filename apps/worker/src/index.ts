@@ -22,7 +22,7 @@ import {
 import { AnalyticsTracker } from "@freeepg/analytics";
 
 import { Redis } from "ioredis";
-import { pathToFileURL } from "node:url";
+import { runDockerInit } from "@freeepg/db/init";
 
 const redisUrl = process.env.REDIS_URL ?? "redis://localhost:6379";
 const redisClient = new Redis(redisUrl);
@@ -170,8 +170,6 @@ function parseXmltvDate(s: string): Date | null {
 }
 
 async function main() {
-  const initPath = path.join(process.cwd(), "packages/db/dist/docker-init.js");
-  const { runDockerInit } = await import(pathToFileURL(initPath).href);
   await runDockerInit();
 
   console.log("FreeEPG worker started");

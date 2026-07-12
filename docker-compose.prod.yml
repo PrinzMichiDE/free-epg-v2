@@ -3,13 +3,20 @@
 
 services:
   db-init:
-    image: ${DOCKERHUB_USER:-freeepg}/freeepg-worker:${IMAGE_TAG:-latest}
-    env_file:
-      - stack.env
+    image: postgres:16-alpine
     environment:
-      DATABASE_URL: ${DATABASE_URL}
-      SEED_ON_START: "false"
-    command: ["node", "packages/db/dist/docker-migrate.js"]
+      PGPASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - ./packages/db/drizzle/0000_init.sql:/init.sql:ro
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+      - |
+        set -e
+        echo "[db-init] waiting for postgres..."
+        until pg_isready -h postgres -p 5432 -U freeepg; do sleep 2; done
+        echo "[db-init] applying schema..."
+        psql -h postgres -U freeepg -d freeepg -v ON_ERROR_STOP=1 -f /init.sql
+        echo "[db-init] schema ready"
     depends_on:
       postgres:
         condition: service_healthy
