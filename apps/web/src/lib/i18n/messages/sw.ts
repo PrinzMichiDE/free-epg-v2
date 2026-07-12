@@ -15,6 +15,10 @@ export const sw = {
   "lang.select": "Chagua lugha",
   "donate.paypal": "PayPal",
   "donate.kofi": "Ko-fi",
+
+  "donate.amazon": "Amazon",
+  "donate.banner.message": "Support FreeEPG — via Amazon wishlist",
+  "donate.banner.cta": "View on Amazon",
   "donate.hint":
     "Mchango wa hiari kupitia PayPal au Ko-fi kwa uendeshaji na maendeleo endelevu.",
   "footer.tagline":

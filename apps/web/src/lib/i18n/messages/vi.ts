@@ -15,6 +15,10 @@ export const vi = {
   "lang.select": "Chọn ngôn ngữ",
   "donate.paypal": "PayPal",
   "donate.kofi": "Ko-fi",
+
+  "donate.amazon": "Amazon",
+  "donate.banner.message": "Support FreeEPG — via Amazon wishlist",
+  "donate.banner.cta": "View on Amazon",
   "donate.hint":
     "Quyên góp tự nguyện qua PayPal hoặc Ko-fi để vận hành và phát triển liên tục.",
   "footer.tagline":

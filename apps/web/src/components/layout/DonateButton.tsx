@@ -1,8 +1,8 @@
 "use client";
 
-import { Coffee, Heart } from "lucide-react";
+import { Coffee, Gift, Heart } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { PAYPAL_DONATE_URL, KOFI_DONATE_URL } from "@/lib/site";
+import { PAYPAL_DONATE_URL, KOFI_DONATE_URL, AMAZON_SUPPORT_URL } from "@/lib/site";
 import { useI18n } from "@/lib/i18n/I18nProvider";
 
 interface DonateButtonProps {
@@ -46,6 +46,13 @@ export function DonateButton({
       label: t("donate.kofi"),
       amountLabel: null,
       Icon: Coffee,
+    },
+    {
+      id: "amazon",
+      url: AMAZON_SUPPORT_URL,
+      label: t("donate.amazon"),
+      amountLabel: null,
+      Icon: Gift,
     },
   ] as const;
 

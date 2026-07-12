@@ -15,6 +15,10 @@ export const mr = {
   "lang.select": "भाषा निवडा",
   "donate.paypal": "PayPal",
   "donate.kofi": "Ko-fi",
+
+  "donate.amazon": "Amazon",
+  "donate.banner.message": "Support FreeEPG — via Amazon wishlist",
+  "donate.banner.cta": "View on Amazon",
   "donate.hint":
     "चालवणूक आणि विकासासाठी PayPal किंवा Ko-fi द्वारे स्वैच्छिक देणगी.",
   "footer.tagline":

@@ -15,6 +15,10 @@ export const zh = {
   "lang.select": "选择语言",
   "donate.paypal": "PayPal",
   "donate.kofi": "Ko-fi",
+
+  "donate.amazon": "Amazon",
+  "donate.banner.message": "Support FreeEPG — via Amazon wishlist",
+  "donate.banner.cta": "View on Amazon",
   "donate.hint": "通过 PayPal 或 Ko-fi 自愿捐赠，支持运营与持续开发。",
   "footer.tagline":
     "自托管 EPG 平台，支持 XMLTV 与 Rytec — 不保证数据完整。",

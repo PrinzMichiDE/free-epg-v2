@@ -36,6 +36,20 @@ Nicht im Scope: Jeder Einzel-Commit ohne betriebliche Relevanz.
 
 ## Detailbeschreibung
 
+### Eintrag CHG-2026-007: Amazon-Unterstützung als Banner
+
+| Feld | Inhalt |
+|------|--------|
+| Datum | 2026-07-12 |
+| Version | App-Release (Web) |
+| Begründung | Zusätzliche Unterstützungsmöglichkeit via Amazon-Wunschzettel (`amzn.to/4w1wbC5`) |
+| Auswirkung | Globales `AmazonSupportBanner` unter dem Header; Amazon-Button in `DonateButton`; URL in `lib/site.ts` |
+| Risiko | niedrig |
+| Betroffene Komponenten | `apps/web` (Layout, DonateButton, i18n) |
+| Prüfung | Manuell Banner sichtbar, Link öffnet Amazon |
+| Freigabe | Product Owner |
+| Rollback | Vorheriges Web-Image |
+
 ### Eintrag CHG-2026-006: EPG im TV Player
 
 | Feld | Inhalt |

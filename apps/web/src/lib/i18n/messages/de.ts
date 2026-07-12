@@ -15,7 +15,10 @@ export const de = {
   "lang.select": "Sprache wählen",
   "donate.paypal": "PayPal",
   "donate.kofi": "Ko-fi",
-  "donate.hint": "Freiwillige Spende via PayPal oder Ko-fi für Betrieb und Weiterentwicklung.",
+  "donate.amazon": "Amazon",
+  "donate.hint": "Freiwillige Spende via PayPal, Ko-fi oder Amazon für Betrieb und Weiterentwicklung.",
+  "donate.banner.message": "FreeEPG unterstützen — über Amazon Wunschzettel",
+  "donate.banner.cta": "Auf Amazon ansehen",
   "footer.tagline":
     "Self-hosted EPG-Plattform für XMLTV und Rytec — ohne Garantie auf Vollständigkeit.",
   "footer.resources": "Ressourcen",

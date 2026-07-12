@@ -15,6 +15,10 @@ export const hi = {
   "lang.select": "भाषा चुनें",
   "donate.paypal": "PayPal",
   "donate.kofi": "Ko-fi",
+
+  "donate.amazon": "Amazon",
+  "donate.banner.message": "Support FreeEPG — via Amazon wishlist",
+  "donate.banner.cta": "View on Amazon",
   "donate.hint":
     "संचालन और विकास के लिए PayPal या Ko-fi के माध्यम से स्वैच्छिक दान।",
   "footer.tagline":

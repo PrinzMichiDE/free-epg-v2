@@ -7,6 +7,10 @@ export const KOFI_DONATE_URL = "https://ko-fi.com/michelfritzsch";
 
 export const KOFI_DONATE_LABEL = "Ko-fi";
 
+export const AMAZON_SUPPORT_URL = "https://amzn.to/4w1wbC5";
+
+export const AMAZON_SUPPORT_LABEL = "Amazon";
+
 export const DONATE_OPTIONS = [
   {
     id: "paypal",
@@ -21,5 +25,12 @@ export const DONATE_OPTIONS = [
     label: "Ko-fi",
     amountLabel: null,
     ariaLabel: `Spenden — ${KOFI_DONATE_LABEL}`,
+  },
+  {
+    id: "amazon",
+    url: AMAZON_SUPPORT_URL,
+    label: "Amazon",
+    amountLabel: null,
+    ariaLabel: `Unterstützung — ${AMAZON_SUPPORT_LABEL}`,
   },
 ] as const;
