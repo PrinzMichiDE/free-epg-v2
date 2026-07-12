@@ -2,6 +2,7 @@ import { sql } from "drizzle-orm";
 import { getDatabase } from "@/lib/db";
 import { channels, generatedFiles } from "@freeepg/db";
 import { EPG_PW_COUNTRIES } from "@freeepg/epg-sources";
+import { countryEpgPaths } from "@/lib/utils";
 
 export async function GET() {
   const db = getDatabase();
@@ -20,13 +21,16 @@ export async function GET() {
   const countries = EPG_PW_COUNTRIES.map((code) => {
     const stat = stats.find((s) => s.country === code);
     const file = fileMap.get(code);
+    const paths = countryEpgPaths(code);
     return {
       code,
       channelCount: stat?.count ?? 0,
       hasEpg: !!file,
       lastUpdate: file?.generatedAt ?? null,
-      xmlUrl: `/api/epg/${code.toLowerCase()}.xml`,
-      xmlGzipUrl: `/api/epg/${code.toLowerCase()}.xml.gz`,
+      xmlUrl: paths.xmlUrl,
+      xmlGzipUrl: paths.xmlGzipUrl,
+      rytecUrl: paths.rytecUrl,
+      rytecGzipUrl: paths.rytecGzipUrl,
       fileSize: file?.size ?? 0,
     };
   }).sort((a, b) => b.channelCount - a.channelCount);

@@ -3,6 +3,7 @@ import { getDatabase } from "@/lib/db";
 import { channels, generatedFiles } from "@freeepg/db";
 import { EPG_PW_COUNTRIES } from "@freeepg/epg-sources";
 import { CountryCard } from "@/components/country/CountryCard";
+import { countryEpgPaths } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
 
@@ -23,12 +24,14 @@ async function getCountriesData() {
   return EPG_PW_COUNTRIES.map((code) => {
     const stat = stats.find((s) => s.country === code);
     const file = fileMap.get(code);
+    const paths = countryEpgPaths(code);
     return {
       code,
       channelCount: stat?.count ?? 0,
       hasEpg: !!file,
       lastUpdate: file?.generatedAt?.toISOString() ?? null,
-      xmlUrl: `/api/epg/${code.toLowerCase()}.xml`,
+      xmlUrl: paths.xmlUrl,
+      rytecGzipUrl: paths.rytecGzipUrl,
     };
   }).sort((a, b) => b.channelCount - a.channelCount);
 }
@@ -41,13 +44,17 @@ export default async function HomePage() {
     countries = await getCountriesData();
     totalChannels = countries.reduce((s, c) => s + c.channelCount, 0);
   } catch {
-    countries = EPG_PW_COUNTRIES.map((code) => ({
-      code,
-      channelCount: 0,
-      hasEpg: false,
-      lastUpdate: null,
-      xmlUrl: `/api/epg/${code.toLowerCase()}.xml`,
-    }));
+    countries = EPG_PW_COUNTRIES.map((code) => {
+      const paths = countryEpgPaths(code);
+      return {
+        code,
+        channelCount: 0,
+        hasEpg: false,
+        lastUpdate: null,
+        xmlUrl: paths.xmlUrl,
+        rytecGzipUrl: paths.rytecGzipUrl,
+      };
+    });
   }
 
   return (
@@ -77,7 +84,10 @@ export default async function HomePage() {
       </section>
 
       <section>
-        <h2 className="text-2xl font-bold mb-6">Länder</h2>
+        <h2 className="text-2xl font-bold mb-2">Länder</h2>
+        <p className="text-sm text-[var(--muted)] mb-6">
+          Pro Land XMLTV- und Rytec-URL kopieren — Rytec für Enigma2 / EPGImport.
+        </p>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
           {countries.slice(0, 20).map((c) => (
             <CountryCard key={c.code} {...c} />

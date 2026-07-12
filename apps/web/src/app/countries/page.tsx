@@ -3,19 +3,24 @@ import { getDatabase } from "@/lib/db";
 import { channels, generatedFiles } from "@freeepg/db";
 import { EPG_PW_COUNTRIES } from "@freeepg/epg-sources";
 import { CountryCard } from "@/components/country/CountryCard";
+import { countryEpgPaths } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
 
 export default async function CountriesPage() {
   const db = getDatabase();
 
-  let countries = EPG_PW_COUNTRIES.map((code) => ({
-    code,
-    channelCount: 0,
-    hasEpg: false,
-    lastUpdate: null as string | null,
-    xmlUrl: `/api/epg/${code.toLowerCase()}.xml`,
-  }));
+  let countries = EPG_PW_COUNTRIES.map((code) => {
+    const paths = countryEpgPaths(code);
+    return {
+      code,
+      channelCount: 0,
+      hasEpg: false,
+      lastUpdate: null as string | null,
+      xmlUrl: paths.xmlUrl,
+      rytecGzipUrl: paths.rytecGzipUrl,
+    };
+  });
 
   try {
     const stats = await db
@@ -32,12 +37,14 @@ export default async function CountriesPage() {
     countries = EPG_PW_COUNTRIES.map((code) => {
       const stat = stats.find((s) => s.country === code);
       const file = fileMap.get(code);
+      const paths = countryEpgPaths(code);
       return {
         code,
         channelCount: stat?.count ?? 0,
         hasEpg: !!file,
         lastUpdate: file?.generatedAt?.toISOString() ?? null,
-        xmlUrl: `/api/epg/${code.toLowerCase()}.xml`,
+        xmlUrl: paths.xmlUrl,
+        rytecGzipUrl: paths.rytecGzipUrl,
       };
     }).sort((a, b) => b.channelCount - a.channelCount);
   } catch {

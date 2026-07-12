@@ -9,6 +9,7 @@ interface CountryCardProps {
   hasEpg: boolean;
   lastUpdate: string | null;
   xmlUrl: string;
+  rytecGzipUrl: string;
 }
 
 export function CountryCard({
@@ -17,15 +18,18 @@ export function CountryCard({
   hasEpg,
   lastUpdate,
   xmlUrl,
+  rytecGzipUrl,
 }: CountryCardProps) {
-  const [copied, setCopied] = useState(false);
+  const [copied, setCopied] = useState<"xmltv" | "rytec" | null>(null);
 
-  const copyUrl = async () => {
-    const full = `${window.location.origin}${xmlUrl}`;
+  const copyUrl = async (path: string, kind: "xmltv" | "rytec") => {
+    const full = `${window.location.origin}${path}`;
     await navigator.clipboard.writeText(full);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+    setCopied(kind);
+    setTimeout(() => setCopied(null), 2000);
   };
+
+  const xmlGzipUrl = xmlUrl.endsWith(".xml") ? `${xmlUrl}.gz` : xmlUrl;
 
   return (
     <div className="rounded-xl border border-[var(--border)] bg-[var(--card)] p-5 hover:shadow-lg transition-shadow">
@@ -61,10 +65,19 @@ export function CountryCard({
           Details
         </a>
         <button
-          onClick={copyUrl}
+          type="button"
+          onClick={() => copyUrl(xmlGzipUrl, "xmltv")}
           className="flex-1 text-sm py-2 rounded-lg bg-[var(--primary)] text-[var(--primary-foreground)] hover:opacity-90 transition-opacity"
         >
-          {copied ? "Kopiert ✓" : "XML URL"}
+          {copied === "xmltv" ? "Kopiert ✓" : "XMLTV"}
+        </button>
+        <button
+          type="button"
+          onClick={() => copyUrl(rytecGzipUrl, "rytec")}
+          className="flex-1 text-sm py-2 rounded-lg border border-[var(--border)] hover:bg-[var(--background)] transition-colors"
+          title="Rytec XML für Enigma2 / EPGImport"
+        >
+          {copied === "rytec" ? "Kopiert ✓" : "Rytec"}
         </button>
       </div>
     </div>

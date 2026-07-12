@@ -2,7 +2,7 @@ import { eq } from "drizzle-orm";
 import { notFound } from "next/navigation";
 import { getDatabase } from "@/lib/db";
 import { channels } from "@freeepg/db";
-import { XmlUrlBox } from "@/components/epg/XmlUrlBox";
+import { EpgFeedsPanel } from "@/components/epg/EpgFeedsPanel";
 
 export const dynamic = "force-dynamic";
 
@@ -29,10 +29,7 @@ export default async function ChannelDetailPage({
       <p className="mb-8 text-[var(--muted)]">
         {channel.country} · {channel.hasEpg ? "EPG verfügbar" : "Kein EPG"}
       </p>
-      <XmlUrlBox
-        url={`/api/epg/${channel.country.toLowerCase()}.xml`}
-        gzipUrl={`/api/epg/${channel.country.toLowerCase()}.xml.gz`}
-      />
+      <EpgFeedsPanel countryCode={channel.country} />
     </div>
   );
 }

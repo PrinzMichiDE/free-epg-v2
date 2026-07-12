@@ -27,3 +27,21 @@ export function xmlUrl(country: string): string {
 export function xmlGzipUrl(country: string): string {
   return `${BASE_URL}/api/epg/${country.toLowerCase()}.xml.gz`;
 }
+
+export function rytecXmlUrl(country: string): string {
+  return `${BASE_URL}/api/epg/rytec/${country.toLowerCase()}.xml`;
+}
+
+export function rytecGzipUrl(country: string): string {
+  return `${BASE_URL}/api/epg/rytec/${country.toLowerCase()}.xml.gz`;
+}
+
+export function countryEpgPaths(country: string) {
+  const cc = country.toLowerCase();
+  return {
+    xmlUrl: `/api/epg/${cc}.xml`,
+    xmlGzipUrl: `/api/epg/${cc}.xml.gz`,
+    rytecUrl: `/api/epg/rytec/${cc}.xml`,
+    rytecGzipUrl: `/api/epg/rytec/${cc}.xml.gz`,
+  };
+}
