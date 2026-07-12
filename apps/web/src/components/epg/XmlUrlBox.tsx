@@ -1,9 +1,11 @@
 "use client";
 
 import { useState } from "react";
-import { Check, Copy, Download } from "lucide-react";
+import { Check, Copy, Download, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/Button";
+import { ButtonLink } from "@/components/ui/ButtonLink";
 import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/Card";
+import { absoluteUrl, copyToClipboard } from "@/lib/clipboard";
 
 interface XmlUrlBoxProps {
   url: string;
@@ -19,16 +21,22 @@ export function XmlUrlBox({
   description,
 }: XmlUrlBoxProps) {
   const [copied, setCopied] = useState(false);
+  const [copyError, setCopyError] = useState(false);
 
-  const copy = async (text: string) => {
-    await navigator.clipboard.writeText(text);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+  const displayPath = gzipUrl ?? url;
+  const fullUrl = absoluteUrl(displayPath);
+
+  const copy = async () => {
+    setCopyError(false);
+    const ok = await copyToClipboard(fullUrl);
+    if (ok) {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } else {
+      setCopyError(true);
+      setTimeout(() => setCopyError(false), 3000);
+    }
   };
-
-  const displayUrl = gzipUrl ?? url;
-  const fullUrl =
-    typeof window !== "undefined" ? `${window.location.origin}${displayUrl}` : displayUrl;
 
   return (
     <Card className="hover:shadow-sm">
@@ -41,12 +49,14 @@ export function XmlUrlBox({
         {fullUrl}
       </code>
 
+      {copyError && (
+        <p className="text-xs text-[var(--destructive)] mt-2">
+          Kopieren fehlgeschlagen — URL oben manuell markieren oder „Öffnen“ nutzen.
+        </p>
+      )}
+
       <div className="flex flex-wrap gap-2 mt-4">
-        <Button
-          size="sm"
-          onClick={() => copy(fullUrl)}
-          aria-label={`${title} URL kopieren`}
-        >
+        <Button size="sm" onClick={copy} aria-label={`${title} URL kopieren`}>
           {copied ? (
             <>
               <Check className="h-4 w-4" aria-hidden />
@@ -59,19 +69,19 @@ export function XmlUrlBox({
             </>
           )}
         </Button>
-        <a href={url} download className="inline-flex">
-          <Button variant="outline" size="sm" type="button">
-            <Download className="h-4 w-4" aria-hidden />
-            XML
-          </Button>
-        </a>
+        <ButtonLink href={displayPath} variant="outline" size="sm">
+          <ExternalLink className="h-4 w-4" aria-hidden />
+          Öffnen
+        </ButtonLink>
+        <ButtonLink href={url} variant="outline" size="sm" download>
+          <Download className="h-4 w-4" aria-hidden />
+          XML
+        </ButtonLink>
         {gzipUrl && (
-          <a href={gzipUrl} className="inline-flex">
-            <Button variant="outline" size="sm" type="button">
-              <Download className="h-4 w-4" aria-hidden />
-              .gz
-            </Button>
-          </a>
+          <ButtonLink href={gzipUrl} variant="outline" size="sm" download>
+            <Download className="h-4 w-4" aria-hidden />
+            .gz
+          </ButtonLink>
         )}
       </div>
     </Card>

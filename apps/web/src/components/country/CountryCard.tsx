@@ -1,11 +1,10 @@
 "use client";
 
-import { useState } from "react";
 import Link from "next/link";
-import { Check, Clock, Copy, ExternalLink } from "lucide-react";
+import { Check, Clock, ExternalLink } from "lucide-react";
 import { cn, formatNumber, formatDate } from "@/lib/utils";
 import { Badge } from "@/components/ui/Badge";
-import { Button } from "@/components/ui/Button";
+import { ButtonLink } from "@/components/ui/ButtonLink";
 import { CountryFlag } from "@/components/country/CountryFlag";
 import { getCountryName } from "@/lib/countries";
 
@@ -26,15 +25,6 @@ export function CountryCard({
   xmlUrl,
   rytecGzipUrl,
 }: CountryCardProps) {
-  const [copied, setCopied] = useState<"xmltv" | "rytec" | null>(null);
-
-  const copyUrl = async (path: string, kind: "xmltv" | "rytec") => {
-    const full = `${window.location.origin}${path}`;
-    await navigator.clipboard.writeText(full);
-    setCopied(kind);
-    setTimeout(() => setCopied(null), 2000);
-  };
-
   const xmlGzipUrl = xmlUrl.endsWith(".xml") ? `${xmlUrl}.gz` : xmlUrl;
 
   return (
@@ -84,34 +74,22 @@ export function CountryCard({
           Details
           <ExternalLink className="h-3.5 w-3.5 opacity-60" aria-hidden />
         </Link>
-        <Button
+        <ButtonLink
+          href={xmlGzipUrl}
           variant="primary"
           size="sm"
-          className="col-span-1"
-          onClick={() => copyUrl(xmlGzipUrl, "xmltv")}
-          aria-label={`XMLTV URL für ${code} kopieren`}
+          className="col-span-1 w-full"
         >
-          {copied === "xmltv" ? (
-            <Check className="h-4 w-4" aria-hidden />
-          ) : (
-            <Copy className="h-4 w-4" aria-hidden />
-          )}
           XMLTV
-        </Button>
-        <Button
+        </ButtonLink>
+        <ButtonLink
+          href={rytecGzipUrl}
           variant="outline"
           size="sm"
-          className="col-span-1"
-          onClick={() => copyUrl(rytecGzipUrl, "rytec")}
-          aria-label={`Rytec URL für ${code} kopieren`}
+          className="col-span-1 w-full"
         >
-          {copied === "rytec" ? (
-            <Check className="h-4 w-4" aria-hidden />
-          ) : (
-            <Copy className="h-4 w-4" aria-hidden />
-          )}
           Rytec
-        </Button>
+        </ButtonLink>
       </div>
     </article>
   );
