@@ -9,21 +9,28 @@ import { EPG_PW_COUNTRIES } from "@freeepg/epg-sources";
 import { eq, sql } from "drizzle-orm";
 import { formatNumber } from "@/lib/utils";
 import { notFound } from "next/navigation";
-import { Check } from "lucide-react";
+import { Check, ChevronLeft, ChevronRight } from "lucide-react";
 
 export const dynamic = "force-dynamic";
 
+const PAGE_SIZE = 50;
+
 export default async function CountryDetailPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ code: string }>;
+  searchParams: Promise<{ page?: string }>;
 }) {
   const { code } = await params;
+  const { page: pageParam } = await searchParams;
   const cc = code.toUpperCase();
 
   if (!EPG_PW_COUNTRIES.includes(cc)) {
     notFound();
   }
+
+  const page = Math.max(1, Number.parseInt(pageParam ?? "1", 10) || 1);
 
   let countryChannels: (typeof channels.$inferSelect)[] = [];
   let totalCount = 0;
@@ -38,15 +45,24 @@ export default async function CountryDetailPage({
       .where(eq(channels.country, cc));
 
     totalCount = countRow?.count ?? 0;
+    const totalPages = Math.max(1, Math.ceil(totalCount / PAGE_SIZE));
+    const safePage = Math.min(page, totalPages);
+    const offset = (safePage - 1) * PAGE_SIZE;
 
     countryChannels = await db
       .select()
       .from(channels)
       .where(eq(channels.country, cc))
-      .limit(100);
+      .orderBy(channels.name)
+      .limit(PAGE_SIZE)
+      .offset(offset);
   } catch {
     dbUnavailable = true;
   }
+
+  const totalPages = Math.max(1, Math.ceil(totalCount / PAGE_SIZE));
+  const safePage = Math.min(page, totalPages);
+  const pageBase = `/countries/${code.toLowerCase()}`;
 
   return (
     <div className="page-shell py-10 sm:py-14">
@@ -68,7 +84,7 @@ export default async function CountryDetailPage({
       </header>
 
       <div className="grid lg:grid-cols-5 gap-8 lg:gap-10">
-        <div className="lg:col-span-2">
+        <div className="lg:col-span-2 lg:sticky lg:top-24 lg:self-start">
           <EpgFeedsPanel countryCode={code} />
         </div>
 
@@ -87,14 +103,16 @@ export default async function CountryDetailPage({
             </div>
           ) : (
             <>
-              <div className="flex items-center justify-between gap-4 mb-4">
+              <div className="flex flex-wrap items-center justify-between gap-4 mb-4">
                 <h2 className="text-xl font-semibold tracking-tight">Sender</h2>
-                {totalCount > countryChannels.length && (
-                  <p className="text-sm text-[var(--muted-foreground)]">
-                    {countryChannels.length} von {formatNumber(totalCount)}
-                  </p>
-                )}
+                <Link
+                  href={`/channels?country=${cc}`}
+                  className="text-sm font-medium text-[var(--primary)] hover:underline underline-offset-4"
+                >
+                  Alle durchsuchen
+                </Link>
               </div>
+
               <div className="surface-card overflow-hidden">
                 <div className="overflow-x-auto">
                   <table className="w-full text-sm">
@@ -138,6 +156,41 @@ export default async function CountryDetailPage({
                   </table>
                 </div>
               </div>
+
+              {totalPages > 1 && (
+                <nav
+                  className="flex items-center justify-between gap-4 mt-6"
+                  aria-label="Sender-Seiten"
+                >
+                  <p className="text-sm text-[var(--muted-foreground)] tabular-nums">
+                    Seite {safePage} von {totalPages} · {formatNumber(totalCount)} Sender
+                  </p>
+                  <div className="flex gap-2">
+                    {safePage > 1 ? (
+                      <Link
+                        href={safePage === 2 ? pageBase : `${pageBase}?page=${safePage - 1}`}
+                        className="inline-flex items-center gap-1 h-9 px-3 rounded-lg border border-[var(--border)] text-sm hover:bg-[var(--surface-muted)] transition-colors"
+                      >
+                        <ChevronLeft className="h-4 w-4" aria-hidden />
+                        Zurück
+                      </Link>
+                    ) : (
+                      <span className="inline-flex items-center h-9 px-3 text-sm text-[var(--muted-foreground)] opacity-50">
+                        Zurück
+                      </span>
+                    )}
+                    {safePage < totalPages ? (
+                      <Link
+                        href={`${pageBase}?page=${safePage + 1}`}
+                        className="inline-flex items-center gap-1 h-9 px-3 rounded-lg border border-[var(--border)] text-sm hover:bg-[var(--surface-muted)] transition-colors"
+                      >
+                        Weiter
+                        <ChevronRight className="h-4 w-4" aria-hidden />
+                      </Link>
+                    ) : null}
+                  </div>
+                </nav>
+              )}
             </>
           )}
         </div>
