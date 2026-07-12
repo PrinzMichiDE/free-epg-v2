@@ -24,6 +24,22 @@ services:
     networks:
       - freeepg-internal
 
+  db-seed:
+    image: ${DOCKERHUB_USER:-freeepg}/freeepg-worker:${IMAGE_TAG:-latest}
+    env_file:
+      - stack.env
+    environment:
+      DATABASE_URL: ${DATABASE_URL}
+    command: ["node", "dist/seed-cli.js"]
+    depends_on:
+      db-init:
+        condition: service_completed_successfully
+      postgres:
+        condition: service_healthy
+    restart: "no"
+    networks:
+      - freeepg-internal
+
   web:
     image: ${DOCKERHUB_USER:-freeepg}/freeepg-web:${IMAGE_TAG:-latest}
     env_file:
@@ -45,7 +61,7 @@ services:
     volumes:
       - epg-data:/data/epg
     depends_on:
-      db-init:
+      db-seed:
         condition: service_completed_successfully
       postgres:
         condition: service_healthy
@@ -67,7 +83,7 @@ services:
     volumes:
       - epg-data:/data/epg
     depends_on:
-      db-init:
+      db-seed:
         condition: service_completed_successfully
       postgres:
         condition: service_healthy

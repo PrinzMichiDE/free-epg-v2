@@ -17,6 +17,10 @@
     "./init": {
       "types": "./dist/docker-init.d.ts",
       "import": "./dist/docker-init.js"
+    },
+    "./seed": {
+      "types": "./dist/seed.d.ts",
+      "import": "./dist/seed.js"
     }
   },
   "scripts": {
