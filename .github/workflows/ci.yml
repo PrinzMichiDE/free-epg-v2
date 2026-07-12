@@ -38,4 +38,5 @@ jobs:
           npm run typecheck -w @freeepg/worker
 
       - name: Docker build check
+        if: github.event_name == 'pull_request'
         run: docker compose build
