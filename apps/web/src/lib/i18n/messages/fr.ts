@@ -96,4 +96,10 @@ export const fr = {
   "player.loadErrorTitle": "Player unavailable",
   "player.disclaimer":
     "Streams are provided by third parties. Availability and geo-blocking are outside FreeEPG's control.",
+
+  "player.epg.title": "Program guide",
+  "player.epg.now": "Now",
+  "player.epg.next": "Up next",
+  "player.epg.loading": "Loading EPG…",
+  "player.epg.noData": "No EPG data available for this channel.",
 } as const;

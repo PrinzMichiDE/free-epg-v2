@@ -94,6 +94,11 @@ export const de = {
   "player.loadErrorTitle": "Player nicht verfügbar",
   "player.disclaimer":
     "Streams stammen von Drittanbietern. Verfügbarkeit und Geo-Blocking liegen außerhalb von FreeEPG.",
+  "player.epg.title": "Programm",
+  "player.epg.now": "Jetzt",
+  "player.epg.next": "Als Nächstes",
+  "player.epg.loading": "EPG wird geladen…",
+  "player.epg.noData": "Keine EPG-Daten für diesen Sender verfügbar.",
 } as const;
 
 export type MessageKey = keyof typeof de;

@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import Link from "next/link";
 import { ChevronLeft, Play, Search, Tv } from "lucide-react";
 import { TvPlayer } from "@/components/player/TvPlayer";
+import { ChannelEpgPanel } from "@/components/player/ChannelEpgPanel";
 import { cn } from "@/lib/utils";
 import { useI18n } from "@/lib/i18n/I18nProvider";
 import type { PlaylistPlayerData, PlaylistPlayerEntry } from "@/lib/playlists";
@@ -80,14 +81,10 @@ export function PlaylistWatchView({ playlist, backHref }: PlaylistWatchViewProps
           />
 
           {activeChannel && (
-            <div className="rounded-xl border border-[var(--border)] bg-[var(--card)] p-4">
-              <p className="font-semibold tracking-tight">{activeChannel.title}</p>
-              {activeChannel.groupTitle && (
-                <p className="text-sm text-[var(--muted-foreground)] mt-1">
-                  {activeChannel.groupTitle}
-                </p>
-              )}
-            </div>
+            <ChannelEpgPanel
+              tvgId={activeChannel.tvgId}
+              channelTitle={activeChannel.title}
+            />
           )}
 
           <p className="text-xs text-[var(--muted-foreground)] leading-relaxed">

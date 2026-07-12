@@ -36,6 +36,20 @@ Nicht im Scope: Jeder Einzel-Commit ohne betriebliche Relevanz.
 
 ## Detailbeschreibung
 
+### Eintrag CHG-2026-006: EPG im TV Player
+
+| Feld | Inhalt |
+|------|--------|
+| Datum | 2026-07-12 |
+| Version | App-Release (Web) |
+| Begründung | Nutzer sollen beim Abspielen sehen, welches Programm gerade läuft und was als Nächstes kommt |
+| Auswirkung | `ChannelEpgPanel` unter dem Video; API `GET /api/channels/{xmltvId}` liefert `current` + `upcoming` aus DB; Fortschrittsbalken für laufende Sendung |
+| Risiko | niedrig (EPG nur verfügbar, wenn Worker Programme in DB gespeichert hat) |
+| Betroffene Komponenten | `apps/web` (Player, channel-epg lib, channels API) |
+| Prüfung | `npm run typecheck -w @freeepg/web`; manuell Sender mit EPG in `/playlists/de/watch` |
+| Freigabe | Product Owner |
+| Rollback | Vorheriges Web-Image |
+
 ### Eintrag CHG-2026-005: TV Player für Playlists
 
 | Feld | Inhalt |
