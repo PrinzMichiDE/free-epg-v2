@@ -1,6 +1,11 @@
+# Production stack — requires stack.env for compose interpolation and service env:
+#   docker compose --env-file stack.env -f docker-compose.prod.yml up -d
+
 services:
   web:
     image: ${DOCKERHUB_USER:-freeepg}/freeepg-web:${IMAGE_TAG:-latest}
+    env_file:
+      - stack.env
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.freeepg.rule=Host(`free-epg.de`) || Host(`www.free-epg.de`)"
@@ -8,15 +13,6 @@ services:
       - "traefik.http.routers.freeepg.tls.certresolver=myresolver"
       - "traefik.http.services.freeepg.loadbalancer.server.port=3000"
       - "traefik.docker.network=proxy-public"
-    environment:
-      DATABASE_URL: postgresql://freeepg:${POSTGRES_PASSWORD:-freeepg}@postgres:5432/freeepg
-      REDIS_URL: redis://redis:6379
-      EPG_DATA_DIR: /data/epg
-      NEXTAUTH_URL: https://free-epg.de
-      NEXTAUTH_SECRET: ${NEXTAUTH_SECRET}
-      ADMIN_EMAIL: ${ADMIN_EMAIL}
-      ADMIN_PASSWORD: ${ADMIN_PASSWORD}
-      ANALYTICS_ENABLED: ${ANALYTICS_ENABLED:-true}
     volumes:
       - epg-data:/data/epg
     depends_on:
@@ -30,11 +26,8 @@ services:
 
   worker:
     image: ${DOCKERHUB_USER:-freeepg}/freeepg-worker:${IMAGE_TAG:-latest}
-    environment:
-      DATABASE_URL: postgresql://freeepg:${POSTGRES_PASSWORD:-freeepg}@postgres:5432/freeepg
-      REDIS_URL: redis://redis:6379
-      EPG_DATA_DIR: /data/epg
-      FETCH_ON_START: ${FETCH_ON_START:-true}
+    env_file:
+      - stack.env
     volumes:
       - epg-data:/data/epg
     depends_on:
@@ -47,9 +40,10 @@ services:
 
   postgres:
     image: postgres:16-alpine
+    env_file:
+      - stack.env
     environment:
       POSTGRES_USER: freeepg
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-freeepg}
       POSTGRES_DB: freeepg
     volumes:
       - pgdata:/var/lib/postgresql/data

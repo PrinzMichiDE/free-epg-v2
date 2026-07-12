@@ -22,10 +22,10 @@ docker compose up -d --build
 ## Prod (Docker Hub + Traefik)
 
 ```bash
-cp .env.example .env
-# NEXTAUTH_SECRET, ADMIN_PASSWORD setzen
-docker compose -f docker-compose.prod.yml pull
-docker compose -f docker-compose.prod.yml up -d
+cp stack.env.example stack.env
+# POSTGRES_PASSWORD, NEXTAUTH_SECRET, ADMIN_PASSWORD in stack.env setzen
+docker compose --env-file stack.env -f docker-compose.prod.yml pull
+docker compose --env-file stack.env -f docker-compose.prod.yml up -d
 # → https://free-epg.de
 ```
 
@@ -48,6 +48,11 @@ packages/epg-core, epg-sources, analytics, m3u-matcher
 | `GET /api/health` | Health Check |
 
 ## Seed
+
+On first deploy the stack auto-migrates and seeds channel metadata (`SEED_ON_START=true` in `stack.env`).
+The worker fetches EPG XML on start when `FETCH_ON_START=true`.
+
+Manual:
 
 ```bash
 npm run db:migrate

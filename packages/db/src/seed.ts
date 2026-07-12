@@ -21,7 +21,7 @@ async function fetchCountries(): Promise<Array<{ code: string; name: string }>> 
   return res.json() as Promise<Array<{ code: string; name: string }>>;
 }
 
-async function seed() {
+export async function runSeed() {
   const db = getDb();
 
   console.log("Fetching iptv-org metadata...");
@@ -77,7 +77,13 @@ async function seed() {
   await closeDb();
 }
 
-seed().catch((err) => {
-  console.error(err);
-  process.exit(1);
-});
+const isDirectRun =
+  typeof process.argv[1] === "string" &&
+  (process.argv[1].endsWith("seed.js") || process.argv[1].endsWith("seed.ts"));
+
+if (isDirectRun) {
+  runSeed().catch((err) => {
+    console.error(err);
+    process.exit(1);
+  });
+}

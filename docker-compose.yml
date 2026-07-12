@@ -14,6 +14,7 @@ services:
       ADMIN_EMAIL: ${ADMIN_EMAIL:-admin@free-epg.de}
       ADMIN_PASSWORD: ${ADMIN_PASSWORD:-admin}
       ANALYTICS_ENABLED: ${ANALYTICS_ENABLED:-true}
+      SEED_ON_START: ${SEED_ON_START:-true}
     volumes:
       - epg-data:/data/epg
     depends_on:
@@ -37,7 +38,8 @@ services:
       DATABASE_URL: postgresql://freeepg:freeepg@postgres:5432/freeepg
       REDIS_URL: redis://redis:6379
       EPG_DATA_DIR: /data/epg
-      FETCH_ON_START: ${FETCH_ON_START:-false}
+      FETCH_ON_START: ${FETCH_ON_START:-true}
+      SEED_ON_START: ${SEED_ON_START:-true}
       CRON_COUNTRY_FETCH: ${CRON_COUNTRY_FETCH:-0 */6 * * *}
     volumes:
       - epg-data:/data/epg

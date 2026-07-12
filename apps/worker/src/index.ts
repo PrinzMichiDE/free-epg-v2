@@ -22,6 +22,7 @@ import {
 import { AnalyticsTracker } from "@freeepg/analytics";
 
 import { Redis } from "ioredis";
+import { pathToFileURL } from "node:url";
 
 const redisUrl = process.env.REDIS_URL ?? "redis://localhost:6379";
 const redisClient = new Redis(redisUrl);
@@ -168,6 +169,14 @@ function parseXmltvDate(s: string): Date | null {
   return new Date(`${y}-${mo}-${d}T${h}:${mi}:${se}Z`);
 }
 
+async function main() {
+  const initPath = path.join(process.cwd(), "packages/db/dist/docker-init.js");
+  const { runDockerInit } = await import(pathToFileURL(initPath).href);
+  await runDockerInit();
+
+  console.log("FreeEPG worker started");
+  console.log(`EPG data dir: ${epgDataDir}`);
+
 const worker = new Worker(
   "epg-jobs",
   async (job) => {
@@ -218,11 +227,14 @@ cron.schedule(process.env.CRON_ANALYTICS_CLEANUP ?? "0 3 * * 0", () => {
   epgQueue.add("analytics-cleanup", {}, { attempts: 1 });
 });
 
-console.log("FreeEPG worker started");
-console.log(`EPG data dir: ${epgDataDir}`);
-
 if (process.env.FETCH_ON_START === "true") {
   epgQueue.add("fetch-all-countries", {}, { attempts: 1 });
 }
+}
+
+main().catch((err) => {
+  console.error("Worker failed to start:", err);
+  process.exit(1);
+});
 
 export { epgQueue, saveXml, epgDataDir };

@@ -36,6 +36,20 @@ Nicht im Scope: Jeder Einzel-Commit ohne betriebliche Relevanz.
 
 ## Detailbeschreibung
 
+### Eintrag CHG-2026-002: Production-Env über stack.env
+
+| Feld | Inhalt |
+|------|--------|
+| Datum | 2026-07-12 |
+| Version | Betriebskonfiguration (kein App-Release) |
+| Begründung | Trennung von Dev-`.env` und Prod-Secrets; einheitliches Deployment-Muster mit Traefik-Stacks |
+| Auswirkung | `docker-compose.prod.yml` lädt `stack.env` via `env_file`; Compose-Interpolation via `--env-file stack.env`; neue Vorlage `stack.env.example` |
+| Risiko | niedrig (Breaking nur für bestehende Prod-Deployments, die bisher `.env` nutzten) |
+| Betroffene Komponenten | `docker-compose.prod.yml`, `stack.env.example`, `README.md`, `.gitignore` |
+| Prüfung | `docker compose --env-file stack.env.example -f docker-compose.prod.yml config` |
+| Freigabe | Betrieb |
+| Rollback | `.env` wieder verwenden oder `stack.env` aus Backup; Compose-Befehl mit `--env-file stack.env` |
+
 ### Eintrag CHG-2026-001: Initiale Internal-Docs-Struktur
 
 | Feld | Inhalt |
@@ -91,8 +105,8 @@ flowchart TD
 
 ### Rollback-Verfahren Prod
 
-1. Vorherigen stabilen `IMAGE_TAG` in `.env` setzen (z. B. semver oder `sha-*`).
-2. `docker compose -f docker-compose.prod.yml pull && up -d`.
+1. Vorherigen stabilen `IMAGE_TAG` in `stack.env` setzen (z. B. semver oder `sha-*`).
+2. `docker compose --env-file stack.env -f docker-compose.prod.yml pull && up -d`.
 3. DB-Migrationen sind forward-only (Drizzle); Rollback erfordert DB-Restore aus Backup bei breaking migrations.
 4. EPG-Volume `epg-data` bleibt erhalten; ggf. manuell konsistent halten.
 
