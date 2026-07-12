@@ -1,6 +1,6 @@
-import { Heart } from "lucide-react";
+import { Coffee, Heart } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { PAYPAL_DONATE_LABEL, PAYPAL_DONATE_URL } from "@/lib/site";
+import { DONATE_OPTIONS } from "@/lib/site";
 
 interface DonateButtonProps {
   variant?: "primary" | "outline";
@@ -21,6 +21,11 @@ const sizes = {
   md: "h-10 px-4 text-sm gap-2",
 };
 
+const icons = {
+  paypal: Heart,
+  kofi: Coffee,
+} as const;
+
 export function DonateButton({
   variant = "outline",
   size = "sm",
@@ -28,25 +33,32 @@ export function DonateButton({
   showAmount = false,
 }: DonateButtonProps) {
   return (
-    <a
-      href={PAYPAL_DONATE_URL}
-      target="_blank"
-      rel="noopener noreferrer"
-      aria-label={`Spenden — ${PAYPAL_DONATE_LABEL}`}
-      className={cn(
-        "inline-flex items-center justify-center rounded-lg font-medium transition-opacity duration-200 cursor-pointer",
-        variants[variant],
-        sizes[size],
-        className
-      )}
-    >
-      <Heart className="h-4 w-4 shrink-0" aria-hidden />
-      <span>Spenden</span>
-      {showAmount && (
-        <span className="text-[var(--muted-foreground)] font-normal">
-          ({PAYPAL_DONATE_LABEL})
-        </span>
-      )}
-    </a>
+    <div className={cn("inline-flex flex-wrap items-center gap-2", className)}>
+      {DONATE_OPTIONS.map((option) => {
+        const Icon = icons[option.id];
+        return (
+          <a
+            key={option.id}
+            href={option.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label={option.ariaLabel}
+            className={cn(
+              "inline-flex items-center justify-center rounded-lg font-medium transition-opacity duration-200 cursor-pointer",
+              variants[variant],
+              sizes[size]
+            )}
+          >
+            <Icon className="h-4 w-4 shrink-0" aria-hidden />
+            <span>{option.label}</span>
+            {showAmount && option.amountLabel && (
+              <span className="text-[var(--muted-foreground)] font-normal">
+                ({option.amountLabel})
+              </span>
+            )}
+          </a>
+        );
+      })}
+    </div>
   );
 }

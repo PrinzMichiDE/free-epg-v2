@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { Github } from "lucide-react";
 import { DonateButton } from "@/components/layout/DonateButton";
-import { PAYPAL_DONATE_LABEL } from "@/lib/site";
 
 const links = [
   { href: "/docs", label: "Dokumentation" },
@@ -22,7 +21,7 @@ export function Footer() {
           </p>
           <DonateButton variant="outline" size="sm" showAmount />
           <p className="text-xs text-[var(--muted-foreground)] mt-2">
-            Freiwillige Spende ({PAYPAL_DONATE_LABEL}) für Betrieb und Weiterentwicklung.
+            Freiwillige Spende via PayPal oder Ko-fi für Betrieb und Weiterentwicklung.
           </p>
         </div>
 
