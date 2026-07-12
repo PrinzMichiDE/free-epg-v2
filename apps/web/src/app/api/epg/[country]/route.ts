@@ -7,9 +7,16 @@ export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ country: string }> }
 ) {
-  const { country: raw } = await params;
+  const { country: paramCountry } = await params;
+  const format = request.nextUrl.searchParams.get("format");
+  const rawFromPath = request.nextUrl.pathname.match(/\/api\/epg\/([^/]+)\/?$/)?.[1];
+  const raw = decodeURIComponent(rawFromPath ?? paramCountry);
   const country = raw.replace(/\.xml\.gz$|\.xml$/i, "").toUpperCase();
-  const wantsGzip = raw.endsWith(".gz") || request.headers.get("accept-encoding")?.includes("gzip");
+  const wantsGzip =
+    raw.endsWith(".gz") ||
+    format === "gz" ||
+    request.nextUrl.searchParams.get("gzip") === "1" ||
+    request.headers.get("accept-encoding")?.includes("gzip") === true;
 
   try {
     await ensureCountryXml(country);

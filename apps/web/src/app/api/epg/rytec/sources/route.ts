@@ -2,6 +2,8 @@ import { buildRytecSourcesXml, rytecCountryCode } from "@freeepg/epg-core";
 import { EPG_PW_COUNTRIES } from "@freeepg/epg-sources";
 import { BASE_URL } from "@/lib/utils";
 
+export const dynamic = "force-dynamic";
+
 const COUNTRY_LABELS: Record<string, string> = {
   AU: "Australia",
   BR: "Brazil",

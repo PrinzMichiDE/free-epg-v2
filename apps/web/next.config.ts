@@ -11,6 +11,30 @@ const nextConfig: NextConfig = {
   ],
   output: "standalone",
   serverExternalPackages: ["postgres", "ioredis", "bullmq"],
+  async rewrites() {
+    return [
+      {
+        source: "/api/epg/rytec/:country.xml.gz",
+        destination: "/api/epg/rytec/:country?format=gz",
+      },
+      {
+        source: "/api/epg/rytec/:country.xml",
+        destination: "/api/epg/rytec/:country",
+      },
+      {
+        source: "/api/epg/rytec/channels/:country.xml",
+        destination: "/api/epg/rytec/channels/:country",
+      },
+      {
+        source: "/api/epg/:country.xml.gz",
+        destination: "/api/epg/:country?format=gz",
+      },
+      {
+        source: "/api/epg/:country.xml",
+        destination: "/api/epg/:country",
+      },
+    ];
+  },
 };
 
 export default nextConfig;

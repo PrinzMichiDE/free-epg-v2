@@ -1,28 +1,58 @@
 import { NextRequest } from "next/server";
+import { EPG_PW_COUNTRIES } from "@freeepg/epg-sources";
+import {
+  parseRytecCountryRequest,
+  readCountryRytecPayload,
+} from "@/lib/ensure-epg";
 import { streamFileResponse } from "@/lib/xml-response";
 import { countryRytecGzipPath, countryRytecPath } from "@/lib/epg-paths";
-import { ensureCountryRytec } from "@/lib/ensure-epg";
+import { existsSync } from "node:fs";
+
+export const dynamic = "force-dynamic";
 
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ country: string }> }
 ) {
-  const { country: raw } = await params;
-  const country = raw.replace(/\.xml\.gz$|\.xml$/i, "").toUpperCase();
-  const wantsGzip = raw.endsWith(".gz") || request.headers.get("accept-encoding")?.includes("gzip");
+  const { country: paramCountry } = await params;
+  const format = request.nextUrl.searchParams.get("format");
+  const { country, wantsGzip: gzipFromPath, raw } = parseRytecCountryRequest(
+    request.nextUrl.pathname,
+    paramCountry
+  );
+  const wantsGzip =
+    gzipFromPath || format === "gz" || request.nextUrl.searchParams.get("gzip") === "1";
 
-  try {
-    await ensureCountryRytec(country);
-  } catch {
-    return new Response("Rytec EPG not found for this country", { status: 404 });
+  if (!EPG_PW_COUNTRIES.includes(country)) {
+    return new Response(`Unknown country: ${raw}`, { status: 404 });
   }
 
-  const filePath = wantsGzip ? countryRytecGzipPath(country) : countryRytecPath(country);
-  const ifNoneMatch = request.headers.get("if-none-match");
+  const gzipPath = countryRytecGzipPath(country);
+  const xmlPath = countryRytecPath(country);
+  const diskPath = wantsGzip ? gzipPath : xmlPath;
 
-  return streamFileResponse(
-    filePath,
-    wantsGzip ? "application/gzip" : "application/xml; charset=utf-8",
-    { gzip: wantsGzip, ifNoneMatch }
-  );
+  if (existsSync(diskPath)) {
+    return streamFileResponse(
+      diskPath,
+      wantsGzip ? "application/gzip" : "application/xml; charset=utf-8",
+      { gzip: wantsGzip, ifNoneMatch: request.headers.get("if-none-match") }
+    );
+  }
+
+  try {
+    const payload = await readCountryRytecPayload(country, wantsGzip);
+    const body = typeof payload === "string" ? payload : new Uint8Array(payload);
+
+    return new Response(body, {
+      headers: {
+        "Content-Type": wantsGzip
+          ? "application/gzip"
+          : "application/xml; charset=utf-8",
+        "Cache-Control": "public, max-age=3600",
+      },
+    });
+  } catch (err) {
+    console.error(`[rytec] ${country}:`, err);
+    return new Response("Rytec EPG not found for this country", { status: 404 });
+  }
 }

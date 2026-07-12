@@ -2,14 +2,25 @@ import { NextRequest } from "next/server";
 import { eq } from "drizzle-orm";
 import { buildRytecChannelsXml } from "@freeepg/epg-core";
 import { channels } from "@freeepg/db";
+import { EPG_PW_COUNTRIES } from "@freeepg/epg-sources";
 import { getDatabase } from "@/lib/db";
+import { parseRytecChannelsRequest } from "@/lib/ensure-epg";
+
+export const dynamic = "force-dynamic";
 
 export async function GET(
-  _request: NextRequest,
+  request: NextRequest,
   { params }: { params: Promise<{ country: string }> }
 ) {
-  const { country: raw } = await params;
-  const country = raw.replace(/\.xml$/i, "").toUpperCase();
+  const { country: paramCountry } = await params;
+  const country = parseRytecChannelsRequest(
+    request.nextUrl.pathname,
+    paramCountry
+  );
+
+  if (!EPG_PW_COUNTRIES.includes(country)) {
+    return new Response("Unknown country", { status: 404 });
+  }
 
   const db = getDatabase();
   const rows = await db
