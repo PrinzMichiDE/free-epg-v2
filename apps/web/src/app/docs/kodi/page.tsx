@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 export default function KodiDocsPage() {
   return (
     <article>
@@ -10,7 +12,7 @@ export default function KodiDocsPage() {
       </ol>
       <p>
         Tipp: Nutze den{" "}
-        <a href="/m3u">M3U Matcher</a> um tvg-ids automatisch anzupassen.
+        <Link href="/m3u">M3U Matcher</Link> um tvg-ids automatisch anzupassen.
       </p>
     </article>
   );

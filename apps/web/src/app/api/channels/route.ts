@@ -1,7 +1,7 @@
 import { NextRequest } from "next/server";
 import { sql, eq, ilike, or, and } from "drizzle-orm";
 import { getDatabase } from "@/lib/db";
-import { channels, programmes } from "@freeepg/db";
+import { channels } from "@freeepg/db";
 
 export async function GET(request: NextRequest) {
   const db = getDatabase();

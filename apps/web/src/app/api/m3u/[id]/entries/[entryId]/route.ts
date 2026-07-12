@@ -1,7 +1,6 @@
 import { eq } from "drizzle-orm";
 import { getDatabase } from "@/lib/db";
 import {
-  m3uPlaylists,
   m3uEntries,
   m3uMatchOverrides,
   channels,

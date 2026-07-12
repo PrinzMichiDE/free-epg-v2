@@ -1,7 +1,6 @@
 import { EpgPwAdapter } from "@freeepg/epg-sources";
 import { buildXmltv } from "@freeepg/epg-core";
 import { streamFileResponse } from "@/lib/xml-response";
-import { countryGzipPath } from "@/lib/epg-paths";
 import { writeFile, mkdir } from "node:fs/promises";
 import path from "node:path";
 import { gzipSync } from "node:zlib";

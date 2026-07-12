@@ -1,7 +1,6 @@
 import { eq } from "drizzle-orm";
 import { getDatabase } from "@/lib/db";
 import { m3uPlaylists, m3uEntries } from "@freeepg/db";
-import { enrichM3u, matchM3uEntries } from "@freeepg/m3u-matcher";
 import { BASE_URL } from "@/lib/utils";
 
 export async function GET(

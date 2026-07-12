@@ -12,12 +12,10 @@ import {
   parseM3u,
   matchM3uEntries,
   enrichM3u,
-  normalizeChannelName,
 } from "@freeepg/m3u-matcher";
 import {
   buildXmltv,
   filterXmltvByChannelIds,
-  parseXmltv,
 } from "@freeepg/epg-core";
 import { EpgPwAdapter } from "@freeepg/epg-sources";
 import { writeFile, mkdir } from "node:fs/promises";

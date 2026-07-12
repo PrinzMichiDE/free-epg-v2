@@ -6,8 +6,6 @@ import {
   epgSources,
   epgJobs,
   channels,
-  analyticsDaily,
-  analyticsEvents,
 } from "@freeepg/db";
 
 export async function GET() {

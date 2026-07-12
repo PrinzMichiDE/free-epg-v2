@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 export default function M3uDocsPage() {
   return (
     <article>
@@ -8,7 +10,7 @@ export default function M3uDocsPage() {
       </p>
       <h2>Schritte</h2>
       <ol>
-        <li>Gehe zu <a href="/m3u">M3U Matcher</a></li>
+        <li>Gehe zu <Link href="/m3u">M3U Matcher</Link></li>
         <li>Datei hochladen oder URL eingeben</li>
         <li>Matches prüfen (grün/gelb/rot)</li>
         <li>Angereicherte M3U herunterladen</li>

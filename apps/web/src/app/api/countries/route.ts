@@ -1,6 +1,6 @@
-import { sql, eq, ilike, or, desc } from "drizzle-orm";
+import { sql } from "drizzle-orm";
 import { getDatabase } from "@/lib/db";
-import { channels, generatedFiles, epgSources, epgJobs } from "@freeepg/db";
+import { channels, generatedFiles } from "@freeepg/db";
 import { EPG_PW_COUNTRIES } from "@freeepg/epg-sources";
 
 export async function GET() {

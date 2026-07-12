@@ -1,4 +1,4 @@
-import { sql, eq } from "drizzle-orm";
+import { sql } from "drizzle-orm";
 import { getDatabase } from "@/lib/db";
 import { channels, generatedFiles } from "@freeepg/db";
 import { EPG_PW_COUNTRIES } from "@freeepg/epg-sources";
