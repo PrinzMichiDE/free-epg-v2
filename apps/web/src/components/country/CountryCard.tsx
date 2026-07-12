@@ -6,6 +6,8 @@ import { Check, Clock, Copy, ExternalLink } from "lucide-react";
 import { cn, formatNumber, formatDate } from "@/lib/utils";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
+import { CountryFlag } from "@/components/country/CountryFlag";
+import { getCountryName } from "@/lib/countries";
 
 interface CountryCardProps {
   code: string;
@@ -39,16 +41,13 @@ export function CountryCard({
     <article className="surface-card p-5 flex flex-col gap-4 hover:shadow-md transition-shadow duration-200">
       <div className="flex items-start justify-between gap-3">
         <div className="flex items-center gap-3 min-w-0">
-          <div
-            className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-[var(--surface-muted)] font-mono text-sm font-semibold text-[var(--primary)]"
-            aria-hidden
-          >
-            {code}
-          </div>
+          <CountryFlag code={code} size="md" />
           <div className="min-w-0">
-            <h3 className="font-semibold text-base tracking-tight">{code}</h3>
+            <h3 className="font-semibold text-base tracking-tight truncate">
+              {getCountryName(code)}
+            </h3>
             <p className="text-sm text-[var(--muted-foreground)]">
-              {formatNumber(channelCount)} Sender
+              {code} · {formatNumber(channelCount)} Sender
             </p>
           </div>
         </div>

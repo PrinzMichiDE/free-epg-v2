@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { EpgFeedsPanel } from "@/components/epg/EpgFeedsPanel";
 import { Badge } from "@/components/ui/Badge";
+import { CountryFlag } from "@/components/country/CountryFlag";
+import { getCountryName } from "@/lib/countries";
 import { getDatabase } from "@/lib/db";
 import { channels } from "@freeepg/db";
 import { EPG_PW_COUNTRIES } from "@freeepg/epg-sources";
@@ -49,16 +51,17 @@ export default async function CountryDetailPage({
   return (
     <div className="page-shell py-10 sm:py-14">
       <header className="mb-10">
-        <div className="flex flex-wrap items-center gap-3 mb-3">
-          <span className="flex h-12 w-12 items-center justify-center rounded-xl bg-[var(--surface-muted)] font-mono text-base font-semibold text-[var(--primary)]">
-            {cc}
-          </span>
+        <div className="flex flex-wrap items-center gap-4 mb-3">
+          <CountryFlag code={cc} size="lg" />
           <div>
-            <h1 className="text-3xl sm:text-4xl font-semibold tracking-tight">{cc}</h1>
-            <p className="text-[var(--muted-foreground)] mt-1">
+            <h1 className="text-3xl sm:text-4xl font-semibold tracking-tight">
+              {getCountryName(cc)}
+            </h1>
+            <p className="text-[var(--muted-foreground)] mt-1 font-mono text-sm">
+              {cc}
               {dbUnavailable
-                ? "Senderdaten vorübergehend nicht verfügbar"
-                : `${formatNumber(totalCount)} Sender in der Datenbank`}
+                ? " · Senderdaten vorübergehend nicht verfügbar"
+                : ` · ${formatNumber(totalCount)} Sender`}
             </p>
           </div>
         </div>

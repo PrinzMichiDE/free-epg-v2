@@ -7,6 +7,7 @@ const nextConfig: NextConfig = {
     "@freeepg/epg-sources",
     "@freeepg/analytics",
     "@freeepg/m3u-matcher",
+    "country-flag-icons",
   ],
   output: "standalone",
   serverExternalPackages: ["postgres", "ioredis", "bullmq"],
