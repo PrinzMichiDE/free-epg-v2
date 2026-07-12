@@ -36,6 +36,20 @@ Nicht im Scope: Jeder Einzel-Commit ohne betriebliche Relevanz.
 
 ## Detailbeschreibung
 
+### Eintrag CHG-2026-005: TV Player für Playlists
+
+| Feld | Inhalt |
+|------|--------|
+| Datum | 2026-07-12 |
+| Version | App-Release (Web) |
+| Begründung | Nutzer sollen ausgewählte Playlists direkt im Browser abspielen können, ohne externe IPTV-App |
+| Auswirkung | Neue Routen `/playlists/{code}/watch`, `/playlists/world/watch`; API `GET /api/playlists/{code}/entries` (JSON); Stream-Proxy `GET /api/player/stream`; hls.js-Integration; „Abspielen“-Buttons auf Playlist-Karten und Detailseiten |
+| Risiko | mittel (Streams von Drittanbietern; Proxy-Bandbreite; Geo-Blocking/CORS können einzelne Sender blockieren) |
+| Betroffene Komponenten | `apps/web` (Player-Komponenten, playlists API, stream-proxy) |
+| Prüfung | `npm run typecheck -w @freeepg/web`; manuell `/playlists/de/watch`, Senderwechsel, Suche |
+| Freigabe | Product Owner |
+| Rollback | Vorheriges Web-Image |
+
 ### Eintrag CHG-2026-004: Mehrsprachigkeit (Top-20) und Admin aus Navigation
 
 | Feld | Inhalt |

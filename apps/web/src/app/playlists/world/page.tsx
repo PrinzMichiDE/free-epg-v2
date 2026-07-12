@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { ChevronLeft, Globe2, ListMusic } from "lucide-react";
+import { WatchPlaylistButton } from "@/components/player/WatchPlaylistButton";
 import { XmlUrlBox } from "@/components/epg/XmlUrlBox";
 import { Badge } from "@/components/ui/Badge";
 import { ButtonLink } from "@/components/ui/ButtonLink";
@@ -79,6 +80,7 @@ export default async function WorldPlaylistPage() {
       </div>
 
       <div className="flex flex-wrap gap-3">
+        <WatchPlaylistButton href="/playlists/world/watch" />
         <ButtonLink href={world.m3uUrl} size="md" download>
           <ListMusic className="h-4 w-4" aria-hidden />
           M3U herunterladen

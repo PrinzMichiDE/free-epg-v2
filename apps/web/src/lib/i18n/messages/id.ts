@@ -81,4 +81,19 @@ export const id = {
   "error.notFound.desc": "Halaman yang diminta tidak ada.",
   "error.page.title": "Halaman tidak dapat dimuat",
   "error.page.desc": "Terjadi kesalahan server. Silakan coba lagi.",
+
+  "player.watch": "Watch",
+  "player.badge": "TV Player",
+  "player.back": "Back to playlist",
+  "player.channelCount": "{count} channels",
+  "player.allChannels": "All channels",
+  "player.searchPlaceholder": "Search channels…",
+  "player.noResults": "No channels found.",
+  "player.loading": "Loading stream…",
+  "player.loadingPlaylist": "Loading playlist…",
+  "player.playbackError": "Playback failed. Stream may be unavailable or geo-blocked.",
+  "player.loadError": "Could not load the playlist.",
+  "player.loadErrorTitle": "Player unavailable",
+  "player.disclaimer":
+    "Streams are provided by third parties. Availability and geo-blocking are outside FreeEPG's control.",
 } as const;

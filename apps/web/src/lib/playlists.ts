@@ -11,6 +11,7 @@ import { channels } from "@freeepg/db";
 import {
   buildM3uPlaylist,
   pickBestStreamsPerChannel,
+  qualityScore,
   type PlaylistStreamEntry,
 } from "@freeepg/m3u-matcher";
 import { getDatabase } from "@/lib/db";
@@ -277,6 +278,152 @@ export async function buildWorldPlaylistM3u(): Promise<{
   };
 }
 
+export interface PlaylistPlayerEntry {
+  id: string;
+  tvgId: string;
+  title: string;
+  url: string;
+  groupTitle?: string;
+  referrer?: string;
+  userAgent?: string;
+}
+
+export interface PlaylistPlayerData {
+  code: string;
+  name: string;
+  epgUrl: string;
+  m3uUrl: string;
+  entries: PlaylistPlayerEntry[];
+}
+
+interface EnrichedStreamCandidate {
+  channelId: string;
+  title: string;
+  url: string;
+  quality?: string | null;
+  referrer?: string | null;
+  userAgent?: string | null;
+}
+
+function pickBestEnrichedStreams(
+  streams: EnrichedStreamCandidate[],
+  maxEntries = 3000
+): EnrichedStreamCandidate[] {
+  const best = new Map<string, EnrichedStreamCandidate>();
+
+  for (const stream of streams) {
+    const existing = best.get(stream.channelId);
+    if (
+      !existing ||
+      qualityScore(stream.quality) > qualityScore(existing.quality)
+    ) {
+      best.set(stream.channelId, stream);
+    }
+  }
+
+  return [...best.values()]
+    .sort((a, b) => a.title.localeCompare(b.title, "de"))
+    .slice(0, maxEntries);
+}
+
+function toPlayerEntries(
+  streams: EnrichedStreamCandidate[],
+  groupTitleFor?: (channelId: string) => string | undefined
+): PlaylistPlayerEntry[] {
+  return streams.map((stream, index) => ({
+    id: `${stream.channelId}-${index}`,
+    tvgId: stream.channelId,
+    title: stream.title,
+    url: stream.url,
+    groupTitle: groupTitleFor?.(stream.channelId),
+    referrer: stream.referrer ?? undefined,
+    userAgent: stream.userAgent ?? undefined,
+  }));
+}
+
+export async function getCountryPlaylistPlayerData(
+  countryCode: string
+): Promise<PlaylistPlayerData | null> {
+  const cc = countryCode.toUpperCase();
+  const [streams, channelMap, worldNames] = await Promise.all([
+    loadCachedStreams(),
+    loadChannelCountryMap(),
+    loadWorldCountryNames(),
+  ]);
+
+  const candidates: EnrichedStreamCandidate[] = streams
+    .filter((stream) => {
+      const channelId = stream.channel!;
+      return channelMap.get(channelId) === cc;
+    })
+    .map((stream) => ({
+      channelId: stream.channel!,
+      title: stream.title,
+      url: stream.url,
+      quality: stream.quality,
+      referrer: stream.referrer,
+      userAgent: stream.user_agent,
+    }));
+
+  if (candidates.length === 0) {
+    return null;
+  }
+
+  const picked = pickBestEnrichedStreams(candidates);
+  const countryLabel = playlistName(cc, worldNames);
+
+  return {
+    code: cc,
+    name: countryLabel,
+    epgUrl: resolveEpgUrl(cc),
+    m3uUrl: `/api/playlists/${cc.toLowerCase()}.m3u`,
+    entries: toPlayerEntries(picked, () => countryLabel),
+  };
+}
+
+export async function getWorldPlaylistPlayerData(): Promise<PlaylistPlayerData | null> {
+  const [streams, channelMap, worldNames] = await Promise.all([
+    loadCachedStreams(),
+    loadChannelCountryMap(),
+    loadWorldCountryNames(),
+  ]);
+
+  const candidates: EnrichedStreamCandidate[] = streams
+    .filter((stream) => channelMap.has(stream.channel!))
+    .map((stream) => ({
+      channelId: stream.channel!,
+      title: stream.title,
+      url: stream.url,
+      quality: stream.quality,
+      referrer: stream.referrer,
+      userAgent: stream.user_agent,
+    }));
+
+  if (candidates.length === 0) {
+    return null;
+  }
+
+  const picked = pickBestEnrichedStreams(candidates, WORLD_PLAYLIST_MAX_ENTRIES);
+  const sorted = [...picked].sort((a, b) => {
+    const countryA = playlistName(channelMap.get(a.channelId)!, worldNames);
+    const countryB = playlistName(channelMap.get(b.channelId)!, worldNames);
+    return (
+      countryA.localeCompare(countryB, "de") ||
+      a.title.localeCompare(b.title, "de")
+    );
+  });
+
+  return {
+    code: WORLD_PLAYLIST_SLUG,
+    name: "Weltweit — alle Länder",
+    epgUrl: `${BASE_URL}/api/epg`,
+    m3uUrl: `/api/playlists/${WORLD_PLAYLIST_SLUG}.m3u`,
+    entries: toPlayerEntries(sorted, (channelId) =>
+      playlistName(channelMap.get(channelId)!, worldNames)
+    ),
+  };
+}
+
 export async function getPlaylistCountry(
   countryCode: string
 ): Promise<PlaylistCountry | null> {
@@ -284,3 +431,4 @@ export async function getPlaylistCountry(
   const countries = await getPlaylistCountries();
   return countries.find((c) => c.code === cc) ?? null;
 }
+

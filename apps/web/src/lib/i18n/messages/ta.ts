@@ -81,4 +81,19 @@ export const ta = {
   "error.notFound.desc": "கோரப்பட்ட பக்கம் இல்லை.",
   "error.page.title": "பக்கத்தை ஏற்ற முடியவில்லை",
   "error.page.desc": "சேவையக பிழை ஏற்பட்டது. மீண்டும் முயற்சிக்கவும்.",
+
+  "player.watch": "Watch",
+  "player.badge": "TV Player",
+  "player.back": "Back to playlist",
+  "player.channelCount": "{count} channels",
+  "player.allChannels": "All channels",
+  "player.searchPlaceholder": "Search channels…",
+  "player.noResults": "No channels found.",
+  "player.loading": "Loading stream…",
+  "player.loadingPlaylist": "Loading playlist…",
+  "player.playbackError": "Playback failed. Stream may be unavailable or geo-blocked.",
+  "player.loadError": "Could not load the playlist.",
+  "player.loadErrorTitle": "Player unavailable",
+  "player.disclaimer":
+    "Streams are provided by third parties. Availability and geo-blocking are outside FreeEPG's control.",
 } as const;

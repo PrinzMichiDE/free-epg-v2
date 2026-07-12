@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Check, ExternalLink, ListMusic, Radio } from "lucide-react";
+import { Check, ExternalLink, ListMusic, Play, Radio } from "lucide-react";
 import { cn, formatNumber } from "@/lib/utils";
 import { Badge } from "@/components/ui/Badge";
 import { ButtonLink } from "@/components/ui/ButtonLink";
@@ -64,9 +64,20 @@ export function PlaylistCard({
 
       <div className="grid grid-cols-2 gap-2 mt-auto">
         <Link
-          href={`/playlists/${code.toLowerCase()}`}
+          href={`/playlists/${code.toLowerCase()}/watch`}
           className={cn(
             "col-span-2 flex items-center justify-center gap-1.5",
+            "h-10 rounded-lg text-sm font-medium",
+            "bg-[var(--primary)] text-[var(--primary-foreground)] hover:opacity-90 transition-opacity"
+          )}
+        >
+          <Play className="h-4 w-4" aria-hidden />
+          {t("player.watch")}
+        </Link>
+        <Link
+          href={`/playlists/${code.toLowerCase()}`}
+          className={cn(
+            "col-span-1 flex items-center justify-center gap-1.5",
             "h-10 rounded-lg border border-[var(--border)] text-sm font-medium",
             "text-[var(--foreground)] hover:bg-[var(--surface-muted)] transition-colors duration-200"
           )}
@@ -76,21 +87,13 @@ export function PlaylistCard({
         </Link>
         <ButtonLink
           href={m3uUrl}
-          variant="primary"
+          variant="outline"
           size="sm"
           className="col-span-1 w-full"
           download
         >
           <ListMusic className="h-4 w-4" aria-hidden />
           {t("common.m3u")}
-        </ButtonLink>
-        <ButtonLink
-          href={epgUrl.replace(/^https?:\/\/[^/]+/, "")}
-          variant="outline"
-          size="sm"
-          className="col-span-1 w-full"
-        >
-          {t("common.epg")}
         </ButtonLink>
       </div>
     </article>

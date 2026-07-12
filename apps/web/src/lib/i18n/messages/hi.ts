@@ -81,4 +81,19 @@ export const hi = {
   "error.notFound.desc": "अनुरोधित पृष्ठ मौजूद नहीं है।",
   "error.page.title": "पृष्ठ लोड नहीं हो सका",
   "error.page.desc": "सर्वर त्रुटि हुई। कृपया पुनः प्रयास करें।",
+
+  "player.watch": "Watch",
+  "player.badge": "TV Player",
+  "player.back": "Back to playlist",
+  "player.channelCount": "{count} channels",
+  "player.allChannels": "All channels",
+  "player.searchPlaceholder": "Search channels…",
+  "player.noResults": "No channels found.",
+  "player.loading": "Loading stream…",
+  "player.loadingPlaylist": "Loading playlist…",
+  "player.playbackError": "Playback failed. Stream may be unavailable or geo-blocked.",
+  "player.loadError": "Could not load the playlist.",
+  "player.loadErrorTitle": "Player unavailable",
+  "player.disclaimer":
+    "Streams are provided by third parties. Availability and geo-blocking are outside FreeEPG's control.",
 } as const;

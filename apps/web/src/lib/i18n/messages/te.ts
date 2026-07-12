@@ -81,4 +81,19 @@ export const te = {
   "error.notFound.desc": "అభ్యర్థించిన పేజీ ఉనికిలో లేదు.",
   "error.page.title": "పేజీ లోడ్ చేయలేకపోయింది",
   "error.page.desc": "సర్వర్ లోపం సంభవించింది. దయచేసి మళ్లీ ప్రయత్నించండి.",
+
+  "player.watch": "Watch",
+  "player.badge": "TV Player",
+  "player.back": "Back to playlist",
+  "player.channelCount": "{count} channels",
+  "player.allChannels": "All channels",
+  "player.searchPlaceholder": "Search channels…",
+  "player.noResults": "No channels found.",
+  "player.loading": "Loading stream…",
+  "player.loadingPlaylist": "Loading playlist…",
+  "player.playbackError": "Playback failed. Stream may be unavailable or geo-blocked.",
+  "player.loadError": "Could not load the playlist.",
+  "player.loadErrorTitle": "Player unavailable",
+  "player.disclaimer":
+    "Streams are provided by third parties. Availability and geo-blocking are outside FreeEPG's control.",
 } as const;

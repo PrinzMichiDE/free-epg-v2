@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Globe2, ListMusic } from "lucide-react";
+import { Globe2, ListMusic, Play } from "lucide-react";
 import { cn, formatNumber } from "@/lib/utils";
 import { Badge } from "@/components/ui/Badge";
 import { ButtonLink } from "@/components/ui/ButtonLink";
@@ -49,6 +49,16 @@ export function WorldPlaylistCard({ playlist, className }: WorldPlaylistCardProp
       </div>
 
       <div className="flex flex-wrap gap-2 shrink-0">
+        <Link
+          href={`/playlists/${playlist.slug}/watch`}
+          className={cn(
+            "inline-flex items-center justify-center gap-2 h-10 px-4 rounded-lg text-sm font-medium",
+            "bg-[var(--primary)] text-[var(--primary-foreground)] hover:opacity-90 transition-opacity"
+          )}
+        >
+          <Play className="h-4 w-4" aria-hidden />
+          {t("player.watch")}
+        </Link>
         <Link
           href={`/playlists/${playlist.slug}`}
           className={cn(

@@ -80,6 +80,20 @@ export const de = {
   "error.notFound.desc": "Die angeforderte Seite existiert nicht.",
   "error.page.title": "Seite konnte nicht geladen werden",
   "error.page.desc": "Ein Serverfehler ist aufgetreten. Bitte erneut versuchen.",
+  "player.watch": "Abspielen",
+  "player.badge": "TV Player",
+  "player.back": "Zurück zur Playlist",
+  "player.channelCount": "{count} Sender",
+  "player.allChannels": "Alle Sender",
+  "player.searchPlaceholder": "Sender suchen…",
+  "player.noResults": "Keine Sender gefunden.",
+  "player.loading": "Stream wird geladen…",
+  "player.loadingPlaylist": "Playlist wird geladen…",
+  "player.playbackError": "Wiedergabe fehlgeschlagen. Stream ggf. nicht verfügbar oder geo-blockiert.",
+  "player.loadError": "Die Playlist konnte nicht geladen werden.",
+  "player.loadErrorTitle": "Player nicht verfügbar",
+  "player.disclaimer":
+    "Streams stammen von Drittanbietern. Verfügbarkeit und Geo-Blocking liegen außerhalb von FreeEPG.",
 } as const;
 
 export type MessageKey = keyof typeof de;

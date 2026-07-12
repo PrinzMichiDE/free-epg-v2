@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ChevronLeft, ListMusic } from "lucide-react";
+import { WatchPlaylistButton } from "@/components/player/WatchPlaylistButton";
 import { CountryFlag } from "@/components/country/CountryFlag";
 import { EpgFeedsPanel } from "@/components/epg/EpgFeedsPanel";
 import { XmlUrlBox } from "@/components/epg/XmlUrlBox";
@@ -90,6 +91,7 @@ export default async function PlaylistDetailPage({
       </div>
 
       <div className="flex flex-wrap gap-3 mb-10">
+        <WatchPlaylistButton href={`/playlists/${cc.toLowerCase()}/watch`} />
         <ButtonLink href={playlist.m3uUrl} size="md" download>
           <ListMusic className="h-4 w-4" aria-hidden />
           M3U herunterladen
