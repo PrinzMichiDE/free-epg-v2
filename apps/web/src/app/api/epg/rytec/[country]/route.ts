@@ -1,7 +1,7 @@
 import { NextRequest } from "next/server";
 import { streamFileResponse } from "@/lib/xml-response";
-import { countryGzipPath, countryXmlPath } from "@/lib/epg-paths";
-import { ensureCountryXml } from "@/lib/ensure-epg";
+import { countryRytecGzipPath, countryRytecPath } from "@/lib/epg-paths";
+import { ensureCountryRytec } from "@/lib/ensure-epg";
 
 export async function GET(
   request: NextRequest,
@@ -12,12 +12,12 @@ export async function GET(
   const wantsGzip = raw.endsWith(".gz") || request.headers.get("accept-encoding")?.includes("gzip");
 
   try {
-    await ensureCountryXml(country);
+    await ensureCountryRytec(country);
   } catch {
-    return new Response("EPG not found for this country", { status: 404 });
+    return new Response("Rytec EPG not found for this country", { status: 404 });
   }
 
-  const filePath = wantsGzip ? countryGzipPath(country) : countryXmlPath(country);
+  const filePath = wantsGzip ? countryRytecGzipPath(country) : countryRytecPath(country);
   const ifNoneMatch = request.headers.get("if-none-match");
 
   return streamFileResponse(

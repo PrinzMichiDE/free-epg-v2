@@ -5,9 +5,10 @@ import { useState } from "react";
 interface XmlUrlBoxProps {
   url: string;
   gzipUrl?: string;
+  title?: string;
 }
 
-export function XmlUrlBox({ url, gzipUrl }: XmlUrlBoxProps) {
+export function XmlUrlBox({ url, gzipUrl, title = "XMLTV Feed URL" }: XmlUrlBoxProps) {
   const [copied, setCopied] = useState(false);
 
   const copy = async (text: string) => {
@@ -21,7 +22,7 @@ export function XmlUrlBox({ url, gzipUrl }: XmlUrlBoxProps) {
 
   return (
     <div className="rounded-xl border border-[var(--border)] bg-[var(--card)] p-4">
-      <p className="text-sm font-medium mb-2">XMLTV Feed URL</p>
+      <p className="text-sm font-medium mb-2">{title}</p>
       <code className="font-mono text-sm block p-3 rounded-lg bg-[var(--background)] break-all">
         {fullUrl}
       </code>

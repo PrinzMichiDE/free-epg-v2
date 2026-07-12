@@ -52,11 +52,30 @@ export default async function CountryDetailPage({
           : `${formatNumber(totalCount)}+ Sender`}
       </p>
 
-      <div className="mb-8">
+      <div className="space-y-6 mb-8">
         <XmlUrlBox
+          title="XMLTV Feed"
           url={`/api/epg/${code.toLowerCase()}.xml`}
           gzipUrl={`/api/epg/${code.toLowerCase()}.xml.gz`}
         />
+        <XmlUrlBox
+          title="Rytec (Enigma2 / EPGImport)"
+          url={`/api/epg/rytec/${code.toLowerCase()}.xml`}
+          gzipUrl={`/api/epg/rytec/${code.toLowerCase()}.xml.gz`}
+        />
+        <p className="text-sm text-[var(--muted)]">
+          Enigma2:{" "}
+          <a href="/docs/enigma2" className="text-[var(--primary)] hover:underline">
+            EPGImport-Anleitung
+          </a>
+          {" · "}
+          <a
+            href={`/api/epg/rytec/channels/${code.toLowerCase()}.xml`}
+            className="text-[var(--primary)] hover:underline"
+          >
+            Channel-Map Vorlage
+          </a>
+        </p>
       </div>
 
       {dbUnavailable ? (

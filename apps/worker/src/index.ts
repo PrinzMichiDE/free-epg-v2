@@ -13,7 +13,7 @@ import {
   channels,
   programmes,
 } from "@freeepg/db";
-import { buildXmltv, mergeXmltvDocs, parseXmltv } from "@freeepg/epg-core";
+import { buildXmltv, mergeXmltvDocs, parseXmltv, buildRytecXmltv, rytecXmlFileName } from "@freeepg/epg-core";
 import {
   getDefaultAdapters,
   EPG_PW_COUNTRIES,
@@ -41,13 +41,22 @@ async function ensureDir(dir: string) {
   await mkdir(dir, { recursive: true });
 }
 
-async function saveXml(country: string, xml: string) {
+async function saveXml(country: string, doc: ReturnType<typeof parseXmltv>) {
   await ensureDir(epgDataDir);
-  const filePath = path.join(epgDataDir, `${country.toLowerCase()}.xml`);
+  const cc = country.toLowerCase();
+
+  const xml = buildXmltv(doc);
+  const filePath = path.join(epgDataDir, `${cc}.xml`);
   const gzipPath = `${filePath}.gz`;
   await writeFile(filePath, xml, "utf-8");
   const gzipped = gzipSync(Buffer.from(xml, "utf-8"));
   await writeFile(gzipPath, gzipped);
+
+  const rytecXml = buildRytecXmltv(doc);
+  const rytecPath = path.join(epgDataDir, rytecXmlFileName(country));
+  const rytecGzipPath = `${rytecPath}.gz`;
+  await writeFile(rytecPath, rytecXml, "utf-8");
+  await writeFile(rytecGzipPath, gzipSync(Buffer.from(rytecXml, "utf-8")));
 
   const checksum = createHash("md5").update(xml).digest("hex");
   const db = getDb();
@@ -59,7 +68,14 @@ async function saveXml(country: string, xml: string) {
     checksum,
   });
 
-  return { filePath, gzipPath, checksum, size: Buffer.byteLength(xml) };
+  return {
+    filePath,
+    gzipPath,
+    rytecPath,
+    rytecGzipPath,
+    checksum,
+    size: Buffer.byteLength(xml),
+  };
 }
 
 async function fetchCountryEpg(country: string) {
@@ -88,8 +104,7 @@ async function fetchCountryEpg(country: string) {
       throw new Error(`No EPG data for ${country}`);
     }
 
-    const xml = buildXmltv(merged);
-    const saved = await saveXml(country, xml);
+    const saved = await saveXml(country, merged);
 
     const channelIds = new Set(merged.channels.map((c) => c.id));
     await db

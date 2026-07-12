@@ -10,6 +10,9 @@ export default function ApiDocsPage() {
         <tbody>
           <tr><td className="p-2 font-mono">GET /api/epg/{"{country}"}.xml</td><td className="p-2">Land-EPG</td></tr>
           <tr><td className="p-2 font-mono">GET /api/epg/{"{country}"}.xml.gz</td><td className="p-2">gzip</td></tr>
+          <tr><td className="p-2 font-mono">GET /api/epg/rytec/{"{country}"}.xml.gz</td><td className="p-2">Rytec/Enigma2 EPG</td></tr>
+          <tr><td className="p-2 font-mono">GET /api/epg/rytec/sources</td><td className="p-2">EPGImport sources.xml</td></tr>
+          <tr><td className="p-2 font-mono">GET /api/epg/rytec/channels/{"{country}"}.xml</td><td className="p-2">Channel-Map Vorlage</td></tr>
           <tr><td className="p-2 font-mono">GET /api/epg/list/{"{id}"}.xml</td><td className="p-2">Custom List EPG</td></tr>
           <tr><td className="p-2 font-mono">GET /api/epg/m3u/{"{id}"}.xml</td><td className="p-2">M3U EPG</td></tr>
         </tbody>
