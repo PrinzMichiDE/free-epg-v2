@@ -1,0 +1,41 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install
+        run: npm ci
+
+      - name: Build packages
+        run: |
+          npm run build -w @freeepg/db
+          npm run build -w @freeepg/epg-core
+          npm run build -w @freeepg/epg-sources
+          npm run build -w @freeepg/analytics
+          npm run build -w @freeepg/m3u-matcher
+
+      - name: Lint
+        run: npm run lint -w @freeepg/web
+
+      - name: Typecheck
+        run: |
+          npm run typecheck -w @freeepg/db
+          npm run typecheck -w @freeepg/epg-core
+          npm run typecheck -w @freeepg/worker
+
+      - name: Docker build check
+        run: docker compose build

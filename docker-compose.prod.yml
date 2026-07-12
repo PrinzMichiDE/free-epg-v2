@@ -1,0 +1,86 @@
+services:
+  web:
+    image: ${DOCKERHUB_USER:-freeepg}/freeepg-web:${IMAGE_TAG:-latest}
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.freeepg.rule=Host(`free-epg.de`) || Host(`www.free-epg.de`)"
+      - "traefik.http.routers.freeepg.entrypoints=websecure"
+      - "traefik.http.routers.freeepg.tls.certresolver=myresolver"
+      - "traefik.http.services.freeepg.loadbalancer.server.port=3000"
+      - "traefik.docker.network=proxy-public"
+    environment:
+      DATABASE_URL: postgresql://freeepg:${POSTGRES_PASSWORD:-freeepg}@postgres:5432/freeepg
+      REDIS_URL: redis://redis:6379
+      EPG_DATA_DIR: /data/epg
+      NEXTAUTH_URL: https://free-epg.de
+      NEXTAUTH_SECRET: ${NEXTAUTH_SECRET}
+      ADMIN_EMAIL: ${ADMIN_EMAIL}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD}
+      ANALYTICS_ENABLED: ${ANALYTICS_ENABLED:-true}
+    volumes:
+      - epg-data:/data/epg
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - proxy-public
+      - freeepg-internal
+
+  worker:
+    image: ${DOCKERHUB_USER:-freeepg}/freeepg-worker:${IMAGE_TAG:-latest}
+    environment:
+      DATABASE_URL: postgresql://freeepg:${POSTGRES_PASSWORD:-freeepg}@postgres:5432/freeepg
+      REDIS_URL: redis://redis:6379
+      EPG_DATA_DIR: /data/epg
+      FETCH_ON_START: ${FETCH_ON_START:-true}
+    volumes:
+      - epg-data:/data/epg
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - freeepg-internal
+
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: freeepg
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-freeepg}
+      POSTGRES_DB: freeepg
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      - freeepg-internal
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U freeepg"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    command: redis-server --maxmemory 200mb --maxmemory-policy allkeys-lru
+    volumes:
+      - redisdata:/data
+    networks:
+      - freeepg-internal
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  pgdata:
+  redisdata:
+  epg-data:
+
+networks:
+  proxy-public:
+    external: true
+  freeepg-internal:
+    internal: true

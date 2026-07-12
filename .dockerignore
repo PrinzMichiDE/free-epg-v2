@@ -1,0 +1,9 @@
+node_modules
+.git
+.next
+.turbo
+data
+*.md
+internal-docs
+.env
+.env.local

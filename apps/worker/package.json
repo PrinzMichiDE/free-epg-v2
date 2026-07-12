@@ -1,0 +1,27 @@
+{
+  "name": "@freeepg/worker",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@freeepg/analytics": "*",
+    "@freeepg/db": "*",
+    "@freeepg/epg-core": "*",
+    "@freeepg/epg-sources": "*",
+    "bullmq": "^5.53.2",
+    "drizzle-orm": "^0.44.2",
+    "ioredis": "^5.6.1",
+    "node-cron": "^4.1.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.15.21",
+    "tsx": "^4.19.4",
+    "typescript": "^5.8.3"
+  }
+}

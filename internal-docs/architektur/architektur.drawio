@@ -1,0 +1,169 @@
+<mxfile host="app.diagrams.net" modified="2026-07-12T10:00:00.000Z" agent="FreeEPG-Docs" version="22.1.0">
+  <diagram id="freeepg-architecture" name="FreeEPG Systemkontext">
+    <mxGraphModel dx="1422" dy="794" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="827" math="0" shadow="0">
+      <root>
+        <mxCell id="0"/>
+        <mxCell id="1" parent="0"/>
+
+        <!-- Title -->
+        <mxCell id="title" value="FreeEPG – Systemkontext &amp; Trust Boundaries" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=18;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="320" y="20" width="520" height="40" as="geometry"/>
+        </mxCell>
+
+        <!-- Trust Boundary: Internet -->
+        <mxCell id="zone-internet" value="Internet (Untrusted)" style="swimlane;fillColor=#fff2cc;strokeColor=#d6b656;fontStyle=1;startSize=30;" vertex="1" parent="1">
+          <mxGeometry x="40" y="80" width="280" height="200" as="geometry"/>
+        </mxCell>
+        <mxCell id="user-iptv" value="IPTV-Nutzer&#xa;(Kodi, Plex, Apps)" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="zone-internet">
+          <mxGeometry x="50" y="60" width="40" height="80" as="geometry"/>
+        </mxCell>
+        <mxCell id="user-browser" value="Browser-Nutzer" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="zone-internet">
+          <mxGeometry x="170" y="60" width="40" height="80" as="geometry"/>
+        </mxCell>
+
+        <!-- Trust Boundary: Edge -->
+        <mxCell id="zone-edge" value="Edge / DMZ (TLS Termination)" style="swimlane;fillColor=#ffe6cc;strokeColor=#d79b00;fontStyle=1;startSize=30;" vertex="1" parent="1">
+          <mxGeometry x="360" y="80" width="200" height="120" as="geometry"/>
+        </mxCell>
+        <mxCell id="traefik" value="Traefik&#xa;free-epg.de&#xa;TLS (websecure)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontStyle=1" vertex="1" parent="zone-edge">
+          <mxGeometry x="40" y="45" width="120" height="60" as="geometry"/>
+        </mxCell>
+
+        <!-- Trust Boundary: Application -->
+        <mxCell id="zone-app" value="Application Zone (freeepg-internal + proxy-public)" style="swimlane;fillColor=#d5e8d4;strokeColor=#82b366;fontStyle=1;startSize=30;" vertex="1" parent="1">
+          <mxGeometry x="360" y="240" width="480" height="320" as="geometry"/>
+        </mxCell>
+        <mxCell id="web" value="Next.js Web&#xa;@freeepg/web&#xa;Port 3000&#xa;UI + REST API&#xa;NextAuth Admin" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontStyle=1" vertex="1" parent="zone-app">
+          <mxGeometry x="30" y="50" width="160" height="90" as="geometry"/>
+        </mxCell>
+        <mxCell id="worker" value="Worker&#xa;@freeepg/worker&#xa;BullMQ Consumer&#xa;Cron Jobs" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontStyle=1" vertex="1" parent="zone-app">
+          <mxGeometry x="30" y="170" width="160" height="80" as="geometry"/>
+        </mxCell>
+        <mxCell id="packages" value="Shared Packages&#xa;epg-core | epg-sources&#xa;analytics | m3u-matcher | db" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;dashed=1;" vertex="1" parent="zone-app">
+          <mxGeometry x="220" y="50" width="230" height="60" as="geometry"/>
+        </mxCell>
+        <mxCell id="epg-fs" value="Volume: epg-data&#xa;/data/epg/*.xml[.gz]" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=12;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="zone-app">
+          <mxGeometry x="220" y="140" width="120" height="70" as="geometry"/>
+        </mxCell>
+        <mxCell id="admin" value="Administrator" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;fillColor=#f8cecc;strokeColor=#b85450;" vertex="1" parent="zone-app">
+          <mxGeometry x="400" y="200" width="40" height="80" as="geometry"/>
+        </mxCell>
+
+        <!-- Trust Boundary: Data -->
+        <mxCell id="zone-data" value="Data Layer (Internal Network – no public routing in Prod)" style="swimlane;fillColor=#f5f5f5;strokeColor=#666666;fontStyle=1;startSize=30;" vertex="1" parent="1">
+          <mxGeometry x="600" y="80" width="240" height="140" as="geometry"/>
+        </mxCell>
+        <mxCell id="postgres" value="PostgreSQL 16&#xa;Drizzle ORM&#xa;channels, m3u,&#xa;analytics, jobs" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;fillColor=#647687;fontColor=#ffffff;strokeColor=#314354;" vertex="1" parent="zone-data">
+          <mxGeometry x="20" y="45" width="90" height="75" as="geometry"/>
+        </mxCell>
+        <mxCell id="redis" value="Redis 7&#xa;BullMQ Queue&#xa;Analytics Buffer" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;fillColor=#647687;fontColor=#ffffff;strokeColor=#314354;" vertex="1" parent="zone-data">
+          <mxGeometry x="130" y="45" width="90" height="75" as="geometry"/>
+        </mxCell>
+
+        <!-- External Services -->
+        <mxCell id="zone-ext" value="Externe EPG-Quellen (Outbound HTTPS)" style="swimlane;fillColor=#ffffff;strokeColor=#999999;fontStyle=1;startSize=30;dashed=1;" vertex="1" parent="1">
+          <mxGeometry x="40" y="320" width="280" height="240" as="geometry"/>
+        </mxCell>
+        <mxCell id="epgpw" value="epg.pw&#xa;XMLTV per Land" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="zone-ext">
+          <mxGeometry x="20" y="45" width="110" height="50" as="geometry"/>
+        </mxCell>
+        <mxCell id="xmltvse" value="xmltv.se&#xa;DE/AT/CH/..." style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="zone-ext">
+          <mxGeometry x="150" y="45" width="110" height="50" as="geometry"/>
+        </mxCell>
+        <mxCell id="iptvorg" value="iptv-org API&#xa;channels.json&#xa;guides.json" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="zone-ext">
+          <mxGeometry x="20" y="120" width="110" height="60" as="geometry"/>
+        </mxCell>
+        <mxCell id="dockerhub" value="Docker Hub&#xa;CI/CD Images" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;dashed=1;" vertex="1" parent="zone-ext">
+          <mxGeometry x="150" y="130" width="110" height="50" as="geometry"/>
+        </mxCell>
+
+        <!-- Connections -->
+        <mxCell id="e1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#6c8ebf;" edge="1" parent="1" source="user-iptv" target="traefik">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e1l" value="HTTPS&#xa;XMLTV/M3U" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="e1">
+          <mxGeometry x="-0.1" y="1" relative="1" as="geometry"><mxPoint as="offset"/></mxGeometry>
+        </mxCell>
+
+        <mxCell id="e2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#6c8ebf;" edge="1" parent="1" source="user-browser" target="traefik">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="e3" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#b85450;" edge="1" parent="1" source="traefik" target="web">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e3l" value="HTTP :3000" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="e3">
+          <mxGeometry x="-0.1" y="1" relative="1" as="geometry"><mxPoint as="offset"/></mxGeometry>
+        </mxCell>
+
+        <mxCell id="e4" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#82b366;" edge="1" parent="1" source="web" target="postgres">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e4l" value="DATABASE_URL" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="e4">
+          <mxGeometry x="-0.1" y="1" relative="1" as="geometry"><mxPoint as="offset"/></mxGeometry>
+        </mxCell>
+
+        <mxCell id="e5" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#82b366;" edge="1" parent="1" source="web" target="redis">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e5l" value="Analytics buffer" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="e5">
+          <mxGeometry x="-0.1" y="1" relative="1" as="geometry"><mxPoint as="offset"/></mxGeometry>
+        </mxCell>
+
+        <mxCell id="e6" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#82b366;" edge="1" parent="1" source="worker" target="postgres">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="e7" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#82b366;" edge="1" parent="1" source="worker" target="redis">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e7l" value="BullMQ epg-jobs" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="e7">
+          <mxGeometry x="-0.1" y="1" relative="1" as="geometry"><mxPoint as="offset"/></mxGeometry>
+        </mxCell>
+
+        <mxCell id="e8" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#d6b656;dashed=1;" edge="1" parent="1" source="worker" target="epgpw">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e9" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#d6b656;dashed=1;" edge="1" parent="1" source="worker" target="xmltvse">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e10" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#d6b656;dashed=1;" edge="1" parent="1" source="web" target="epgpw">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e10l" value="On-demand fetch" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="e10">
+          <mxGeometry x="-0.1" y="1" relative="1" as="geometry"><mxPoint as="offset"/></mxGeometry>
+        </mxCell>
+
+        <mxCell id="e11" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#9673a6;dashed=1;" edge="1" parent="1" source="worker" target="iptvorg">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e11l" value="Seed metadata" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="e11">
+          <mxGeometry x="-0.1" y="1" relative="1" as="geometry"><mxPoint as="offset"/></mxGeometry>
+        </mxCell>
+
+        <mxCell id="e12" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#82b366;" edge="1" parent="1" source="web" target="epg-fs">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e13" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#82b366;" edge="1" parent="1" source="worker" target="epg-fs">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e13l" value="Write XML/GZIP" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="e13">
+          <mxGeometry x="-0.1" y="1" relative="1" as="geometry"><mxPoint as="offset"/></mxGeometry>
+        </mxCell>
+
+        <mxCell id="e14" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#b85450;" edge="1" parent="1" source="admin" target="web">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e14l" value="/admin NextAuth" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="e14">
+          <mxGeometry x="-0.1" y="1" relative="1" as="geometry"><mxPoint as="offset"/></mxGeometry>
+        </mxCell>
+
+        <!-- Legend -->
+        <mxCell id="legend" value="Legende&#xa;—— Datenfluss (solid)&#xa;- - - Externer Abruf / optional&#xa;🔒 Prod: freeepg-internal = internal:true" style="text;html=1;strokeColor=#666666;fillColor=#f5f5f5;align=left;verticalAlign=top;whiteSpace=wrap;rounded=1;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="40" y="580" width="280" height="80" as="geometry"/>
+        </mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
