@@ -36,6 +36,20 @@ Nicht im Scope: Jeder Einzel-Commit ohne betriebliche Relevanz.
 
 ## Detailbeschreibung
 
+### Eintrag CHG-2026-003: Playlisten weltweit (iptv-org M3U-Katalog)
+
+| Feld | Inhalt |
+|------|--------|
+| Datum | 2026-07-12 |
+| Version | App-Release (Web) |
+| Begründung | Nutzer sollen fertige IPTV-Playlists pro Land abrufen können — ergänzt EPG-Feeds um Stream-URLs aus iptv-org |
+| Auswirkung | Neue Routen `/playlists`, `/api/playlists`, `/api/playlists/{country}.m3u`; Stream-Cache unter `{EPG_DATA_DIR}/playlists/` (24h TTL); Navigation „Playlisten“ |
+| Risiko | mittel (Erstaufruf lädt große iptv-org streams.json; Stream-Verfügbarkeit/Geo-Blocking außerhalb FreeEPG-Kontrolle) |
+| Betroffene Komponenten | `apps/web`, `packages/epg-sources`, `packages/m3u-matcher`, `next.config.ts` Rewrites |
+| Prüfung | `npm run build -w @freeepg/web`; manuell `GET /api/playlists`, `GET /api/playlists/de.m3u` |
+| Freigabe | Product Owner |
+| Rollback | Vorheriges Web-Image; Cache-Ordner `playlists/` optional löschen |
+
 ### Eintrag CHG-2026-002: Production-Env über stack.env
 
 | Feld | Inhalt |
@@ -83,6 +97,7 @@ Nicht im Scope: Jeder Einzel-Commit ohne betriebliche Relevanz.
 | ETag/304 Caching | web | `lib/xml-response.ts` |
 | M3U Upload & Match | web, m3u-matcher | `POST /api/m3u/upload` |
 | Custom EPG Lists | web | `custom_lists` DB, `/api/lists` |
+| Weltweite Playlists | web, epg-sources, m3u-matcher | `GET /api/playlists`, `GET /api/playlists/{cc}.m3u` |
 | Admin Dashboard | web | `/admin`, `/api/admin/*` |
 | Interne Analytics | analytics, middleware, worker | Redis buffer → PostgreSQL |
 | EPG Fetch Worker | worker | BullMQ, Cron 6h, 20 epg.pw-Länder |
@@ -166,4 +181,5 @@ Auto-Migration beim Web-Start: `apps/web/docker-entrypoint.sh`.
 
 | Datum | Autor/Rolle | Änderung | Anlass |
 |-------|-------------|----------|--------|
+| 2026-07-12 | Cursor Agent / Entwicklung | CHG-2026-003 Playlisten weltweit | Feature-Release |
 | 2026-07-12 | Cursor Agent / Dokumentation | Erstversion mit Baseline und CHG-2026-001 | Initiale Prozess-Dokumentation |

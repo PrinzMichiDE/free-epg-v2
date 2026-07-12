@@ -146,4 +146,12 @@ export function enrichM3u(
   return out.join("\n");
 }
 
+export {
+  buildM3uPlaylist,
+  pickBestStreamsPerChannel,
+  qualityScore,
+  type PlaylistStreamEntry,
+  type StreamCandidate,
+} from "./playlist.js";
+
 export { normalizeChannelName };

@@ -22,6 +22,10 @@ export const COUNTRY_NAMES: Record<string, string> = {
   ZA: "Südafrika",
 };
 
-export function getCountryName(code: string): string {
-  return COUNTRY_NAMES[code.toUpperCase()] ?? code.toUpperCase();
+export function getCountryName(
+  code: string,
+  worldNames?: Record<string, string>
+): string {
+  const cc = code.toUpperCase();
+  return COUNTRY_NAMES[cc] ?? worldNames?.[cc] ?? cc;
 }

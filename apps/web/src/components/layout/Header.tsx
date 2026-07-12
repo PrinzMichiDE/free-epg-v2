@@ -10,6 +10,7 @@ import { DonateButton } from "@/components/layout/DonateButton";
 
 const nav = [
   { href: "/countries", label: "Länder" },
+  { href: "/playlists", label: "Playlisten" },
   { href: "/channels", label: "Sender" },
   { href: "/m3u", label: "M3U Matcher" },
   { href: "/lists/new", label: "Listen" },

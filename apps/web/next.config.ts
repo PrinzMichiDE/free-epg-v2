@@ -33,6 +33,10 @@ const nextConfig: NextConfig = {
         source: "/api/epg/:country.xml",
         destination: "/api/epg/:country",
       },
+      {
+        source: "/api/playlists/:country.m3u",
+        destination: "/api/playlists/:country",
+      },
     ];
   },
 };

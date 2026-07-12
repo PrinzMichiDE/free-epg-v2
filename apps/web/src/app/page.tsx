@@ -85,6 +85,11 @@ export default async function HomePage() {
               <Link href="/countries">
                 <Button size="lg">Länder-Feeds ansehen</Button>
               </Link>
+              <Link href="/playlists">
+                <Button variant="outline" size="lg">
+                  Playlisten weltweit
+                </Button>
+              </Link>
               <Link href="/docs">
                 <Button variant="outline" size="lg">
                   Dokumentation
@@ -136,6 +141,36 @@ export default async function HomePage() {
             {countries.slice(0, 20).map((c) => (
               <CountryCard key={c.code} {...c} />
             ))}
+          </div>
+        </section>
+
+        <section>
+          <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-8">
+            <div>
+              <h2 className="text-2xl sm:text-3xl font-semibold tracking-tight">
+                Playlisten weltweit
+              </h2>
+              <p className="text-[var(--muted-foreground)] mt-2 max-w-xl">
+                Fertige M3U-Playlists aus iptv-org, nach Land gruppiert — mit
+                tvg-id und passender EPG-URL für Kodi, VLC und Enigma2.
+              </p>
+            </div>
+            <Link
+              href="/playlists"
+              className="text-sm font-medium text-[var(--primary)] hover:underline underline-offset-4 shrink-0"
+            >
+              Alle Playlisten ansehen
+            </Link>
+          </div>
+          <div className="rounded-xl border border-[var(--border)] bg-[var(--surface-muted)]/40 p-6 sm:p-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <p className="text-[var(--muted-foreground)] max-w-xl leading-relaxed">
+              Kein manuelles Suchen von Stream-URLs: FreeEPG baut pro Land eine
+              M3U mit den besten verfügbaren Streams und verknüpft sie
+              automatisch mit dem EPG.
+            </p>
+            <Link href="/playlists">
+              <Button>Zum Playlist-Katalog</Button>
+            </Link>
           </div>
         </section>
       </div>

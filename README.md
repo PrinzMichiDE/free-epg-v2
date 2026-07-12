@@ -6,6 +6,7 @@ Weltweite EPG-Daten im XMLTV-Format — self-hosted Next.js Plattform.
 
 - **XMLTV API** — EPG pro Land (`/api/epg/de.xml`, gzip, ETag/304)
 - **M3U Matcher** — Upload, auto tvg-id matching, angereicherte M3U
+- **Playlisten weltweit** — fertige Land-M3U aus iptv-org mit EPG-Verknüpfung
 - **Custom Lists** — personalisierte EPG-URLs
 - **Admin Dashboard** — Quellen, Jobs, Analytics
 - **Docker Compose** — Web + Worker + PostgreSQL + Redis
@@ -47,6 +48,8 @@ packages/epg-core, epg-sources, analytics, m3u-matcher
 | `GET /api/epg/{country}.xml` | Land-EPG |
 | `GET /api/epg/{country}.xml.gz` | gzip |
 | `POST /api/m3u/upload` | M3U Matching |
+| `GET /api/playlists` | Playlist-Metadaten (JSON) |
+| `GET /api/playlists/{country}.m3u` | Land-Playlist M3U |
 | `GET /api/health` | Health Check |
 
 ## Seed

@@ -1,0 +1,190 @@
+import { existsSync, statSync } from "node:fs";
+import { mkdir, readFile, writeFile } from "node:fs/promises";
+import path from "node:path";
+import { eq } from "drizzle-orm";
+import {
+  EPG_PW_COUNTRIES,
+  IptvOrgApiAdapter,
+  type IptvStream,
+} from "@freeepg/epg-sources";
+import { channels } from "@freeepg/db";
+import {
+  buildM3uPlaylist,
+  pickBestStreamsPerChannel,
+  type PlaylistStreamEntry,
+} from "@freeepg/m3u-matcher";
+import { getDatabase } from "@/lib/db";
+import { BASE_URL, countryEpgPaths } from "@/lib/utils";
+import { getCountryName } from "@/lib/countries";
+
+const STREAMS_TTL_MS = 24 * 60 * 60 * 1000;
+const COUNTRIES_TTL_MS = 7 * 24 * 60 * 60 * 1000;
+
+export interface PlaylistCountry {
+  code: string;
+  name: string;
+  streamCount: number;
+  channelCount: number;
+  hasEpg: boolean;
+  m3uUrl: string;
+  epgUrl: string;
+}
+
+function epgDataDir(): string {
+  return process.env.EPG_DATA_DIR ?? path.join(process.cwd(), "../../data/epg");
+}
+
+function playlistsDir(): string {
+  return path.join(epgDataDir(), "playlists");
+}
+
+function isFresh(filePath: string, ttlMs: number): boolean {
+  if (!existsSync(filePath)) return false;
+  return Date.now() - statSync(filePath).mtimeMs < ttlMs;
+}
+
+async function loadCachedStreams(): Promise<IptvStream[]> {
+  const cacheFile = path.join(playlistsDir(), "streams.json");
+
+  if (isFresh(cacheFile, STREAMS_TTL_MS)) {
+    return JSON.parse(await readFile(cacheFile, "utf8")) as IptvStream[];
+  }
+
+  const api = new IptvOrgApiAdapter();
+  const streams = await api.fetchStreams();
+  const filtered = streams.filter((s) => s.channel && s.url);
+
+  await mkdir(playlistsDir(), { recursive: true });
+  await writeFile(cacheFile, JSON.stringify(filtered));
+
+  return filtered;
+}
+
+async function loadWorldCountryNames(): Promise<Record<string, string>> {
+  const cacheFile = path.join(playlistsDir(), "country-names.json");
+
+  if (isFresh(cacheFile, COUNTRIES_TTL_MS)) {
+    return JSON.parse(await readFile(cacheFile, "utf8")) as Record<
+      string,
+      string
+    >;
+  }
+
+  const api = new IptvOrgApiAdapter();
+  const countries = await api.fetchCountries();
+  const map = Object.fromEntries(
+    countries.map((c) => [c.code.toUpperCase(), c.name])
+  );
+
+  await mkdir(playlistsDir(), { recursive: true });
+  await writeFile(cacheFile, JSON.stringify(map));
+
+  return map;
+}
+
+async function loadChannelCountryMap(): Promise<Map<string, string>> {
+  const db = getDatabase();
+  const rows = await db
+    .select({ xmltvId: channels.xmltvId, country: channels.country })
+    .from(channels);
+
+  return new Map(rows.map((r) => [r.xmltvId, r.country.toUpperCase()]));
+}
+
+function resolveEpgUrl(countryCode: string): string {
+  const cc = countryCode.toUpperCase();
+  if (EPG_PW_COUNTRIES.includes(cc)) {
+    return `${BASE_URL}${countryEpgPaths(cc).xmlUrl}`;
+  }
+  return `${BASE_URL}/api/epg`;
+}
+
+function playlistName(code: string, worldNames: Record<string, string>): string {
+  return getCountryName(code, worldNames);
+}
+
+export async function getPlaylistCountries(): Promise<PlaylistCountry[]> {
+  const [streams, channelMap, worldNames] = await Promise.all([
+    loadCachedStreams(),
+    loadChannelCountryMap(),
+    loadWorldCountryNames(),
+  ]);
+
+  const streamCounts = new Map<string, number>();
+  const channelCounts = new Map<string, Set<string>>();
+
+  for (const stream of streams) {
+    const channelId = stream.channel!;
+    const country = channelMap.get(channelId);
+    if (!country) continue;
+
+    streamCounts.set(country, (streamCounts.get(country) ?? 0) + 1);
+
+    if (!channelCounts.has(country)) {
+      channelCounts.set(country, new Set());
+    }
+    channelCounts.get(country)!.add(channelId);
+  }
+
+  return [...streamCounts.entries()]
+    .map(([code, streamCount]) => ({
+      code,
+      name: playlistName(code, worldNames),
+      streamCount,
+      channelCount: channelCounts.get(code)?.size ?? 0,
+      hasEpg: EPG_PW_COUNTRIES.includes(code),
+      m3uUrl: `/api/playlists/${code.toLowerCase()}.m3u`,
+      epgUrl: resolveEpgUrl(code),
+    }))
+    .sort((a, b) => b.streamCount - a.streamCount);
+}
+
+export async function buildCountryPlaylistM3u(
+  countryCode: string
+): Promise<{ content: string; entryCount: number } | null> {
+  const cc = countryCode.toUpperCase();
+  const [streams, channelMap, worldNames] = await Promise.all([
+    loadCachedStreams(),
+    loadChannelCountryMap(),
+    loadWorldCountryNames(),
+  ]);
+
+  const candidates = streams
+    .filter((stream) => {
+      const channelId = stream.channel!;
+      return channelMap.get(channelId) === cc;
+    })
+    .map((stream) => ({
+      channelId: stream.channel!,
+      title: stream.title,
+      url: stream.url,
+      quality: stream.quality,
+    }));
+
+  if (candidates.length === 0) {
+    return null;
+  }
+
+  const picked = pickBestStreamsPerChannel(candidates);
+  const countryLabel = playlistName(cc, worldNames);
+
+  const entries: PlaylistStreamEntry[] = picked.map((stream) => ({
+    tvgId: stream.channelId,
+    title: stream.title,
+    url: stream.url,
+    groupTitle: countryLabel,
+  }));
+
+  const epgUrl = resolveEpgUrl(cc);
+  const content = buildM3uPlaylist(entries, epgUrl);
+
+  return { content, entryCount: entries.length };
+}
+
+export async function getPlaylistCountry(
+  countryCode: string
+): Promise<PlaylistCountry | null> {
+  const cc = countryCode.toUpperCase();
+  const countries = await getPlaylistCountries();
+  return countries.find((c) => c.code === cc) ?? null;
+}

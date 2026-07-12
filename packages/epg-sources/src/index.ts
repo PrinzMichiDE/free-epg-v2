@@ -125,6 +125,26 @@ export class IptvOrgApiAdapter {
       Array<{ channel: string; site: string; site_id: string; lang?: string }>
     >;
   }
+
+  async fetchStreams(): Promise<IptvStream[]> {
+    const res = await fetch("https://iptv-org.github.io/api/streams.json", {
+      signal: AbortSignal.timeout(180_000),
+      headers: { "User-Agent": "FreeEPG/1.0" },
+    });
+    if (!res.ok) throw new Error("Failed to fetch iptv-org streams");
+    return res.json() as Promise<IptvStream[]>;
+  }
+}
+
+export interface IptvStream {
+  channel: string | null;
+  feed?: string | null;
+  title: string;
+  url: string;
+  referrer?: string | null;
+  user_agent?: string | null;
+  quality?: string | null;
+  label?: string | null;
 }
 
 export function getDefaultAdapters(): EpgSourceAdapter[] {
