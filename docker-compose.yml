@@ -22,12 +22,19 @@ services:
       - freeepg-internal
 
   db-seed:
-    build:
-      context: .
-      dockerfile: apps/worker/Dockerfile
+    image: node:22-alpine
+    working_dir: /app
     environment:
       DATABASE_URL: postgresql://freeepg:freeepg@postgres:5432/freeepg
-    command: ["node", "dist/seed-cli.js"]
+      PGPASSWORD: freeepg
+    volumes:
+      - .:/app
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+      - |
+        apk add --no-cache postgresql-client >/dev/null
+        chmod +x ./scripts/db-seed.sh
+        exec ./scripts/db-seed.sh
     depends_on:
       db-init:
         condition: service_completed_successfully
