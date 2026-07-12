@@ -1,7 +1,11 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
+import { Check, Clock, Copy, ExternalLink } from "lucide-react";
 import { cn, formatNumber, formatDate } from "@/lib/utils";
+import { Badge } from "@/components/ui/Badge";
+import { Button } from "@/components/ui/Button";
 
 interface CountryCardProps {
   code: string;
@@ -32,62 +36,84 @@ export function CountryCard({
   const xmlGzipUrl = xmlUrl.endsWith(".xml") ? `${xmlUrl}.gz` : xmlUrl;
 
   return (
-    <div className="rounded-xl border border-[var(--border)] bg-[var(--card)] p-5 hover:shadow-lg transition-shadow">
-      <div className="flex items-center gap-3 mb-3">
-        <span className="text-2xl">{flagEmoji(code)}</span>
-        <div>
-          <h3 className="font-semibold text-lg">{code}</h3>
-          <p className="text-sm text-[var(--muted)]">
-            {formatNumber(channelCount)} Sender
-          </p>
+    <article className="surface-card p-5 flex flex-col gap-4 hover:shadow-md transition-shadow duration-200">
+      <div className="flex items-start justify-between gap-3">
+        <div className="flex items-center gap-3 min-w-0">
+          <div
+            className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-[var(--surface-muted)] font-mono text-sm font-semibold text-[var(--primary)]"
+            aria-hidden
+          >
+            {code}
+          </div>
+          <div className="min-w-0">
+            <h3 className="font-semibold text-base tracking-tight">{code}</h3>
+            <p className="text-sm text-[var(--muted-foreground)]">
+              {formatNumber(channelCount)} Sender
+            </p>
+          </div>
         </div>
-        <span
-          className={cn(
-            "ml-auto text-xs px-2 py-1 rounded-full",
-            hasEpg
-              ? "bg-teal-500/10 text-teal-600"
-              : "bg-yellow-500/10 text-yellow-600"
+        <Badge variant={hasEpg ? "success" : "warning"}>
+          {hasEpg ? (
+            <span className="inline-flex items-center gap-1">
+              <Check className="h-3 w-3" aria-hidden />
+              EPG
+            </span>
+          ) : (
+            <span className="inline-flex items-center gap-1">
+              <Clock className="h-3 w-3" aria-hidden />
+              Pending
+            </span>
           )}
-        >
-          {hasEpg ? "EPG ✓" : "Pending"}
-        </span>
+        </Badge>
       </div>
+
       {lastUpdate && (
-        <p className="text-xs text-[var(--muted)] mb-3">
-          Update: {formatDate(lastUpdate)}
+        <p className="text-xs text-[var(--muted-foreground)]">
+          Aktualisiert: {formatDate(lastUpdate)}
         </p>
       )}
-      <div className="flex gap-2">
-        <a
+
+      <div className="grid grid-cols-2 gap-2 mt-auto">
+        <Link
           href={`/countries/${code.toLowerCase()}`}
-          className="flex-1 text-center text-sm py-2 rounded-lg border border-[var(--border)] hover:bg-[var(--background)] transition-colors"
+          className={cn(
+            "col-span-2 flex items-center justify-center gap-1.5",
+            "h-10 rounded-lg border border-[var(--border)] text-sm font-medium",
+            "text-[var(--foreground)] hover:bg-[var(--surface-muted)] transition-colors duration-200"
+          )}
         >
           Details
-        </a>
-        <button
-          type="button"
+          <ExternalLink className="h-3.5 w-3.5 opacity-60" aria-hidden />
+        </Link>
+        <Button
+          variant="primary"
+          size="sm"
+          className="col-span-1"
           onClick={() => copyUrl(xmlGzipUrl, "xmltv")}
-          className="flex-1 text-sm py-2 rounded-lg bg-[var(--primary)] text-[var(--primary-foreground)] hover:opacity-90 transition-opacity"
+          aria-label={`XMLTV URL für ${code} kopieren`}
         >
-          {copied === "xmltv" ? "Kopiert ✓" : "XMLTV"}
-        </button>
-        <button
-          type="button"
+          {copied === "xmltv" ? (
+            <Check className="h-4 w-4" aria-hidden />
+          ) : (
+            <Copy className="h-4 w-4" aria-hidden />
+          )}
+          XMLTV
+        </Button>
+        <Button
+          variant="outline"
+          size="sm"
+          className="col-span-1"
           onClick={() => copyUrl(rytecGzipUrl, "rytec")}
-          className="flex-1 text-sm py-2 rounded-lg border border-[var(--border)] hover:bg-[var(--background)] transition-colors"
-          title="Rytec XML für Enigma2 / EPGImport"
+          aria-label={`Rytec URL für ${code} kopieren`}
         >
-          {copied === "rytec" ? "Kopiert ✓" : "Rytec"}
-        </button>
+          {copied === "rytec" ? (
+            <Check className="h-4 w-4" aria-hidden />
+          ) : (
+            <Copy className="h-4 w-4" aria-hidden />
+          )}
+          Rytec
+        </Button>
       </div>
-    </div>
+    </article>
   );
-}
-
-function flagEmoji(code: string): string {
-  return code
-    .toUpperCase()
-    .replace(/./g, (c) =>
-      String.fromCodePoint(0x1f1e6 + c.charCodeAt(0) - 65)
-    );
 }

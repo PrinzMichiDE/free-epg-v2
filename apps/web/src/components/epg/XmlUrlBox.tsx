@@ -1,14 +1,23 @@
 "use client";
 
 import { useState } from "react";
+import { Check, Copy, Download } from "lucide-react";
+import { Button } from "@/components/ui/Button";
+import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/Card";
 
 interface XmlUrlBoxProps {
   url: string;
   gzipUrl?: string;
   title?: string;
+  description?: string;
 }
 
-export function XmlUrlBox({ url, gzipUrl, title = "XMLTV Feed URL" }: XmlUrlBoxProps) {
+export function XmlUrlBox({
+  url,
+  gzipUrl,
+  title = "XMLTV Feed",
+  description,
+}: XmlUrlBoxProps) {
   const [copied, setCopied] = useState(false);
 
   const copy = async (text: string) => {
@@ -17,38 +26,54 @@ export function XmlUrlBox({ url, gzipUrl, title = "XMLTV Feed URL" }: XmlUrlBoxP
     setTimeout(() => setCopied(false), 2000);
   };
 
+  const displayUrl = gzipUrl ?? url;
   const fullUrl =
-    typeof window !== "undefined" ? `${window.location.origin}${url}` : url;
+    typeof window !== "undefined" ? `${window.location.origin}${displayUrl}` : displayUrl;
 
   return (
-    <div className="rounded-xl border border-[var(--border)] bg-[var(--card)] p-4">
-      <p className="text-sm font-medium mb-2">{title}</p>
-      <code className="font-mono text-sm block p-3 rounded-lg bg-[var(--background)] break-all">
+    <Card className="hover:shadow-sm">
+      <CardHeader>
+        <CardTitle>{title}</CardTitle>
+        {description && <CardDescription>{description}</CardDescription>}
+      </CardHeader>
+
+      <code className="font-mono text-xs sm:text-sm block p-3 rounded-lg bg-[var(--surface-muted)] border border-[var(--border)] break-all leading-relaxed">
         {fullUrl}
       </code>
-      <div className="flex gap-2 mt-3">
-        <button
+
+      <div className="flex flex-wrap gap-2 mt-4">
+        <Button
+          size="sm"
           onClick={() => copy(fullUrl)}
-          className="px-4 py-2 rounded-lg bg-[var(--primary)] text-[var(--primary-foreground)] text-sm hover:opacity-90"
+          aria-label={`${title} URL kopieren`}
         >
-          {copied ? "Kopiert ✓" : "URL kopieren"}
-        </button>
-        <a
-          href={url}
-          className="px-4 py-2 rounded-lg border border-[var(--border)] text-sm hover:bg-[var(--background)]"
-          download
-        >
-          Download XML
+          {copied ? (
+            <>
+              <Check className="h-4 w-4" aria-hidden />
+              Kopiert
+            </>
+          ) : (
+            <>
+              <Copy className="h-4 w-4" aria-hidden />
+              URL kopieren
+            </>
+          )}
+        </Button>
+        <a href={url} download className="inline-flex">
+          <Button variant="outline" size="sm" type="button">
+            <Download className="h-4 w-4" aria-hidden />
+            XML
+          </Button>
         </a>
         {gzipUrl && (
-          <a
-            href={gzipUrl}
-            className="px-4 py-2 rounded-lg border border-[var(--border)] text-sm hover:bg-[var(--background)]"
-          >
-            .xml.gz
+          <a href={gzipUrl} className="inline-flex">
+            <Button variant="outline" size="sm" type="button">
+              <Download className="h-4 w-4" aria-hidden />
+              .gz
+            </Button>
           </a>
         )}
       </div>
-    </div>
+    </Card>
   );
 }

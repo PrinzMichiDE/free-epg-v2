@@ -1,8 +1,11 @@
+import Link from "next/link";
+import { EpgFeedsPanel } from "@/components/epg/EpgFeedsPanel";
+import { Badge } from "@/components/ui/Badge";
 import { eq } from "drizzle-orm";
 import { notFound } from "next/navigation";
+import { Check } from "lucide-react";
 import { getDatabase } from "@/lib/db";
 import { channels } from "@freeepg/db";
-import { EpgFeedsPanel } from "@/components/epg/EpgFeedsPanel";
 
 export const dynamic = "force-dynamic";
 
@@ -23,12 +26,27 @@ export default async function ChannelDetailPage({
   if (!channel) notFound();
 
   return (
-    <div className="max-w-3xl mx-auto px-4 py-12">
-      <h1 className="text-3xl font-bold mb-2">{channel.name}</h1>
-      <p className="font-mono text-sm text-[var(--muted)] mb-6">{channel.xmltvId}</p>
-      <p className="mb-8 text-[var(--muted)]">
-        {channel.country} · {channel.hasEpg ? "EPG verfügbar" : "Kein EPG"}
-      </p>
+    <div className="page-shell py-10 sm:py-14 max-w-4xl">
+      <header className="mb-10">
+        <p className="text-sm font-medium text-[var(--muted-foreground)] mb-2">
+          Sender · {channel.country}
+        </p>
+        <h1 className="text-3xl sm:text-4xl font-semibold tracking-tight mb-3">
+          {channel.name}
+        </h1>
+        <p className="font-mono text-sm text-[var(--muted-foreground)] mb-4">
+          {channel.xmltvId}
+        </p>
+        {channel.hasEpg ? (
+          <Badge variant="success">
+            <Check className="h-3 w-3 mr-1" aria-hidden />
+            EPG verfügbar
+          </Badge>
+        ) : (
+          <Badge variant="warning">Kein EPG</Badge>
+        )}
+      </header>
+
       <EpgFeedsPanel countryCode={channel.country} />
     </div>
   );

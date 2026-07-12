@@ -1,16 +1,79 @@
+import Link from "next/link";
+import { Github } from "lucide-react";
+
+const links = [
+  { href: "/docs", label: "Dokumentation" },
+  { href: "/docs/api", label: "API" },
+  { href: "/docs/enigma2", label: "Enigma2 / Rytec" },
+  { href: "/countries", label: "Länder-Feeds" },
+];
+
 export function Footer() {
   return (
     <footer className="border-t border-[var(--border)] bg-[var(--card)] mt-auto">
-      <div className="max-w-7xl mx-auto px-4 py-8 text-sm text-[var(--muted)]">
-        <p>
-          FreeEPG — Weltweites EPG als XMLTV ·{" "}
-          <a href="https://free-epg.de" className="hover:underline">
+      <div className="page-shell py-10 grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="sm:col-span-2 lg:col-span-1">
+          <p className="font-semibold text-[var(--foreground)] mb-2">FreeEPG</p>
+          <p className="text-sm text-[var(--muted-foreground)] leading-relaxed max-w-xs">
+            Self-hosted EPG-Plattform für XMLTV und Rytec. Daten aus öffentlichen
+            Quellen — ohne Garantie auf Vollständigkeit.
+          </p>
+        </div>
+
+        <div>
+          <p className="text-xs font-semibold uppercase tracking-wider text-[var(--muted-foreground)] mb-3">
+            Ressourcen
+          </p>
+          <ul className="space-y-2 text-sm">
+            {links.map((link) => (
+              <li key={link.href}>
+                <Link
+                  href={link.href}
+                  className="text-[var(--muted-foreground)] hover:text-[var(--foreground)] transition-colors"
+                >
+                  {link.label}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        <div>
+          <p className="text-xs font-semibold uppercase tracking-wider text-[var(--muted-foreground)] mb-3">
+            Quellen
+          </p>
+          <ul className="space-y-2 text-sm text-[var(--muted-foreground)]">
+            <li>iptv-org (Metadaten)</li>
+            <li>epg.pw / xmltv.se</li>
+          </ul>
+        </div>
+
+        <div>
+          <p className="text-xs font-semibold uppercase tracking-wider text-[var(--muted-foreground)] mb-3">
+            Projekt
+          </p>
+          <a
+            href="https://free-epg.de"
+            className="block text-sm text-[var(--muted-foreground)] hover:text-[var(--foreground)] mb-2 transition-colors"
+          >
             free-epg.de
           </a>
-        </p>
-        <p className="mt-2">
-          Daten aus öffentlichen Quellen (iptv-org, epg.pw, xmltv.se). Keine Garantie auf Vollständigkeit.
-        </p>
+          <a
+            href="https://github.com/PrinzMichiDE/free-epg-v2"
+            className="inline-flex items-center gap-2 text-sm text-[var(--muted-foreground)] hover:text-[var(--foreground)] transition-colors"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <Github className="h-4 w-4" aria-hidden />
+            GitHub
+          </a>
+        </div>
+      </div>
+
+      <div className="border-t border-[var(--border)]">
+        <div className="page-shell py-4 text-xs text-[var(--muted-foreground)]">
+          © {new Date().getFullYear()} FreeEPG · Open Source EPG Infrastructure
+        </div>
       </div>
     </footer>
   );

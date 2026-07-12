@@ -1,35 +1,157 @@
 @import "tailwindcss";
 
 :root {
-  --background: #f8fafc;
-  --foreground: #0f172a;
-  --primary: #1e40af;
+  --background: #f3f6f9;
+  --foreground: #0c1829;
+  --primary: #1e3a5f;
   --primary-foreground: #ffffff;
   --accent: #0d9488;
-  --muted: #64748b;
+  --accent-foreground: #ffffff;
+  --muted: #5c6b7a;
+  --muted-foreground: #5c6b7a;
   --card: #ffffff;
-  --border: #e2e8f0;
+  --card-foreground: #0c1829;
+  --border: #d8e0e9;
+  --ring: #1e3a5f;
+  --success: #059669;
+  --success-muted: #ecfdf5;
+  --warning: #b45309;
+  --warning-muted: #fffbeb;
+  --destructive: #dc2626;
+  --surface-muted: #e8eef4;
+  --header-height: 4rem;
+  --radius: 0.75rem;
+  --shadow-sm: 0 1px 2px rgb(12 24 41 / 0.04);
+  --shadow-md: 0 4px 16px rgb(12 24 41 / 0.06);
+  --font-sans: var(--font-plus-jakarta), system-ui, sans-serif;
+  --font-mono: var(--font-jetbrains-mono), ui-monospace, monospace;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0f172a;
-    --foreground: #f1f5f9;
-    --primary: #3b82f6;
-    --primary-foreground: #ffffff;
-    --accent: #14b8a6;
-    --muted: #94a3b8;
-    --card: #1e293b;
-    --border: #334155;
+    --background: #080d14;
+    --foreground: #e8edf3;
+    --primary: #5b9fd4;
+    --primary-foreground: #081018;
+    --accent: #2dd4bf;
+    --accent-foreground: #042f2e;
+    --muted: #8b9cb0;
+    --muted-foreground: #8b9cb0;
+    --card: #111927;
+    --card-foreground: #e8edf3;
+    --border: #243044;
+    --ring: #5b9fd4;
+    --success: #34d399;
+    --success-muted: rgb(52 211 153 / 0.12);
+    --warning: #fbbf24;
+    --warning-muted: rgb(251 191 36 / 0.12);
+    --destructive: #f87171;
+    --surface-muted: #161f2e;
+    --shadow-sm: 0 1px 2px rgb(0 0 0 / 0.24);
+    --shadow-md: 0 8px 24px rgb(0 0 0 / 0.32);
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Inter, system-ui, sans-serif;
+@layer base {
+  *,
+  *::before,
+  *::after {
+    border-color: var(--border);
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+
+  body {
+    background: var(--background);
+    color: var(--foreground);
+    font-family: var(--font-sans);
+    font-size: 1rem;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    letter-spacing: -0.02em;
+    line-height: 1.2;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 2px;
+  }
+
+  ::selection {
+    background: color-mix(in srgb, var(--accent) 28%, transparent);
+  }
 }
 
-.font-mono {
-  font-family: "JetBrains Mono", ui-monospace, monospace;
+@layer utilities {
+  .font-mono {
+    font-family: var(--font-mono);
+  }
+
+  .page-shell {
+    @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
+  }
+
+  .surface-card {
+    background: var(--card);
+    color: var(--card-foreground);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-sm);
+  }
+
+  .hero-grid {
+    background-image:
+      linear-gradient(to right, color-mix(in srgb, var(--border) 40%, transparent) 1px, transparent 1px),
+      linear-gradient(to bottom, color-mix(in srgb, var(--border) 40%, transparent) 1px, transparent 1px);
+    background-size: 48px 48px;
+    mask-image: radial-gradient(ellipse 80% 70% at 50% 0%, black 20%, transparent 100%);
+  }
+
+  .prose-docs h1 {
+    @apply text-3xl font-semibold tracking-tight mb-4;
+  }
+
+  .prose-docs h2 {
+    @apply text-xl font-semibold tracking-tight mt-10 mb-3;
+  }
+
+  .prose-docs p,
+  .prose-docs li {
+    @apply text-[var(--muted-foreground)] leading-relaxed;
+  }
+
+  .prose-docs code {
+    @apply font-mono text-sm px-1.5 py-0.5 rounded-md bg-[var(--surface-muted)] text-[var(--foreground)];
+  }
+
+  .prose-docs pre {
+    @apply font-mono text-sm p-4 rounded-xl bg-[var(--surface-muted)] overflow-x-auto border border-[var(--border)];
+  }
+
+  .prose-docs a {
+    @apply text-[var(--primary)] hover:underline underline-offset-4;
+  }
 }

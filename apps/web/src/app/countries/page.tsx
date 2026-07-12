@@ -52,8 +52,13 @@ export default async function CountriesPage() {
   }
 
   return (
-    <div className="max-w-7xl mx-auto px-4 py-12">
-      <h1 className="text-3xl font-bold mb-8">Alle Länder</h1>
+    <div className="page-shell py-10 sm:py-14">
+      <header className="mb-10">
+        <h1 className="text-3xl sm:text-4xl font-semibold tracking-tight">Alle Länder</h1>
+        <p className="text-[var(--muted-foreground)] mt-2 max-w-2xl">
+          {EPG_PW_COUNTRIES.length} unterstützte Regionen mit XMLTV- und Rytec-Feeds.
+        </p>
+      </header>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
         {countries.map((c) => (
           <CountryCard key={c.code} {...c} />

@@ -1,8 +1,12 @@
+import Link from "next/link";
 import { sql } from "drizzle-orm";
+import { Globe2, Radio, Server } from "lucide-react";
 import { getDatabase } from "@/lib/db";
 import { channels, generatedFiles } from "@freeepg/db";
 import { EPG_PW_COUNTRIES } from "@freeepg/epg-sources";
 import { CountryCard } from "@/components/country/CountryCard";
+import { Button } from "@/components/ui/Button";
+import { StatCard } from "@/components/ui/StatCard";
 import { countryEpgPaths } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
@@ -57,43 +61,84 @@ export default async function HomePage() {
     });
   }
 
+  const activeCountries = countries.filter((c) => c.channelCount > 0).length;
+  const epgFeeds = countries.filter((c) => c.hasEpg).length;
+
   return (
-    <div className="max-w-7xl mx-auto px-4 py-12">
-      <section className="text-center mb-16">
-        <h1 className="text-4xl md:text-5xl font-bold mb-4">
-          Weltweites EPG als XMLTV
-        </h1>
-        <p className="text-lg text-[var(--muted)] max-w-2xl mx-auto mb-8">
-          Kostenlos, self-hosted, für tausende Sender weltweit.
-        </p>
+    <>
+      <section className="relative border-b border-[var(--border)] overflow-hidden">
+        <div className="absolute inset-0 hero-grid pointer-events-none" aria-hidden />
+        <div className="page-shell relative py-16 sm:py-20 lg:py-24">
+          <div className="max-w-3xl">
+            <p className="text-sm font-medium text-[var(--accent)] mb-4 tracking-wide uppercase">
+              Self-hosted EPG Infrastructure
+            </p>
+            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-semibold tracking-tight text-[var(--foreground)] mb-5">
+              Weltweites EPG als XMLTV und Rytec
+            </h1>
+            <p className="text-lg text-[var(--muted-foreground)] leading-relaxed mb-8 max-w-2xl">
+              Kostenlose, selbst gehostete Programmdaten für tausende Sender.
+              XMLTV für IPTV-Apps, Rytec für Enigma2 — automatisch generiert
+              und per URL abrufbar.
+            </p>
+            <div className="flex flex-wrap gap-3">
+              <Link href="/countries">
+                <Button size="lg">Länder-Feeds ansehen</Button>
+              </Link>
+              <Link href="/docs">
+                <Button variant="outline" size="lg">
+                  Dokumentation
+                </Button>
+              </Link>
+            </div>
+          </div>
+        </div>
       </section>
 
-      <section className="grid grid-cols-3 gap-4 mb-12 max-w-lg mx-auto text-center">
-        <div className="p-4 rounded-xl bg-[var(--card)] border border-[var(--border)]">
-          <p className="text-2xl font-bold">{totalChannels.toLocaleString("de-DE")}</p>
-          <p className="text-sm text-[var(--muted)]">Sender</p>
-        </div>
-        <div className="p-4 rounded-xl bg-[var(--card)] border border-[var(--border)]">
-          <p className="text-2xl font-bold">{countries.filter((c) => c.channelCount > 0).length}</p>
-          <p className="text-sm text-[var(--muted)]">Länder</p>
-        </div>
-        <div className="p-4 rounded-xl bg-[var(--card)] border border-[var(--border)]">
-          <p className="text-2xl font-bold">{countries.filter((c) => c.hasEpg).length}</p>
-          <p className="text-sm text-[var(--muted)]">EPG Feeds</p>
-        </div>
-      </section>
+      <div className="page-shell py-12 sm:py-16 space-y-14">
+        <section
+          className="grid grid-cols-1 sm:grid-cols-3 gap-4"
+          aria-label="Plattform-Statistiken"
+        >
+          <StatCard
+            label="Sender"
+            value={totalChannels.toLocaleString("de-DE")}
+            icon={Radio}
+          />
+          <StatCard
+            label="Länder mit Metadaten"
+            value={activeCountries}
+            icon={Globe2}
+          />
+          <StatCard label="Aktive EPG-Feeds" value={epgFeeds} icon={Server} />
+        </section>
 
-      <section>
-        <h2 className="text-2xl font-bold mb-2">Länder</h2>
-        <p className="text-sm text-[var(--muted)] mb-6">
-          Pro Land XMLTV- und Rytec-URL kopieren — Rytec für Enigma2 / EPGImport.
-        </p>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-          {countries.slice(0, 20).map((c) => (
-            <CountryCard key={c.code} {...c} />
-          ))}
-        </div>
-      </section>
-    </div>
+        <section>
+          <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-8">
+            <div>
+              <h2 className="text-2xl sm:text-3xl font-semibold tracking-tight">
+                Länder-Feeds
+              </h2>
+              <p className="text-[var(--muted-foreground)] mt-2 max-w-xl">
+                XMLTV- oder Rytec-URL direkt kopieren. Details und Channel-Maps
+                pro Land in der Übersicht.
+              </p>
+            </div>
+            <Link
+              href="/countries"
+              className="text-sm font-medium text-[var(--primary)] hover:underline underline-offset-4 shrink-0"
+            >
+              Alle {EPG_PW_COUNTRIES.length} Länder anzeigen
+            </Link>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+            {countries.slice(0, 20).map((c) => (
+              <CountryCard key={c.code} {...c} />
+            ))}
+          </div>
+        </section>
+      </div>
+    </>
   );
 }
