@@ -1,5 +1,7 @@
 import Link from "next/link";
 import { Github } from "lucide-react";
+import { DonateButton } from "@/components/layout/DonateButton";
+import { PAYPAL_DONATE_LABEL } from "@/lib/site";
 
 const links = [
   { href: "/docs", label: "Dokumentation" },
@@ -14,9 +16,13 @@ export function Footer() {
       <div className="page-shell py-10 grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
         <div className="sm:col-span-2 lg:col-span-1">
           <p className="font-semibold text-[var(--foreground)] mb-2">FreeEPG</p>
-          <p className="text-sm text-[var(--muted-foreground)] leading-relaxed max-w-xs">
+          <p className="text-sm text-[var(--muted-foreground)] leading-relaxed max-w-xs mb-4">
             Self-hosted EPG-Plattform für XMLTV und Rytec. Daten aus öffentlichen
             Quellen — ohne Garantie auf Vollständigkeit.
+          </p>
+          <DonateButton variant="outline" size="sm" showAmount />
+          <p className="text-xs text-[var(--muted-foreground)] mt-2">
+            Freiwillige Spende ({PAYPAL_DONATE_LABEL}) für Betrieb und Weiterentwicklung.
           </p>
         </div>
 

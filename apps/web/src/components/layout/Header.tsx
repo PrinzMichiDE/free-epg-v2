@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 import { Menu, Radio, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/Button";
+import { DonateButton } from "@/components/layout/DonateButton";
 
 const nav = [
   { href: "/countries", label: "Länder" },
@@ -56,6 +57,7 @@ export function Header() {
         </nav>
 
         <div className="hidden lg:flex items-center gap-2">
+          <DonateButton />
           <Link href="/countries">
             <Button variant="outline" size="sm">
               Feeds durchsuchen
@@ -104,6 +106,9 @@ export function Header() {
               </Link>
             );
           })}
+          <div className="pt-3 mt-2 border-t border-[var(--border)]">
+            <DonateButton variant="outline" size="md" className="w-full" showAmount />
+          </div>
         </nav>
       )}
     </header>
