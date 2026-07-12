@@ -1,8 +1,11 @@
+"use client";
+
 import Link from "next/link";
 import { Globe2, ListMusic } from "lucide-react";
 import { cn, formatNumber } from "@/lib/utils";
 import { Badge } from "@/components/ui/Badge";
 import { ButtonLink } from "@/components/ui/ButtonLink";
+import { useI18n } from "@/lib/i18n/I18nProvider";
 import type { WorldPlaylistMeta } from "@/lib/playlists";
 
 interface WorldPlaylistCardProps {
@@ -11,6 +14,8 @@ interface WorldPlaylistCardProps {
 }
 
 export function WorldPlaylistCard({ playlist, className }: WorldPlaylistCardProps) {
+  const { t } = useI18n();
+
   return (
     <article
       className={cn(
@@ -26,18 +31,19 @@ export function WorldPlaylistCard({ playlist, className }: WorldPlaylistCardProp
         <div className="min-w-0">
           <div className="flex flex-wrap items-center gap-2 mb-1">
             <h2 className="text-xl sm:text-2xl font-semibold tracking-tight">
-              {playlist.name}
+              {t("world.title")}
             </h2>
-            <Badge variant="success">Global-Lite EPG</Badge>
+            <Badge variant="success">{t("world.badge")}</Badge>
           </div>
           <p className="text-[var(--muted-foreground)] leading-relaxed max-w-2xl">
-            Eine M3U mit Sendern aus {formatNumber(playlist.countryCount)} Ländern —
-            nach Land gruppiert, mit tvg-id und weltweitem EPG in einer Datei.
+            {t("world.desc", { countries: formatNumber(playlist.countryCount) })}
           </p>
           <p className="text-sm text-[var(--muted-foreground)] mt-2 tabular-nums">
-            {formatNumber(playlist.countryCount)} Länder ·{" "}
-            {formatNumber(playlist.channelCount)} Sender · bis zu{" "}
-            {formatNumber(playlist.entryLimit)} Einträge max.
+            {t("world.stats", {
+              countries: formatNumber(playlist.countryCount),
+              channels: formatNumber(playlist.channelCount),
+              limit: formatNumber(playlist.entryLimit),
+            })}
           </p>
         </div>
       </div>
@@ -51,11 +57,11 @@ export function WorldPlaylistCard({ playlist, className }: WorldPlaylistCardProp
             "hover:bg-[var(--surface-muted)] transition-colors"
           )}
         >
-          Details
+          {t("common.details")}
         </Link>
         <ButtonLink href={playlist.m3uUrl} size="md" download>
           <ListMusic className="h-4 w-4" aria-hidden />
-          M3U herunterladen
+          {t("world.download")}
         </ButtonLink>
       </div>
     </article>

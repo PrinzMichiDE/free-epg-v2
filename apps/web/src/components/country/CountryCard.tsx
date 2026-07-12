@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/Badge";
 import { ButtonLink } from "@/components/ui/ButtonLink";
 import { CountryFlag } from "@/components/country/CountryFlag";
 import { getCountryName } from "@/lib/countries";
+import { useI18n } from "@/lib/i18n/I18nProvider";
 
 interface CountryCardProps {
   code: string;
@@ -25,6 +26,7 @@ export function CountryCard({
   xmlUrl,
   rytecGzipUrl,
 }: CountryCardProps) {
+  const { t } = useI18n();
   const xmlGzipUrl = xmlUrl.endsWith(".xml") ? `${xmlUrl}.gz` : xmlUrl;
 
   return (
@@ -37,7 +39,7 @@ export function CountryCard({
               {getCountryName(code)}
             </h3>
             <p className="text-sm text-[var(--muted-foreground)]">
-              {code} · {formatNumber(channelCount)} Sender
+              {code} · {t("card.channels", { count: formatNumber(channelCount) })}
             </p>
           </div>
         </div>
@@ -45,12 +47,12 @@ export function CountryCard({
           {hasEpg ? (
             <span className="inline-flex items-center gap-1">
               <Check className="h-3 w-3" aria-hidden />
-              EPG
+              {t("common.epg")}
             </span>
           ) : (
             <span className="inline-flex items-center gap-1">
               <Clock className="h-3 w-3" aria-hidden />
-              Pending
+              {t("common.pending")}
             </span>
           )}
         </Badge>
@@ -58,7 +60,7 @@ export function CountryCard({
 
       {lastUpdate && (
         <p className="text-xs text-[var(--muted-foreground)]">
-          Aktualisiert: {formatDate(lastUpdate)}
+          {t("common.updated", { date: formatDate(lastUpdate) })}
         </p>
       )}
 
@@ -71,7 +73,7 @@ export function CountryCard({
             "text-[var(--foreground)] hover:bg-[var(--surface-muted)] transition-colors duration-200"
           )}
         >
-          Details
+          {t("common.details")}
           <ExternalLink className="h-3.5 w-3.5 opacity-60" aria-hidden />
         </Link>
         <ButtonLink
@@ -80,7 +82,7 @@ export function CountryCard({
           size="sm"
           className="col-span-1 w-full"
         >
-          XMLTV
+          {t("common.xmltv")}
         </ButtonLink>
         <ButtonLink
           href={rytecGzipUrl}
@@ -88,7 +90,7 @@ export function CountryCard({
           size="sm"
           className="col-span-1 w-full"
         >
-          Rytec
+          {t("common.rytec")}
         </ButtonLink>
       </div>
     </article>

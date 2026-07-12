@@ -1,9 +1,12 @@
+"use client";
+
 import Link from "next/link";
 import { Check, ExternalLink, ListMusic, Radio } from "lucide-react";
 import { cn, formatNumber } from "@/lib/utils";
 import { Badge } from "@/components/ui/Badge";
 import { ButtonLink } from "@/components/ui/ButtonLink";
 import { CountryFlag } from "@/components/country/CountryFlag";
+import { useI18n } from "@/lib/i18n/I18nProvider";
 
 interface PlaylistCardProps {
   code: string;
@@ -24,6 +27,8 @@ export function PlaylistCard({
   m3uUrl,
   epgUrl,
 }: PlaylistCardProps) {
+  const { t } = useI18n();
+
   return (
     <article className="surface-card p-5 flex flex-col gap-4 hover:shadow-md transition-shadow duration-200">
       <div className="flex items-start justify-between gap-3">
@@ -34,8 +39,11 @@ export function PlaylistCard({
               {name}
             </h3>
             <p className="text-sm text-[var(--muted-foreground)]">
-              {code} · {formatNumber(channelCount)} Sender ·{" "}
-              {formatNumber(streamCount)} Streams
+              {code} ·{" "}
+              {t("card.playlistMeta", {
+                channels: formatNumber(channelCount),
+                streams: formatNumber(streamCount),
+              })}
             </p>
           </div>
         </div>
@@ -43,12 +51,12 @@ export function PlaylistCard({
           {hasEpg ? (
             <span className="inline-flex items-center gap-1">
               <Check className="h-3 w-3" aria-hidden />
-              EPG
+              {t("common.epg")}
             </span>
           ) : (
             <span className="inline-flex items-center gap-1">
               <Radio className="h-3 w-3" aria-hidden />
-              Global
+              {t("common.globalEpg")}
             </span>
           )}
         </Badge>
@@ -63,7 +71,7 @@ export function PlaylistCard({
             "text-[var(--foreground)] hover:bg-[var(--surface-muted)] transition-colors duration-200"
           )}
         >
-          Details
+          {t("common.details")}
           <ExternalLink className="h-3.5 w-3.5 opacity-60" aria-hidden />
         </Link>
         <ButtonLink
@@ -74,7 +82,7 @@ export function PlaylistCard({
           download
         >
           <ListMusic className="h-4 w-4" aria-hidden />
-          M3U
+          {t("common.m3u")}
         </ButtonLink>
         <ButtonLink
           href={epgUrl.replace(/^https?:\/\/[^/]+/, "")}
@@ -82,7 +90,7 @@ export function PlaylistCard({
           size="sm"
           className="col-span-1 w-full"
         >
-          EPG
+          {t("common.epg")}
         </ButtonLink>
       </div>
     </article>

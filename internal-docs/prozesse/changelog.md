@@ -36,6 +36,20 @@ Nicht im Scope: Jeder Einzel-Commit ohne betriebliche Relevanz.
 
 ## Detailbeschreibung
 
+### Eintrag CHG-2026-004: Mehrsprachigkeit (Top-20) und Admin aus Navigation
+
+| Feld | Inhalt |
+|------|--------|
+| Datum | 2026-07-12 |
+| Version | App-Release (Web) |
+| Begründung | Internationale Nutzer sollen die Oberfläche in den 20 meistgesprochenen Sprachen nutzen können; Admin-Bereich soll nicht öffentlich in der Navigation erscheinen |
+| Auswirkung | Neues i18n-Modul (`apps/web/src/lib/i18n/`) mit 20 Locales; Sprachumschalter im Header; Cookie `freeepg_locale`; übersetzte Startseite, Playlists, Header, Footer, Fehlerseiten und Karten; Admin-Link aus Nav entfernt (Route `/admin` bleibt direkt erreichbar) |
+| Risiko | niedrig (Client-seitige Übersetzungen; Docs/Admin-UI weiterhin überwiegend Deutsch/Englisch) |
+| Betroffene Komponenten | `apps/web` (Layout, Header, Footer, Home, Playlists, CountryCard, PlaylistCard) |
+| Prüfung | `npm run typecheck -w @freeepg/web`; manuell Sprachwechsel im Header, Cookie-Persistenz, RTL für Arabisch/Urdu |
+| Freigabe | Product Owner |
+| Rollback | Vorheriges Web-Image; Cookie `freeepg_locale` optional löschen |
+
 ### Eintrag CHG-2026-003: Playlisten weltweit (iptv-org M3U-Katalog)
 
 | Feld | Inhalt |
