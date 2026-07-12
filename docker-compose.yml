@@ -5,8 +5,8 @@ services:
       dockerfile: apps/worker/Dockerfile
     environment:
       DATABASE_URL: postgresql://freeepg:freeepg@postgres:5432/freeepg
-      SEED_ON_START: ${SEED_ON_START:-true}
-    command: ["node", "packages/db/dist/docker-init.js"]
+      SEED_ON_START: "false"
+    command: ["node", "packages/db/dist/docker-migrate.js"]
     depends_on:
       postgres:
         condition: service_healthy
