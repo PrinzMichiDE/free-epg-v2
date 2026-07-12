@@ -60,9 +60,8 @@ export default async function PlaylistDetailPage({
           </Badge>
         </div>
         <p className="text-[var(--muted-foreground)] max-w-2xl leading-relaxed">
-          M3U-Playlist mit iptv-org Streams für {playlist.name}. Die
-          x-tvg-url zeigt auf das passende FreeEPG EPG — Land-Feed oder
-          weltweites Lite-EPG.
+          M3U-Playlist für {playlist.name}. Die x-tvg-url zeigt auf das passende
+          FreeEPG EPG — Land-Feed oder weltweites Lite-EPG.
         </p>
       </header>
 

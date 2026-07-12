@@ -12,12 +12,12 @@ const links = [
 export function Footer() {
   return (
     <footer className="border-t border-[var(--border)] bg-[var(--card)] mt-auto">
-      <div className="page-shell py-10 grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="page-shell py-10 grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
         <div className="sm:col-span-2 lg:col-span-1">
           <p className="font-semibold text-[var(--foreground)] mb-2">FreeEPG</p>
           <p className="text-sm text-[var(--muted-foreground)] leading-relaxed max-w-xs mb-4">
-            Self-hosted EPG-Plattform für XMLTV und Rytec. Daten aus öffentlichen
-            Quellen — ohne Garantie auf Vollständigkeit.
+            Self-hosted EPG-Plattform für XMLTV und Rytec — ohne Garantie auf
+            Vollständigkeit.
           </p>
           <DonateButton variant="outline" size="sm" showAmount />
           <p className="text-xs text-[var(--muted-foreground)] mt-2">
@@ -40,16 +40,6 @@ export function Footer() {
                 </Link>
               </li>
             ))}
-          </ul>
-        </div>
-
-        <div>
-          <p className="text-xs font-semibold uppercase tracking-wider text-[var(--muted-foreground)] mb-3">
-            Quellen
-          </p>
-          <ul className="space-y-2 text-sm text-[var(--muted-foreground)]">
-            <li>iptv-org (Metadaten)</li>
-            <li>epg.pw / xmltv.se</li>
           </ul>
         </div>
 

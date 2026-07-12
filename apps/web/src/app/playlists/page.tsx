@@ -1,16 +1,21 @@
 import Link from "next/link";
 import { Globe2, ListMusic } from "lucide-react";
 import { PlaylistCard } from "@/components/playlist/PlaylistCard";
-import { getPlaylistCountries } from "@/lib/playlists";
+import { WorldPlaylistCard } from "@/components/playlist/WorldPlaylistCard";
+import { getPlaylistCountries, getWorldPlaylistMeta } from "@/lib/playlists";
 
 export const dynamic = "force-dynamic";
 
 export default async function PlaylistsPage() {
   let playlists: Awaited<ReturnType<typeof getPlaylistCountries>> = [];
+  let world: Awaited<ReturnType<typeof getWorldPlaylistMeta>> | null = null;
   let loadError = false;
 
   try {
-    playlists = await getPlaylistCountries();
+    [playlists, world] = await Promise.all([
+      getPlaylistCountries(),
+      getWorldPlaylistMeta(),
+    ]);
   } catch {
     loadError = true;
   }
@@ -29,9 +34,8 @@ export default async function PlaylistsPage() {
           Playlisten weltweit
         </h1>
         <p className="text-[var(--muted-foreground)] mt-3 max-w-2xl leading-relaxed">
-          Fertige M3U-Playlists aus dem iptv-org Stream-Katalog, gruppiert nach
-          Land. Jede Playlist enthält tvg-id-Werte und eine passende FreeEPG
-          EPG-URL — bereit für Kodi, VLC oder Enigma2.
+          Fertige M3U-Playlists nach Land — oder alles gebündelt in einer
+          weltweiten Playlist mit tvg-id und EPG-URL für Kodi, VLC oder Enigma2.
         </p>
         {!loadError && playlists.length > 0 && (
           <p className="text-sm text-[var(--muted-foreground)] mt-4 inline-flex items-center gap-2">
@@ -44,9 +48,8 @@ export default async function PlaylistsPage() {
 
       {loadError && (
         <div className="rounded-xl border border-[var(--border)] bg-[var(--warning-muted)] p-4 text-sm text-[var(--foreground)] mb-8">
-          Playlists konnten gerade nicht geladen werden. Der Stream-Katalog wird
-          beim ersten Aufruf von iptv-org synchronisiert — bitte in Kürze
-          erneut versuchen.
+          Playlists konnten gerade nicht geladen werden. Der Katalog wird beim
+          ersten Aufruf synchronisiert — bitte in Kürze erneut versuchen.
         </div>
       )}
 
@@ -57,6 +60,18 @@ export default async function PlaylistsPage() {
         </div>
       )}
 
+      {world && !loadError && (
+        <section className="mb-10">
+          <WorldPlaylistCard playlist={world} />
+        </section>
+      )}
+
+      {!loadError && playlists.length > 0 && (
+        <h2 className="text-lg font-semibold tracking-tight mb-4">
+          Playlists pro Land
+        </h2>
+      )}
+
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
         {playlists.map((playlist) => (
           <PlaylistCard key={playlist.code} {...playlist} />
@@ -64,16 +79,7 @@ export default async function PlaylistsPage() {
       </div>
 
       <p className="text-xs text-[var(--muted-foreground)] mt-10 max-w-3xl leading-relaxed">
-        Stream-Quelle:{" "}
-        <a
-          href="https://github.com/iptv-org/iptv"
-          className="text-[var(--primary)] hover:underline underline-offset-4"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          iptv-org/iptv
-        </a>
-        . Verfügbarkeit und Geo-Blocking liegen beim jeweiligen Anbieter. Für
+        Verfügbarkeit und Geo-Blocking liegen beim jeweiligen Anbieter. Für
         eigene Listen siehe{" "}
         <Link
           href="/m3u"

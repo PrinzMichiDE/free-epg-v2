@@ -30,6 +30,24 @@ export interface PlaylistCountry {
   epgUrl: string;
 }
 
+export const WORLD_PLAYLIST_SLUG = "world";
+
+export interface WorldPlaylistMeta {
+  slug: typeof WORLD_PLAYLIST_SLUG;
+  name: string;
+  countryCount: number;
+  channelCount: number;
+  streamCount: number;
+  entryLimit: number;
+  hasEpg: boolean;
+  m3uUrl: string;
+  epgUrl: string;
+}
+
+const WORLD_PLAYLIST_MAX_ENTRIES = 10_000;
+
+export { WORLD_PLAYLIST_MAX_ENTRIES };
+
 function epgDataDir(): string {
   return process.env.EPG_DATA_DIR ?? path.join(process.cwd(), "../../data/epg");
 }
@@ -179,6 +197,84 @@ export async function buildCountryPlaylistM3u(
   const content = buildM3uPlaylist(entries, epgUrl);
 
   return { content, entryCount: entries.length };
+}
+
+export async function getWorldPlaylistMeta(): Promise<WorldPlaylistMeta> {
+  const countries = await getPlaylistCountries();
+
+  return {
+    slug: WORLD_PLAYLIST_SLUG,
+    name: "Weltweit — alle Länder",
+    countryCount: countries.length,
+    channelCount: countries.reduce((sum, c) => sum + c.channelCount, 0),
+    streamCount: countries.reduce((sum, c) => sum + c.streamCount, 0),
+    entryLimit: WORLD_PLAYLIST_MAX_ENTRIES,
+    hasEpg: true,
+    m3uUrl: `/api/playlists/${WORLD_PLAYLIST_SLUG}.m3u`,
+    epgUrl: `${BASE_URL}/api/epg`,
+  };
+}
+
+export async function buildWorldPlaylistM3u(): Promise<{
+  content: string;
+  entryCount: number;
+  countryCount: number;
+} | null> {
+  const [streams, channelMap, worldNames] = await Promise.all([
+    loadCachedStreams(),
+    loadChannelCountryMap(),
+    loadWorldCountryNames(),
+  ]);
+
+  const candidates = streams
+    .filter((stream) => {
+      const channelId = stream.channel!;
+      return channelMap.has(channelId);
+    })
+    .map((stream) => ({
+      channelId: stream.channel!,
+      title: stream.title,
+      url: stream.url,
+      quality: stream.quality,
+    }));
+
+  if (candidates.length === 0) {
+    return null;
+  }
+
+  const picked = pickBestStreamsPerChannel(
+    candidates,
+    WORLD_PLAYLIST_MAX_ENTRIES
+  );
+
+  const entries: PlaylistStreamEntry[] = picked
+    .map((stream) => {
+      const country = channelMap.get(stream.channelId)!;
+      return {
+        tvgId: stream.channelId,
+        title: stream.title,
+        url: stream.url,
+        groupTitle: playlistName(country, worldNames),
+      };
+    })
+    .sort(
+      (a, b) =>
+        (a.groupTitle ?? "").localeCompare(b.groupTitle ?? "", "de") ||
+        a.title.localeCompare(b.title, "de")
+    );
+
+  const countriesUsed = new Set(
+    picked.map((stream) => channelMap.get(stream.channelId)!)
+  );
+
+  const epgUrl = `${BASE_URL}/api/epg`;
+  const content = buildM3uPlaylist(entries, epgUrl);
+
+  return {
+    content,
+    entryCount: entries.length,
+    countryCount: countriesUsed.size,
+  };
 }
 
 export async function getPlaylistCountry(

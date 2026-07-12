@@ -151,8 +151,8 @@ export default async function HomePage() {
                 Playlisten weltweit
               </h2>
               <p className="text-[var(--muted-foreground)] mt-2 max-w-xl">
-                Fertige M3U-Playlists aus iptv-org, nach Land gruppiert — mit
-                tvg-id und passender EPG-URL für Kodi, VLC und Enigma2.
+                Eine M3U mit Sendern aus allen Ländern — oder pro Land einzeln,
+                jeweils mit tvg-id und passender EPG-URL.
               </p>
             </div>
             <Link

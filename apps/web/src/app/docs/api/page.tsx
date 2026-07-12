@@ -15,7 +15,8 @@ export default function ApiDocsPage() {
           <tr><td className="p-2 font-mono">GET /api/epg/rytec/channels/{"{country}"}.xml</td><td className="p-2">Channel-Map Vorlage</td></tr>
           <tr><td className="p-2 font-mono">GET /api/epg/list/{"{id}"}.xml</td><td className="p-2">Custom List EPG</td></tr>
           <tr><td className="p-2 font-mono">GET /api/epg/m3u/{"{id}"}.xml</td><td className="p-2">M3U EPG</td></tr>
-          <tr><td className="p-2 font-mono">GET /api/playlists/{"{country}"}.m3u</td><td className="p-2">Land-Playlist (iptv-org)</td></tr>
+          <tr><td className="p-2 font-mono">GET /api/playlists/world.m3u</td><td className="p-2">Weltweite Sammel-Playlist</td></tr>
+          <tr><td className="p-2 font-mono">GET /api/playlists/{"{country}"}.m3u</td><td className="p-2">Land-Playlist M3U</td></tr>
         </tbody>
       </table>
       <h2>JSON Endpunkte</h2>
