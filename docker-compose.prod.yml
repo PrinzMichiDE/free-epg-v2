@@ -2,6 +2,18 @@
 #   docker compose --env-file stack.env -f docker-compose.prod.yml up -d
 
 services:
+  db-init:
+    image: ${DOCKERHUB_USER:-freeepg}/freeepg-worker:${IMAGE_TAG:-latest}
+    env_file:
+      - stack.env
+    command: ["node", "packages/db/dist/docker-init.js"]
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: "no"
+    networks:
+      - freeepg-internal
+
   web:
     image: ${DOCKERHUB_USER:-freeepg}/freeepg-web:${IMAGE_TAG:-latest}
     env_file:
@@ -16,6 +28,8 @@ services:
     volumes:
       - epg-data:/data/epg
     depends_on:
+      db-init:
+        condition: service_completed_successfully
       postgres:
         condition: service_healthy
       redis:
@@ -31,6 +45,8 @@ services:
     volumes:
       - epg-data:/data/epg
     depends_on:
+      db-init:
+        condition: service_completed_successfully
       postgres:
         condition: service_healthy
       redis:

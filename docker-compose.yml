@@ -1,4 +1,19 @@
 services:
+  db-init:
+    build:
+      context: .
+      dockerfile: apps/worker/Dockerfile
+    environment:
+      DATABASE_URL: postgresql://freeepg:freeepg@postgres:5432/freeepg
+      SEED_ON_START: ${SEED_ON_START:-true}
+    command: ["node", "packages/db/dist/docker-init.js"]
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: "no"
+    networks:
+      - freeepg-internal
+
   web:
     build:
       context: .
@@ -18,6 +33,8 @@ services:
     volumes:
       - epg-data:/data/epg
     depends_on:
+      db-init:
+        condition: service_completed_successfully
       postgres:
         condition: service_healthy
       redis:
@@ -44,6 +61,8 @@ services:
     volumes:
       - epg-data:/data/epg
     depends_on:
+      db-init:
+        condition: service_completed_successfully
       postgres:
         condition: service_healthy
       redis:
