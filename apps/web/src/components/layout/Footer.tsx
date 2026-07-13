@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { Github } from "lucide-react";
 import { DonateButton } from "@/components/layout/DonateButton";
+import { AffiliateLinks } from "@/components/layout/AffiliateLinks";
 import { useI18n } from "@/lib/i18n/I18nProvider";
 import type { MessageKey } from "@/lib/i18n/messages";
 
@@ -25,6 +26,10 @@ export function Footer() {
             {t("footer.tagline")}
           </p>
           <DonateButton variant="outline" size="sm" showAmount stacked className="max-w-full" />
+          <p className="text-xs font-semibold uppercase tracking-wider text-[var(--muted-foreground)] mt-4 mb-2">
+            {t("donate.affiliateTitle")}
+          </p>
+          <AffiliateLinks variant="outline" size="sm" stacked className="max-w-full" />
           <p className="text-xs text-[var(--muted-foreground)] mt-2">{t("donate.hint")}</p>
         </div>
 

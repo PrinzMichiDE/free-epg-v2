@@ -4,7 +4,9 @@ import { useEffect, useRef, useState } from "react";
 import { AlertCircle, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { buildProxyUrl } from "@/lib/player/stream-proxy";
+import { IPTV_HLS_CONFIG } from "@/lib/player/hls-config";
 import type { PlaylistPlayerEntry } from "@/lib/playlists";
+import type Hls from "hls.js";
 
 interface TvPlayerProps {
   channel: PlaylistPlayerEntry | null;
@@ -12,6 +14,20 @@ interface TvPlayerProps {
   onError?: (message: string) => void;
   errorLabel: string;
   loadingLabel: string;
+}
+
+function isHlsUrl(url: string): boolean {
+  return (
+    url.includes(".m3u8") ||
+    url.includes("m3u8?") ||
+    !url.match(/\.(mp4|webm|ogg)(\?|$)/i)
+  );
+}
+
+function resetVideoElement(video: HTMLVideoElement) {
+  video.pause();
+  video.removeAttribute("src");
+  video.load();
 }
 
 export function TvPlayer({
@@ -22,7 +38,7 @@ export function TvPlayer({
   loadingLabel,
 }: TvPlayerProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
-  const hlsRef = useRef<{ destroy: () => void } | null>(null);
+  const hlsRef = useRef<Hls | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -32,8 +48,7 @@ export function TvPlayer({
 
     hlsRef.current?.destroy();
     hlsRef.current = null;
-    video.removeAttribute("src");
-    video.load();
+    resetVideoElement(video);
     setError(null);
 
     if (!channel?.url) {
@@ -56,21 +71,30 @@ export function TvPlayer({
       onError?.(message);
     };
 
+    const playWhenReady = () => {
+      const onCanPlay = () => {
+        video.removeEventListener("canplay", onCanPlay);
+        if (cancelled) return;
+        video
+          .play()
+          .then(() => {
+            if (!cancelled) setLoading(false);
+          })
+          .catch(() => fail(errorLabel));
+      };
+      video.addEventListener("canplay", onCanPlay);
+      if (video.readyState >= HTMLMediaElement.HAVE_FUTURE_DATA) {
+        onCanPlay();
+      }
+    };
+
     const playDirect = () => {
       video.src = proxyUrl;
-      video
-        .play()
-        .then(() => {
-          if (!cancelled) setLoading(false);
-        })
-        .catch(() => fail(errorLabel));
+      playWhenReady();
     };
 
     const setup = async () => {
-      const isHls =
-        channel.url.includes(".m3u8") ||
-        channel.url.includes("m3u8?") ||
-        !channel.url.match(/\.(mp4|webm|ogg)(\?|$)/i);
+      const isHls = isHlsUrl(channel.url);
 
       if (
         isHls &&
@@ -82,17 +106,13 @@ export function TvPlayer({
           if (cancelled) return;
 
           if (Hls.isSupported()) {
-            const hls = new Hls({
-              enableWorker: true,
-              lowLatencyMode: true,
-            });
+            const hls = new Hls(IPTV_HLS_CONFIG);
             hlsRef.current = hls;
-            hls.loadSource(proxyUrl);
             hls.attachMedia(video);
+            hls.loadSource(proxyUrl);
             hls.on(Hls.Events.MANIFEST_PARSED, () => {
               if (cancelled) return;
-              video.play().catch(() => fail(errorLabel));
-              setLoading(false);
+              playWhenReady();
             });
             hls.on(Hls.Events.ERROR, (_event, data) => {
               if (cancelled || !data.fatal) return;
@@ -115,6 +135,7 @@ export function TvPlayer({
       cancelled = true;
       hlsRef.current?.destroy();
       hlsRef.current = null;
+      resetVideoElement(video);
     };
   }, [channel, errorLabel, onError]);
 

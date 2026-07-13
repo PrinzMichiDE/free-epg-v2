@@ -7,6 +7,7 @@ import { Menu, Radio, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/Button";
 import { DonateButton } from "@/components/layout/DonateButton";
+import { AffiliateLinks } from "@/components/layout/AffiliateLinks";
 import { LanguageSwitcher } from "@/components/layout/LanguageSwitcher";
 import { useI18n } from "@/lib/i18n/I18nProvider";
 import type { MessageKey } from "@/lib/i18n/messages";
@@ -122,6 +123,7 @@ export function Header() {
           })}
           <div className="pt-3 mt-2 border-t border-[var(--border)] space-y-3">
             <DonateButton variant="outline" size="md" className="w-full" showAmount stacked />
+            <AffiliateLinks variant="outline" size="md" className="w-full" stacked />
             <Link href="/countries" onClick={() => setOpen(false)} className="block">
               <Button variant="outline" size="md" className="w-full">
                 {t("header.browseFeeds")}

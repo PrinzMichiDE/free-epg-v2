@@ -18,6 +18,9 @@ export const ta = {
   "donate.kofi": "Ko-fi",
 
   "donate.amazon": "Amazon",
+  "donate.shoop": "Shoop",
+  "donate.tradere": "trade.re",
+  "donate.affiliateTitle": "Affiliate support",
   "donate.banner.message": "Support FreeEPG — via Amazon wishlist",
   "donate.banner.cta": "View on Amazon",
   "donate.hint":

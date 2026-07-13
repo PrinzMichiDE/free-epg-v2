@@ -36,6 +36,34 @@ Nicht im Scope: Jeder Einzel-Commit ohne betriebliche Relevanz.
 
 ## Detailbeschreibung
 
+### Eintrag CHG-2026-012: TV Player A/V-Synchronisation
+
+| Feld | Inhalt |
+|------|--------|
+| Datum | 2026-07-13 |
+| Version | App-Release (Web) |
+| Begründung | Audio und Bild im TV Player liefen auseinander (typisch bei LL-HLS-Modus auf Standard-IPTV-Streams) |
+| Auswirkung | IPTV-optimierte HLS.js-Konfiguration (`lowLatencyMode: false`, Puffer/Sync-Tuning); Wiedergabe erst nach `canplay`; sauberes Video-Reset beim Kanalwechsel |
+| Risiko | niedrig |
+| Betroffene Komponenten | `TvPlayer.tsx`, `hls-config.ts` |
+| Prüfung | Live-Stream im Player — Ton/Bild synchron; `npm run typecheck -w @freeepg/web` |
+| Freigabe | Product Owner |
+| Rollback | Vorheriges Web-Image |
+
+### Eintrag CHG-2026-011: Affiliate-Links Shoop und trade.re
+
+| Feld | Inhalt |
+|------|--------|
+| Datum | 2026-07-13 |
+| Version | App-Release (Web) |
+| Begründung | Zusätzliche Affiliate-Partner neben Amazon zur Unterstützung des Projekts |
+| Auswirkung | Neue Komponente `AffiliateLinks` (Amazon, Shoop, trade.re) im Footer und Mobile-Menü; URLs in `site.ts`; i18n-Keys `donate.shoop`, `donate.tradere`, `donate.affiliateTitle` in 20 Sprachen; Amazon aus `DonateButton` entfernt (keine Duplikate) |
+| Risiko | niedrig |
+| Betroffene Komponenten | `AffiliateLinks.tsx`, `Footer.tsx`, `Header.tsx`, `DonateButton.tsx`, `site.ts`, i18n |
+| Prüfung | Links im Footer/Mobile-Menü öffnen korrekte URLs mit `rel="sponsored"`; `npm run typecheck -w @freeepg/web` |
+| Freigabe | Product Owner |
+| Rollback | Vorheriges Web-Image |
+
 ### Eintrag CHG-2026-010: App-Icon und Favicon
 
 | Feld | Inhalt |

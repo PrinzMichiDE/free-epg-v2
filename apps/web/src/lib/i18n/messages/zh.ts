@@ -18,6 +18,9 @@ export const zh = {
   "donate.kofi": "Ko-fi",
 
   "donate.amazon": "Amazon",
+  "donate.shoop": "Shoop",
+  "donate.tradere": "trade.re",
+  "donate.affiliateTitle": "Affiliate support",
   "donate.banner.message": "Support FreeEPG — via Amazon wishlist",
   "donate.banner.cta": "View on Amazon",
   "donate.hint": "通过 PayPal 或 Ko-fi 自愿捐赠，支持运营与持续开发。",

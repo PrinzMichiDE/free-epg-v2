@@ -17,8 +17,10 @@ export const en = {
   "donate.paypal": "PayPal",
   "donate.kofi": "Ko-fi",
   "donate.amazon": "Amazon",
-  "donate.hint":
-    "Voluntary donation via PayPal, Ko-fi or Amazon for operations and ongoing development.",
+  "donate.shoop": "Shoop",
+  "donate.tradere": "trade.re",
+  "donate.affiliateTitle": "Affiliate support",
+  "donate.hint": "Voluntary donation or affiliate link — supports operations and ongoing development.",
   "donate.banner.message": "Support FreeEPG — via Amazon wishlist",
   "donate.banner.cta": "View on Amazon",
   "footer.tagline":
