@@ -8,6 +8,8 @@ export const mr = {
   "nav.docs": "दस्तऐवज",
   "header.browseFeeds": "फीड ब्राउझ करा",
   "header.enigma2Setup": "Enigma2 सेटअप",
+  "header.enigma2Short": "Enigma2",
+  "header.moreNav": "More",
   "header.openMenu": "मेनू उघडा",
   "header.closeMenu": "मेनू बंद करा",
   "header.mainNav": "मुख्य नेव्हिगेशन",

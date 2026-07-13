@@ -8,6 +8,8 @@ export const hi = {
   "nav.docs": "दस्तावेज़",
   "header.browseFeeds": "फ़ीड ब्राउज़ करें",
   "header.enigma2Setup": "Enigma2 सेटअप",
+  "header.enigma2Short": "Enigma2",
+  "header.moreNav": "More",
   "header.openMenu": "मेनू खोलें",
   "header.closeMenu": "मेनू बंद करें",
   "header.mainNav": "मुख्य नेविगेशन",

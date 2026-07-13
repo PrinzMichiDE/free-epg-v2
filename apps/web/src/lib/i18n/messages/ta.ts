@@ -8,6 +8,8 @@ export const ta = {
   "nav.docs": "ஆவணங்கள்",
   "header.browseFeeds": "ஃபீட்களை உலாவு",
   "header.enigma2Setup": "Enigma2 அமைப்பு",
+  "header.enigma2Short": "Enigma2",
+  "header.moreNav": "More",
   "header.openMenu": "மெனுவைத் திற",
   "header.closeMenu": "மெனுவை மூடு",
   "header.mainNav": "முதன்மை வழிசெலுத்தல்",

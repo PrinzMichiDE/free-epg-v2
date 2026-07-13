@@ -8,6 +8,8 @@ export const te = {
   "nav.docs": "డాక్స్",
   "header.browseFeeds": "ఫీడ్‌లను బ్రౌజ్ చేయండి",
   "header.enigma2Setup": "Enigma2 సెటప్",
+  "header.enigma2Short": "Enigma2",
+  "header.moreNav": "More",
   "header.openMenu": "మెను తెరవండి",
   "header.closeMenu": "మెను మూసివేయండి",
   "header.mainNav": "ప్రధాన నావిగేషన్",

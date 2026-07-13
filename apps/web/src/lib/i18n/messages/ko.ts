@@ -8,6 +8,8 @@ export const ko = {
   "nav.docs": "문서",
   "header.browseFeeds": "피드 탐색",
   "header.enigma2Setup": "Enigma2 설정",
+  "header.enigma2Short": "Enigma2",
+  "header.moreNav": "More",
   "header.openMenu": "메뉴 열기",
   "header.closeMenu": "메뉴 닫기",
   "header.mainNav": "주요 탐색",

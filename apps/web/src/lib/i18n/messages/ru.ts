@@ -8,6 +8,8 @@ export const ru = {
   "nav.docs": "Документация",
   "header.browseFeeds": "Обзор фидов",
   "header.enigma2Setup": "Настройка Enigma2",
+  "header.enigma2Short": "Enigma2",
+  "header.moreNav": "More",
   "header.openMenu": "Открыть меню",
   "header.closeMenu": "Закрыть меню",
   "header.mainNav": "Основная навигация",

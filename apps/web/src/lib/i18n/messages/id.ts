@@ -8,6 +8,8 @@ export const id = {
   "nav.docs": "Docs",
   "header.browseFeeds": "Jelajahi feed",
   "header.enigma2Setup": "Pengaturan Enigma2",
+  "header.enigma2Short": "Enigma2",
+  "header.moreNav": "More",
   "header.openMenu": "Buka menu",
   "header.closeMenu": "Tutup menu",
   "header.mainNav": "Navigasi utama",

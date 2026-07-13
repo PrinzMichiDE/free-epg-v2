@@ -8,6 +8,8 @@ export const ar = {
   "nav.docs": "الوثائق",
   "header.browseFeeds": "تصفح الخلاصات",
   "header.enigma2Setup": "إعداد Enigma2",
+  "header.enigma2Short": "Enigma2",
+  "header.moreNav": "More",
   "header.openMenu": "فتح القائمة",
   "header.closeMenu": "إغلاق القائمة",
   "header.mainNav": "التنقل الرئيسي",

@@ -8,6 +8,8 @@ export const bn = {
   "nav.docs": "ডক্স",
   "header.browseFeeds": "ফিড ব্রাউজ করুন",
   "header.enigma2Setup": "Enigma2 সেটআপ",
+  "header.enigma2Short": "Enigma2",
+  "header.moreNav": "More",
   "header.openMenu": "মেনু খুলুন",
   "header.closeMenu": "মেনু বন্ধ করুন",
   "header.mainNav": "প্রধান নেভিগেশন",

@@ -6,7 +6,7 @@ import { cn } from "@/lib/utils";
 import { LOCALES, type LocaleCode } from "@/lib/i18n/locales";
 import { useI18n } from "@/lib/i18n/I18nProvider";
 
-export function LanguageSwitcher({ className }: { className?: string }) {
+export function LanguageSwitcher({ className, compact = false }: { className?: string; compact?: boolean }) {
   const { locale, setLocale, t } = useI18n();
   const [open, setOpen] = useState(false);
   const rootRef = useRef<HTMLDivElement>(null);
@@ -29,7 +29,8 @@ export function LanguageSwitcher({ className }: { className?: string }) {
         type="button"
         onClick={() => setOpen((v) => !v)}
         className={cn(
-          "inline-flex items-center gap-1.5 h-9 px-2.5 rounded-lg text-sm font-medium",
+          "inline-flex items-center gap-1.5 h-9 rounded-lg text-sm font-medium",
+          compact ? "px-2 xl:px-2.5" : "px-2.5",
           "border border-[var(--border)] bg-transparent text-[var(--foreground)]",
           "hover:bg-[var(--surface-muted)] transition-colors"
         )}
@@ -38,10 +39,23 @@ export function LanguageSwitcher({ className }: { className?: string }) {
         aria-haspopup="listbox"
       >
         <Globe className="h-4 w-4 shrink-0 opacity-70" aria-hidden />
-        <span className="max-w-[5.5rem] truncate hidden sm:inline">
-          {current.nativeName}
-        </span>
-        <span className="sm:hidden uppercase text-xs font-semibold">{locale}</span>
+        {compact ? (
+          <>
+            <span className="hidden 2xl:inline max-w-[5.5rem] truncate">
+              {current.nativeName}
+            </span>
+            <span className="hidden xl:inline 2xl:hidden uppercase text-xs font-semibold">
+              {locale}
+            </span>
+          </>
+        ) : (
+          <>
+            <span className="max-w-[5.5rem] truncate hidden sm:inline">
+              {current.nativeName}
+            </span>
+            <span className="sm:hidden uppercase text-xs font-semibold">{locale}</span>
+          </>
+        )}
         <ChevronDown
           className={cn("h-3.5 w-3.5 opacity-60 transition-transform", open && "rotate-180")}
           aria-hidden

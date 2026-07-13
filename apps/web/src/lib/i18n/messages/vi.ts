@@ -8,6 +8,8 @@ export const vi = {
   "nav.docs": "Tài liệu",
   "header.browseFeeds": "Duyệt nguồn cấp",
   "header.enigma2Setup": "Thiết lập Enigma2",
+  "header.enigma2Short": "Enigma2",
+  "header.moreNav": "More",
   "header.openMenu": "Mở menu",
   "header.closeMenu": "Đóng menu",
   "header.mainNav": "Điều hướng chính",

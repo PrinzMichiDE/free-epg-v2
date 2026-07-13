@@ -8,6 +8,8 @@ export const ja = {
   "nav.docs": "ドキュメント",
   "header.browseFeeds": "フィードを閲覧",
   "header.enigma2Setup": "Enigma2 セットアップ",
+  "header.enigma2Short": "Enigma2",
+  "header.moreNav": "More",
   "header.openMenu": "メニューを開く",
   "header.closeMenu": "メニューを閉じる",
   "header.mainNav": "メインナビゲーション",

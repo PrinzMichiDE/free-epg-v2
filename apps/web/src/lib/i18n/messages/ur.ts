@@ -8,6 +8,8 @@ export const ur = {
   "nav.docs": "دستاویزات",
   "header.browseFeeds": "فیڈز براؤز کریں",
   "header.enigma2Setup": "Enigma2 سیٹ اپ",
+  "header.enigma2Short": "Enigma2",
+  "header.moreNav": "More",
   "header.openMenu": "مینو کھولیں",
   "header.closeMenu": "مینو بند کریں",
   "header.mainNav": "مرکزی نیویگیشن",

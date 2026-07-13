@@ -36,6 +36,20 @@ Nicht im Scope: Jeder Einzel-Commit ohne betriebliche Relevanz.
 
 ## Detailbeschreibung
 
+### Eintrag CHG-2026-013: Header-Navigation aufgeräumt
+
+| Feld | Inhalt |
+|------|--------|
+| Datum | 2026-07-13 |
+| Version | App-Release (Web) |
+| Begründung | Überfüllter Desktop-Header mit Überlappungen (Sprachwahl/Nav) |
+| Auswirkung | Grid-Layout; Primary-Nav + „Mehr“-Dropdown; Spenden-Buttons aus Desktop-Header entfernt; kompakte Sprachwahl |
+| Risiko | niedrig |
+| Betroffene Komponenten | `Header.tsx`, `NavMoreMenu.tsx`, `LanguageSwitcher.tsx`, i18n |
+| Prüfung | Desktop xl+ ohne Überlappung; Mobile-Menü unverändert vollständig |
+| Freigabe | Product Owner |
+| Rollback | Vorheriges Web-Image |
+
 ### Eintrag CHG-2026-012: TV Player A/V-Synchronisation
 
 | Feld | Inhalt |

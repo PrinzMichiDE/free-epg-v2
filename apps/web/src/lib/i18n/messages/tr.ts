@@ -8,6 +8,8 @@ export const tr = {
   "nav.docs": "Belgeler",
   "header.browseFeeds": "Akışlara göz at",
   "header.enigma2Setup": "Enigma2 kurulumu",
+  "header.enigma2Short": "Enigma2",
+  "header.moreNav": "More",
   "header.openMenu": "Menüyü aç",
   "header.closeMenu": "Menüyü kapat",
   "header.mainNav": "Ana navigasyon",

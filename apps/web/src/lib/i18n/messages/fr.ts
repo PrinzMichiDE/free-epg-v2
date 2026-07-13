@@ -8,6 +8,8 @@ export const fr = {
   "nav.docs": "Docs",
   "header.browseFeeds": "Parcourir les flux",
   "header.enigma2Setup": "Configuration Enigma2",
+  "header.enigma2Short": "Enigma2",
+  "header.moreNav": "More",
   "header.openMenu": "Ouvrir le menu",
   "header.closeMenu": "Fermer le menu",
   "header.mainNav": "Navigation principale",

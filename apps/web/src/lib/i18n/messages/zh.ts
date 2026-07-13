@@ -8,6 +8,8 @@ export const zh = {
   "nav.docs": "文档",
   "header.browseFeeds": "浏览源",
   "header.enigma2Setup": "Enigma2 设置",
+  "header.enigma2Short": "Enigma2",
+  "header.moreNav": "More",
   "header.openMenu": "打开菜单",
   "header.closeMenu": "关闭菜单",
   "header.mainNav": "主导航",

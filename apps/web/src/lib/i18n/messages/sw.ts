@@ -8,6 +8,8 @@ export const sw = {
   "nav.docs": "Nyaraka",
   "header.browseFeeds": "Vinjari milisho",
   "header.enigma2Setup": "Usanidi wa Enigma2",
+  "header.enigma2Short": "Enigma2",
+  "header.moreNav": "More",
   "header.openMenu": "Fungua menyu",
   "header.closeMenu": "Funga menyu",
   "header.mainNav": "Urambazaji mkuu",
