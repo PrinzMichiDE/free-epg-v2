@@ -36,6 +36,20 @@ Nicht im Scope: Jeder Einzel-Commit ohne betriebliche Relevanz.
 
 ## Detailbeschreibung
 
+### Eintrag CHG-2026-010: App-Icon und Favicon
+
+| Feld | Inhalt |
+|------|--------|
+| Datum | 2026-07-13 |
+| Version | App-Release (Web) |
+| Begründung | Einheitliches Branding in Browser-Tab, Lesezeichen und auf dem Home-Bildschirm |
+| Auswirkung | `app/icon.png`, `app/apple-icon.png`, `public/icon.png` — FreeEPG-Icon (Navy/Teal, EPG-Motiv) |
+| Risiko | niedrig |
+| Betroffene Komponenten | `apps/web` (Metadata via Next.js file convention) |
+| Prüfung | Favicon im Browser-Tab nach Deploy sichtbar |
+| Freigabe | Product Owner |
+| Rollback | Icon-Dateien entfernen |
+
 ### Eintrag CHG-2026-009: TV Player in Hauptnavigation
 
 | Feld | Inhalt |
