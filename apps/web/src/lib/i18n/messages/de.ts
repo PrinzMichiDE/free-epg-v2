@@ -108,6 +108,12 @@ export const de = {
   "player.epg.next": "Als Nächstes",
   "player.epg.loading": "EPG wird geladen…",
   "player.epg.noData": "Keine EPG-Daten für diesen Sender verfügbar.",
+  "player.cast.label": "Chromecast",
+  "player.cast.connect": "An Chromecast senden",
+  "player.cast.connected": "Auf TV wiedergeben",
+  "player.cast.error": "Chromecast-Wiedergabe fehlgeschlagen.",
+  "player.airplay.label": "AirPlay",
+  "player.airplay.connect": "Über AirPlay wiedergeben",
 } as const;
 
 export type MessageKey = keyof typeof de;

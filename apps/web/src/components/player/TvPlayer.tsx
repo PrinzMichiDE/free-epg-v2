@@ -5,8 +5,10 @@ import { AlertCircle, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { buildProxyUrl } from "@/lib/player/stream-proxy";
 import { IPTV_HLS_CONFIG } from "@/lib/player/hls-config";
+import { configureAirPlayVideo } from "@/lib/player/airplay";
 import type { PlaylistPlayerEntry } from "@/lib/playlists";
 import type Hls from "hls.js";
+import { RemotePlaybackControls } from "@/components/player/RemotePlaybackControls";
 
 interface TvPlayerProps {
   channel: PlaylistPlayerEntry | null;
@@ -49,6 +51,7 @@ export function TvPlayer({
     hlsRef.current?.destroy();
     hlsRef.current = null;
     resetVideoElement(video);
+    configureAirPlayVideo(video);
     setError(null);
 
     if (!channel?.url) {
@@ -152,7 +155,19 @@ export function TvPlayer({
         controls
         playsInline
         autoPlay
+        disableRemotePlayback={false}
       />
+
+      {channel && (
+        <RemotePlaybackControls
+          channel={channel}
+          videoRef={videoRef}
+          onCastError={(message) => {
+            setError(message);
+            onError?.(message);
+          }}
+        />
+      )}
 
       {loading && (
         <div className="absolute inset-0 flex items-center justify-center bg-black/50">

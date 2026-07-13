@@ -36,6 +36,20 @@ Nicht im Scope: Jeder Einzel-Commit ohne betriebliche Relevanz.
 
 ## Detailbeschreibung
 
+### Eintrag CHG-2026-014: Chromecast und AirPlay im TV Player
+
+| Feld | Inhalt |
+|------|--------|
+| Datum | 2026-07-13 |
+| Version | App-Release (Web) |
+| Begründung | Streams auf TV-Geräte senden (Google Cast / Apple AirPlay) |
+| Auswirkung | Cast-/AirPlay-Buttons im Player; Google Cast SDK; HLS-Live via Proxy mit absoluten Manifest-URLs für Cast-Geräte |
+| Risiko | niedrig (Cast erfordert öffentlich erreichbare Stream-Proxy-URL) |
+| Betroffene Komponenten | `TvPlayer.tsx`, `RemotePlaybackControls.tsx`, `chromecast.ts`, `airplay.ts`, `stream-proxy.ts`, i18n |
+| Prüfung | Chromecast in Chrome mit Cast-Gerät; AirPlay in Safari/macOS/iOS; `npm run typecheck -w @freeepg/web` |
+| Freigabe | Product Owner |
+| Rollback | Vorheriges Web-Image |
+
 ### Eintrag CHG-2026-013: Header-Navigation aufgeräumt
 
 | Feld | Inhalt |

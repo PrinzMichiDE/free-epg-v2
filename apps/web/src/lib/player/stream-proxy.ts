@@ -37,12 +37,17 @@ export interface StreamProxyOptions {
 
 export function buildProxyUrl(
   targetUrl: string,
-  opts?: StreamProxyOptions
+  opts?: StreamProxyOptions,
+  absoluteBase?: string
 ): string {
   const params = new URLSearchParams({ url: targetUrl });
   if (opts?.referrer) params.set("referrer", opts.referrer);
   if (opts?.userAgent) params.set("ua", opts.userAgent);
-  return `/api/player/stream?${params.toString()}`;
+  const path = `/api/player/stream?${params.toString()}`;
+  if (absoluteBase) {
+    return new URL(path, absoluteBase).href;
+  }
+  return path;
 }
 
 function resolveStreamUrl(relativeOrAbsolute: string, baseUrl: string): string {
@@ -52,7 +57,8 @@ function resolveStreamUrl(relativeOrAbsolute: string, baseUrl: string): string {
 export function rewriteHlsPlaylist(
   content: string,
   manifestUrl: string,
-  opts?: StreamProxyOptions
+  opts?: StreamProxyOptions,
+  absoluteBase?: string
 ): string {
   const base = new URL(manifestUrl);
 
@@ -66,13 +72,13 @@ export function rewriteHlsPlaylist(
         return trimmed.replace(/URI="([^"]+)"/g, (_match, uri: string) => {
           const absolute = resolveStreamUrl(uri, base.href);
           if (!isAllowedStreamUrl(absolute)) return `URI="${uri}"`;
-          return `URI="${buildProxyUrl(absolute, opts)}"`;
+          return `URI="${buildProxyUrl(absolute, opts, absoluteBase)}"`;
         });
       }
 
       const absolute = resolveStreamUrl(trimmed, base.href);
       if (!isAllowedStreamUrl(absolute)) return line;
-      return buildProxyUrl(absolute, opts);
+      return buildProxyUrl(absolute, opts, absoluteBase);
     })
     .join("\n");
 }

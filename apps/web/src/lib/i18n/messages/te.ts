@@ -112,4 +112,10 @@ export const te = {
   "player.epg.next": "Up next",
   "player.epg.loading": "Loading EPG…",
   "player.epg.noData": "No EPG data available for this channel.",
+  "player.cast.label": "Chromecast",
+  "player.cast.connect": "Cast to Chromecast",
+  "player.cast.connected": "Playing on TV",
+  "player.cast.error": "Chromecast playback failed.",
+  "player.airplay.label": "AirPlay",
+  "player.airplay.connect": "Play via AirPlay",
 } as const;

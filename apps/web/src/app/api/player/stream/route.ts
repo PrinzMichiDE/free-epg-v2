@@ -38,7 +38,8 @@ export async function GET(request: Request) {
 
     if (isHlsManifest(targetUrl, contentType)) {
       const text = await upstream.text();
-      const rewritten = rewriteHlsPlaylist(text, targetUrl, opts);
+      const requestOrigin = new URL(request.url).origin;
+      const rewritten = rewriteHlsPlaylist(text, targetUrl, opts, requestOrigin);
 
       return new Response(rewritten, {
         headers: {
