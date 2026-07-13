@@ -1,6 +1,7 @@
 export const de = {
   "nav.countries": "Länder",
   "nav.playlists": "Playlisten",
+  "nav.player": "TV Player",
   "nav.channels": "Sender",
   "nav.m3u": "M3U Matcher",
   "nav.lists": "Listen",

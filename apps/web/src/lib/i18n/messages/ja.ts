@@ -1,6 +1,7 @@
 export const ja = {
   "nav.countries": "国・地域",
   "nav.playlists": "プレイリスト",
+  "nav.player": "TVプレーヤー",
   "nav.channels": "チャンネル",
   "nav.m3u": "M3U マッチャー",
   "nav.lists": "リスト",

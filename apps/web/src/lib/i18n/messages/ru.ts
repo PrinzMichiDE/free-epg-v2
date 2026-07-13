@@ -1,6 +1,7 @@
 export const ru = {
   "nav.countries": "Страны",
   "nav.playlists": "Плейлисты",
+  "nav.player": "TV-плеер",
   "nav.channels": "Каналы",
   "nav.m3u": "Сопоставитель M3U",
   "nav.lists": "Списки",

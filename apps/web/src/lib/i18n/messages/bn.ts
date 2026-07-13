@@ -1,6 +1,7 @@
 export const bn = {
   "nav.countries": "দেশ",
   "nav.playlists": "প্লেলিস্ট",
+  "nav.player": "টিভি প্লেয়ার",
   "nav.channels": "চ্যানেল",
   "nav.m3u": "M3U ম্যাচার",
   "nav.lists": "তালিকা",

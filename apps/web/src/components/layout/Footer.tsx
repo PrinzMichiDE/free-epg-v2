@@ -18,13 +18,13 @@ export function Footer() {
 
   return (
     <footer className="border-t border-[var(--border)] bg-[var(--card)] mt-auto">
-      <div className="page-shell py-10 grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="page-shell py-8 sm:py-10 grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
         <div className="sm:col-span-2 lg:col-span-1">
           <p className="font-semibold text-[var(--foreground)] mb-2">FreeEPG</p>
           <p className="text-sm text-[var(--muted-foreground)] leading-relaxed max-w-xs mb-4">
             {t("footer.tagline")}
           </p>
-          <DonateButton variant="outline" size="sm" showAmount />
+          <DonateButton variant="outline" size="sm" showAmount stacked className="max-w-full" />
           <p className="text-xs text-[var(--muted-foreground)] mt-2">{t("donate.hint")}</p>
         </div>
 

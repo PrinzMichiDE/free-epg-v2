@@ -1,6 +1,7 @@
 export const id = {
   "nav.countries": "Negara",
   "nav.playlists": "Daftar putar",
+  "nav.player": "Pemutar TV",
   "nav.channels": "Saluran",
   "nav.m3u": "Pencocok M3U",
   "nav.lists": "Daftar",

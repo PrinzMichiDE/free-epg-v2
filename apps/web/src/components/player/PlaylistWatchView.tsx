@@ -48,52 +48,37 @@ export function PlaylistWatchView({ playlist, backHref }: PlaylistWatchViewProps
   }, [filtered, t]);
 
   return (
-    <div className="page-shell py-6 sm:py-8">
+    <div className="page-shell py-4 sm:py-6 lg:py-8">
       <Link
         href={backHref}
-        className="inline-flex items-center gap-1.5 text-sm text-[var(--muted-foreground)] hover:text-[var(--foreground)] mb-6 transition-colors"
+        className="inline-flex items-center gap-1.5 text-sm text-[var(--muted-foreground)] hover:text-[var(--foreground)] mb-4 sm:mb-6 transition-colors min-h-[44px]"
       >
         <ChevronLeft className="h-4 w-4" aria-hidden />
         {t("player.back")}
       </Link>
 
-      <header className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-        <div>
-          <p className="text-sm font-medium text-[var(--accent)] mb-1 inline-flex items-center gap-2">
-            <Tv className="h-4 w-4" aria-hidden />
-            {t("player.badge")}
-          </p>
-          <h1 className="text-2xl sm:text-3xl font-semibold tracking-tight">
-            {playlist.name}
-          </h1>
-          <p className="text-sm text-[var(--muted-foreground)] mt-1">
-            {t("player.channelCount", { count: playlist.entries.length })}
-          </p>
-        </div>
+      <header className="mb-4 sm:mb-6">
+        <p className="text-xs sm:text-sm font-medium text-[var(--accent)] mb-1 inline-flex items-center gap-2">
+          <Tv className="h-4 w-4" aria-hidden />
+          {t("player.badge")}
+        </p>
+        <h1 className="text-xl sm:text-2xl lg:text-3xl font-semibold tracking-tight text-balance">
+          {playlist.name}
+        </h1>
+        <p className="text-sm text-[var(--muted-foreground)] mt-1">
+          {t("player.channelCount", { count: playlist.entries.length })}
+        </p>
       </header>
 
-      <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_320px] xl:grid-cols-[minmax(0,1fr)_360px] gap-6">
-        <div className="space-y-4 min-w-0">
-          <TvPlayer
-            channel={activeChannel}
-            errorLabel={t("player.playbackError")}
-            loadingLabel={t("player.loading")}
-          />
-
-          {activeChannel && (
-            <ChannelEpgPanel
-              tvgId={activeChannel.tvgId}
-              channelTitle={activeChannel.title}
-            />
+      <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_minmax(280px,360px)] gap-4 sm:gap-6">
+        <aside
+          className={cn(
+            "flex flex-col order-2 lg:order-none",
+            "max-h-[min(50vh,28rem)] lg:max-h-none lg:min-h-[520px]",
+            "rounded-xl border border-[var(--border)] bg-[var(--card)] overflow-hidden"
           )}
-
-          <p className="text-xs text-[var(--muted-foreground)] leading-relaxed">
-            {t("player.disclaimer")}
-          </p>
-        </div>
-
-        <aside className="flex flex-col min-h-[420px] lg:min-h-[520px] rounded-xl border border-[var(--border)] bg-[var(--card)] overflow-hidden">
-          <div className="p-3 border-b border-[var(--border)]">
+        >
+          <div className="p-3 border-b border-[var(--border)] shrink-0">
             <label className="relative block">
               <Search
                 className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[var(--muted-foreground)]"
@@ -105,7 +90,7 @@ export function PlaylistWatchView({ playlist, backHref }: PlaylistWatchViewProps
                 onChange={(e) => setQuery(e.target.value)}
                 placeholder={t("player.searchPlaceholder")}
                 className={cn(
-                  "w-full h-10 pl-9 pr-3 rounded-lg text-sm",
+                  "w-full h-11 pl-9 pr-3 rounded-lg text-base sm:text-sm",
                   "border border-[var(--border)] bg-[var(--surface-muted)]",
                   "text-[var(--foreground)] placeholder:text-[var(--muted-foreground)]",
                   "focus:outline-none focus:ring-2 focus:ring-[var(--primary)]/30"
@@ -114,7 +99,7 @@ export function PlaylistWatchView({ playlist, backHref }: PlaylistWatchViewProps
             </label>
           </div>
 
-          <div className="flex-1 overflow-y-auto p-2">
+          <div className="flex-1 overflow-y-auto p-2 overscroll-contain">
             {filtered.length === 0 && (
               <p className="p-4 text-sm text-[var(--muted-foreground)] text-center">
                 {t("player.noResults")}
@@ -137,11 +122,11 @@ export function PlaylistWatchView({ playlist, backHref }: PlaylistWatchViewProps
                           type="button"
                           onClick={() => setActiveId(entry.id)}
                           className={cn(
-                            "w-full text-left px-3 py-2.5 rounded-lg text-sm transition-colors",
+                            "w-full text-left px-3 py-3 rounded-lg text-sm transition-colors",
                             "flex items-center gap-2 min-h-[44px]",
                             isActive
                               ? "bg-[var(--primary)] text-[var(--primary-foreground)]"
-                              : "text-[var(--foreground)] hover:bg-[var(--surface-muted)]"
+                              : "text-[var(--foreground)] hover:bg-[var(--surface-muted)] active:bg-[var(--surface-muted)]"
                           )}
                         >
                           <Play className="h-3.5 w-3.5 shrink-0 opacity-70" aria-hidden />
@@ -155,6 +140,25 @@ export function PlaylistWatchView({ playlist, backHref }: PlaylistWatchViewProps
             ))}
           </div>
         </aside>
+
+        <div className="space-y-4 min-w-0 order-1 lg:order-none">
+          <TvPlayer
+            channel={activeChannel}
+            errorLabel={t("player.playbackError")}
+            loadingLabel={t("player.loading")}
+          />
+
+          {activeChannel && (
+            <ChannelEpgPanel
+              tvgId={activeChannel.tvgId}
+              channelTitle={activeChannel.title}
+            />
+          )}
+
+          <p className="text-xs text-[var(--muted-foreground)] leading-relaxed order-3 lg:order-none">
+            {t("player.disclaimer")}
+          </p>
+        </div>
       </div>
     </div>
   );

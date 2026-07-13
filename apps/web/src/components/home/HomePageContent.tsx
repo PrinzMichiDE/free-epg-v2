@@ -37,28 +37,30 @@ export function HomePageContent({
     <>
       <section className="relative border-b border-[var(--border)] overflow-hidden">
         <div className="absolute inset-0 hero-grid pointer-events-none" aria-hidden />
-        <div className="page-shell relative py-16 sm:py-20 lg:py-24">
+        <div className="page-shell relative py-12 sm:py-16 lg:py-24">
           <div className="max-w-3xl">
-            <p className="text-sm font-medium text-[var(--accent)] mb-4 tracking-wide uppercase">
+            <p className="text-xs sm:text-sm font-medium text-[var(--accent)] mb-3 sm:mb-4 tracking-wide uppercase">
               {t("home.badge")}
             </p>
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-semibold tracking-tight text-[var(--foreground)] mb-5">
+            <h1 className="text-3xl xs:text-4xl sm:text-5xl lg:text-6xl font-semibold tracking-tight text-[var(--foreground)] mb-4 sm:mb-5 text-balance">
               {t("home.title")}
             </h1>
-            <p className="text-lg text-[var(--muted-foreground)] leading-relaxed mb-8 max-w-2xl">
+            <p className="text-base sm:text-lg text-[var(--muted-foreground)] leading-relaxed mb-6 sm:mb-8 max-w-2xl">
               {t("home.subtitle")}
             </p>
-            <div className="flex flex-wrap gap-3">
-              <Link href="/countries">
-                <Button size="lg">{t("home.ctaCountries")}</Button>
+            <div className="flex flex-col xs:flex-row flex-wrap gap-3">
+              <Link href="/countries" className="w-full xs:w-auto">
+                <Button size="lg" className="w-full xs:w-auto">
+                  {t("home.ctaCountries")}
+                </Button>
               </Link>
-              <Link href="/playlists">
-                <Button variant="outline" size="lg">
+              <Link href="/playlists" className="w-full xs:w-auto">
+                <Button variant="outline" size="lg" className="w-full xs:w-auto">
                   {t("home.ctaPlaylists")}
                 </Button>
               </Link>
-              <Link href="/docs">
-                <Button variant="outline" size="lg">
+              <Link href="/docs" className="w-full xs:w-auto">
+                <Button variant="outline" size="lg" className="w-full xs:w-auto">
                   {t("home.ctaDocs")}
                 </Button>
               </Link>
@@ -67,7 +69,7 @@ export function HomePageContent({
         </div>
       </section>
 
-      <div className="page-shell py-12 sm:py-16 space-y-14">
+      <div className="page-shell py-8 sm:py-12 lg:py-16 space-y-10 sm:space-y-14">
         <section className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <StatCard
             label={t("home.statChannels")}
@@ -124,12 +126,12 @@ export function HomePageContent({
               {t("home.viewAllPlaylists")}
             </Link>
           </div>
-          <div className="rounded-xl border border-[var(--border)] bg-[var(--surface-muted)]/40 p-6 sm:p-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-            <p className="text-[var(--muted-foreground)] max-w-xl leading-relaxed">
+          <div className="rounded-xl border border-[var(--border)] bg-[var(--surface-muted)]/40 p-4 sm:p-6 lg:p-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <p className="text-[var(--muted-foreground)] max-w-xl leading-relaxed text-sm sm:text-base">
               {t("home.playlistsTeaser")}
             </p>
-            <Link href="/playlists">
-              <Button>{t("home.playlistsCta")}</Button>
+            <Link href="/playlists" className="w-full sm:w-auto shrink-0">
+              <Button className="w-full sm:w-auto">{t("home.playlistsCta")}</Button>
             </Link>
           </div>
         </section>

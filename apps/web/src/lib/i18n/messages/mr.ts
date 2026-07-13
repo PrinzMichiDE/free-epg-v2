@@ -1,6 +1,7 @@
 export const mr = {
   "nav.countries": "देश",
   "nav.playlists": "प्लेलिस्ट",
+  "nav.player": "TV प्लेयर",
   "nav.channels": "चॅनेल",
   "nav.m3u": "M3U मॅचर",
   "nav.lists": "याद्या",

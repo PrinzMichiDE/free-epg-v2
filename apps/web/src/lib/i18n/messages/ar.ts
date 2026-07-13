@@ -1,6 +1,7 @@
 export const ar = {
   "nav.countries": "البلدان",
   "nav.playlists": "قوائم التشغيل",
+  "nav.player": "مشغل TV",
   "nav.channels": "القنوات",
   "nav.m3u": "مطابق M3U",
   "nav.lists": "القوائم",

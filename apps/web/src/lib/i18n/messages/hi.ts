@@ -1,6 +1,7 @@
 export const hi = {
   "nav.countries": "देश",
   "nav.playlists": "प्लेलिस्ट",
+  "nav.player": "TV प्लेयर",
   "nav.channels": "चैनल",
   "nav.m3u": "M3U मैचर",
   "nav.lists": "सूचियाँ",

@@ -1,6 +1,7 @@
 export const ur = {
   "nav.countries": "ممالک",
   "nav.playlists": "پلے لسٹ",
+  "nav.player": "ٹی وی پلیئر",
   "nav.channels": "چینلز",
   "nav.m3u": "M3U میچر",
   "nav.lists": "فہرستیں",

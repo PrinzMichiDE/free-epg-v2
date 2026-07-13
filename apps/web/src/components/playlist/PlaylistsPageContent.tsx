@@ -23,7 +23,7 @@ export function PlaylistsPageContent({
   const withEpg = playlists.filter((p) => p.hasEpg).length;
 
   return (
-    <div className="page-shell py-10 sm:py-14">
+      <div className="page-shell py-8 sm:py-10 lg:py-14">
       <header className="mb-10">
         <p className="text-sm font-medium text-[var(--accent)] mb-3 tracking-wide uppercase inline-flex items-center gap-2">
           <Globe2 className="h-4 w-4" aria-hidden />

@@ -1,6 +1,7 @@
 export const ko = {
   "nav.countries": "국가",
   "nav.playlists": "재생 목록",
+  "nav.player": "TV 플레이어",
   "nav.channels": "채널",
   "nav.m3u": "M3U 매처",
   "nav.lists": "목록",

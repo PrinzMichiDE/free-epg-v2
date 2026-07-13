@@ -1,6 +1,7 @@
 export const tr = {
   "nav.countries": "Ülkeler",
   "nav.playlists": "Oynatma listeleri",
+  "nav.player": "TV Oynatıcı",
   "nav.channels": "Kanallar",
   "nav.m3u": "M3U Eşleştirici",
   "nav.lists": "Listeler",

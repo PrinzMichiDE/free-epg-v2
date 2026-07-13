@@ -1,6 +1,7 @@
 export const zh = {
   "nav.countries": "国家/地区",
   "nav.playlists": "播放列表",
+  "nav.player": "电视播放器",
   "nav.channels": "频道",
   "nav.m3u": "M3U 匹配器",
   "nav.lists": "列表",

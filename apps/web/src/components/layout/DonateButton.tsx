@@ -10,6 +10,7 @@ interface DonateButtonProps {
   size?: "sm" | "md";
   className?: string;
   showAmount?: boolean;
+  stacked?: boolean;
 }
 
 const variants = {
@@ -29,6 +30,7 @@ export function DonateButton({
   size = "sm",
   className,
   showAmount = false,
+  stacked = false,
 }: DonateButtonProps) {
   const { t } = useI18n();
 
@@ -57,7 +59,14 @@ export function DonateButton({
   ] as const;
 
   return (
-    <div className={cn("inline-flex flex-wrap items-center gap-2", className)}>
+    <div
+      className={cn(
+        stacked
+          ? "grid grid-cols-1 xs:grid-cols-3 gap-2 w-full"
+          : "inline-flex flex-wrap items-center gap-2",
+        className
+      )}
+    >
       {options.map((option) => (
         <a
           key={option.id}
@@ -66,15 +75,16 @@ export function DonateButton({
           rel="noopener noreferrer"
           aria-label={option.label}
           className={cn(
-            "inline-flex items-center justify-center rounded-lg font-medium transition-opacity duration-200 cursor-pointer",
+            "inline-flex items-center justify-center rounded-lg font-medium transition-opacity duration-200 cursor-pointer min-h-[44px]",
+            stacked && "w-full",
             variants[variant],
             sizes[size]
           )}
         >
           <option.Icon className="h-4 w-4 shrink-0" aria-hidden />
-          <span>{option.label}</span>
+          <span className="truncate">{option.label}</span>
           {option.amountLabel && (
-            <span className="text-[var(--muted-foreground)] font-normal">
+            <span className="text-[var(--muted-foreground)] font-normal shrink-0">
               ({option.amountLabel})
             </span>
           )}

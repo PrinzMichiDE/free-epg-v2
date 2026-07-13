@@ -36,6 +36,34 @@ Nicht im Scope: Jeder Einzel-Commit ohne betriebliche Relevanz.
 
 ## Detailbeschreibung
 
+### Eintrag CHG-2026-009: TV Player in Hauptnavigation
+
+| Feld | Inhalt |
+|------|--------|
+| Datum | 2026-07-13 |
+| Version | App-Release (Web) |
+| Begründung | TV Player soll direkt über das Menü erreichbar sein |
+| Auswirkung | Neuer Menüpunkt „TV Player“ → `/player` (weltweite Playlist); i18n in 20 Sprachen |
+| Risiko | niedrig |
+| Betroffene Komponenten | `Header.tsx`, `app/player/page.tsx`, i18n |
+| Prüfung | Menüpunkt sichtbar (Desktop + Mobile); `/player` lädt Player |
+| Freigabe | Product Owner |
+| Rollback | Vorheriges Web-Image |
+
+### Eintrag CHG-2026-008: Responsive Design für Mobile
+
+| Feld | Inhalt |
+|------|--------|
+| Datum | 2026-07-13 |
+| Version | App-Release (Web) |
+| Begründung | Layout auf Smartphones und Tablets verbessern — Navigation, Banner, Player und CTAs |
+| Auswirkung | `xs`-Breakpoint; Safe-Area-Padding; Mobile-Menü bis `xl` (Fix Lücke lg–xl); Touch-Targets 44px; TV-Player: Video zuerst, Senderliste darunter; Spenden-Buttons gestapelt; Hero-CTAs volle Breite auf Mobile |
+| Risiko | niedrig (nur CSS/Layout) |
+| Betroffene Komponenten | `globals.css`, Header, Footer, DonateButton, AmazonSupportBanner, HomePageContent, PlaylistWatchView, Cards |
+| Prüfung | Manuell auf schmalen Viewports (320–768px); `npm run typecheck -w @freeepg/web` |
+| Freigabe | Product Owner |
+| Rollback | Vorheriges Web-Image |
+
 ### Eintrag CHG-2026-007: Amazon-Unterstützung als Banner
 
 | Feld | Inhalt |

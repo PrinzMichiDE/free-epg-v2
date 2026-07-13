@@ -1,6 +1,7 @@
 export const ta = {
   "nav.countries": "நாடுகள்",
   "nav.playlists": "பிளேலிஸ்ட்கள்",
+  "nav.player": "TV பிளேயர்",
   "nav.channels": "சேனல்கள்",
   "nav.m3u": "M3U மேட்சர்",
   "nav.lists": "பட்டியல்கள்",

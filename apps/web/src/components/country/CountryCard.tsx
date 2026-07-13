@@ -30,7 +30,7 @@ export function CountryCard({
   const xmlGzipUrl = xmlUrl.endsWith(".xml") ? `${xmlUrl}.gz` : xmlUrl;
 
   return (
-    <article className="surface-card p-5 flex flex-col gap-4 hover:shadow-md transition-shadow duration-200">
+    <article className="surface-card p-4 sm:p-5 flex flex-col gap-4 hover:shadow-md transition-shadow duration-200">
       <div className="flex items-start justify-between gap-3">
         <div className="flex items-center gap-3 min-w-0">
           <CountryFlag code={code} size="md" />
@@ -68,8 +68,8 @@ export function CountryCard({
         <Link
           href={`/countries/${code.toLowerCase()}`}
           className={cn(
-            "col-span-2 flex items-center justify-center gap-1.5",
-            "h-10 rounded-lg border border-[var(--border)] text-sm font-medium",
+            "col-span-2 flex items-center justify-center gap-1.5 min-h-[44px]",
+            "rounded-lg border border-[var(--border)] text-sm font-medium",
             "text-[var(--foreground)] hover:bg-[var(--surface-muted)] transition-colors duration-200"
           )}
         >

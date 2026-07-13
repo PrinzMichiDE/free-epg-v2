@@ -15,15 +15,15 @@ export function AmazonSupportBanner() {
           href={AMAZON_SUPPORT_URL}
           target="_blank"
           rel="noopener noreferrer sponsored"
-          className="group flex flex-wrap items-center justify-center sm:justify-between gap-2 sm:gap-4 text-sm"
+          className="group flex flex-col xs:flex-row items-stretch xs:items-center justify-between gap-2 sm:gap-4 text-xs sm:text-sm min-h-[44px]"
         >
-          <span className="inline-flex items-center gap-2 text-[var(--foreground)]">
-            <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#FF9900]/15 text-[#FF9900] shrink-0">
+          <span className="inline-flex items-center gap-2 text-[var(--foreground)] text-center xs:text-left">
+            <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#FF9900]/15 text-[#FF9900] shrink-0 mx-auto xs:mx-0">
               <Gift className="h-4 w-4" aria-hidden />
             </span>
-            <span>{t("donate.banner.message")}</span>
+            <span className="text-balance leading-snug">{t("donate.banner.message")}</span>
           </span>
-          <span className="inline-flex items-center gap-1.5 font-medium text-[#FF9900] group-hover:underline underline-offset-4">
+          <span className="inline-flex items-center justify-center xs:justify-end gap-1.5 font-medium text-[#FF9900] group-hover:underline underline-offset-4 shrink-0 py-1">
             {t("donate.banner.cta")}
             <ExternalLink className="h-3.5 w-3.5 opacity-70" aria-hidden />
           </span>

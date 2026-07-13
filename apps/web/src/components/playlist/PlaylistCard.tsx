@@ -30,7 +30,7 @@ export function PlaylistCard({
   const { t } = useI18n();
 
   return (
-    <article className="surface-card p-5 flex flex-col gap-4 hover:shadow-md transition-shadow duration-200">
+    <article className="surface-card p-4 sm:p-5 flex flex-col gap-4 hover:shadow-md transition-shadow duration-200">
       <div className="flex items-start justify-between gap-3">
         <div className="flex items-center gap-3 min-w-0">
           <CountryFlag code={code} size="md" />
@@ -66,8 +66,8 @@ export function PlaylistCard({
         <Link
           href={`/playlists/${code.toLowerCase()}/watch`}
           className={cn(
-            "col-span-2 flex items-center justify-center gap-1.5",
-            "h-10 rounded-lg text-sm font-medium",
+            "col-span-2 flex items-center justify-center gap-1.5 min-h-[44px]",
+            "rounded-lg text-sm font-medium",
             "bg-[var(--primary)] text-[var(--primary-foreground)] hover:opacity-90 transition-opacity"
           )}
         >
@@ -77,8 +77,8 @@ export function PlaylistCard({
         <Link
           href={`/playlists/${code.toLowerCase()}`}
           className={cn(
-            "col-span-1 flex items-center justify-center gap-1.5",
-            "h-10 rounded-lg border border-[var(--border)] text-sm font-medium",
+            "col-span-1 flex items-center justify-center gap-1.5 min-h-[44px]",
+            "rounded-lg border border-[var(--border)] text-sm font-medium",
             "text-[var(--foreground)] hover:bg-[var(--surface-muted)] transition-colors duration-200"
           )}
         >

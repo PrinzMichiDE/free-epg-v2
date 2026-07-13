@@ -55,8 +55,8 @@ export function XmlUrlBox({
         </p>
       )}
 
-      <div className="flex flex-wrap gap-2 mt-4">
-        <Button size="sm" onClick={copy} aria-label={`${title} URL kopieren`}>
+      <div className="flex flex-wrap sm:flex-nowrap gap-2 mt-4">
+        <Button size="sm" onClick={copy} aria-label={`${title} URL kopieren`} className="flex-1 xs:flex-none min-h-[44px]">
           {copied ? (
             <>
               <Check className="h-4 w-4" aria-hidden />
@@ -69,7 +69,7 @@ export function XmlUrlBox({
             </>
           )}
         </Button>
-        <ButtonLink href={displayPath} variant="outline" size="sm">
+        <ButtonLink href={displayPath} variant="outline" size="sm" className="flex-1 xs:flex-none min-h-[44px]">
           <ExternalLink className="h-4 w-4" aria-hidden />
           Öffnen
         </ButtonLink>

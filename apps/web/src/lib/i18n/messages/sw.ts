@@ -1,6 +1,7 @@
 export const sw = {
   "nav.countries": "Nchi",
   "nav.playlists": "Orodha za kucheza",
+  "nav.player": "Kichezaji TV",
   "nav.channels": "Vituo",
   "nav.m3u": "Kilinganishi cha M3U",
   "nav.lists": "Orodha",

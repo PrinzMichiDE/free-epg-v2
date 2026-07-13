@@ -19,7 +19,7 @@ export function WorldPlaylistCard({ playlist, className }: WorldPlaylistCardProp
   return (
     <article
       className={cn(
-        "surface-card p-6 sm:p-8 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6",
+        "surface-card p-4 sm:p-6 lg:p-8 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 sm:gap-6",
         "border-[var(--accent)]/30 bg-gradient-to-br from-[var(--card)] to-[var(--surface-muted)]/40",
         className
       )}
@@ -48,11 +48,11 @@ export function WorldPlaylistCard({ playlist, className }: WorldPlaylistCardProp
         </div>
       </div>
 
-      <div className="flex flex-wrap gap-2 shrink-0">
+      <div className="flex flex-col xs:flex-row flex-wrap gap-2 w-full lg:w-auto shrink-0">
         <Link
           href={`/playlists/${playlist.slug}/watch`}
           className={cn(
-            "inline-flex items-center justify-center gap-2 h-10 px-4 rounded-lg text-sm font-medium",
+            "inline-flex items-center justify-center gap-2 h-11 sm:h-10 px-4 rounded-lg text-sm font-medium w-full xs:w-auto",
             "bg-[var(--primary)] text-[var(--primary-foreground)] hover:opacity-90 transition-opacity"
           )}
         >
@@ -62,14 +62,14 @@ export function WorldPlaylistCard({ playlist, className }: WorldPlaylistCardProp
         <Link
           href={`/playlists/${playlist.slug}`}
           className={cn(
-            "inline-flex items-center justify-center gap-2 h-10 px-4 rounded-lg",
+            "inline-flex items-center justify-center gap-2 h-11 sm:h-10 px-4 rounded-lg w-full xs:w-auto",
             "border border-[var(--border)] text-sm font-medium",
             "hover:bg-[var(--surface-muted)] transition-colors"
           )}
         >
           {t("common.details")}
         </Link>
-        <ButtonLink href={playlist.m3uUrl} size="md" download>
+        <ButtonLink href={playlist.m3uUrl} size="md" download className="w-full xs:w-auto">
           <ListMusic className="h-4 w-4" aria-hidden />
           {t("world.download")}
         </ButtonLink>

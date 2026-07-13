@@ -1,6 +1,7 @@
 export const vi = {
   "nav.countries": "Quốc gia",
   "nav.playlists": "Danh sách phát",
+  "nav.player": "Trình phát TV",
   "nav.channels": "Kênh",
   "nav.m3u": "Bộ ghép M3U",
   "nav.lists": "Danh sách",

@@ -53,8 +53,9 @@ export function LanguageSwitcher({ className }: { className?: string }) {
           role="listbox"
           aria-label={t("lang.label")}
           className={cn(
-            "absolute right-0 top-full mt-1 z-50 min-w-[11rem] max-h-72 overflow-y-auto",
-            "rounded-lg border border-[var(--border)] bg-[var(--card)] shadow-md py-1"
+            "absolute z-50 max-h-72 overflow-y-auto overscroll-contain",
+            "rounded-lg border border-[var(--border)] bg-[var(--card)] shadow-md py-1",
+            "right-0 top-full mt-1 w-[min(100vw-1.5rem,14rem)] sm:min-w-[11rem]"
           )}
         >
           {LOCALES.map((item) => (

@@ -1,6 +1,7 @@
 export const te = {
   "nav.countries": "దేశాలు",
   "nav.playlists": "ప్లేజాబితాలు",
+  "nav.player": "TV ప్లేయర్",
   "nav.channels": "ఛానెళ్లు",
   "nav.m3u": "M3U మ్యాచర్",
   "nav.lists": "జాబితాలు",
