@@ -1,7 +1,7 @@
 import { sql } from "drizzle-orm";
 import { getDatabase } from "@/lib/db";
 import { channels, generatedFiles } from "@freeepg/db";
-import { EPG_PW_COUNTRIES } from "@freeepg/epg-sources";
+import { SUPPORTED_EPG_COUNTRIES } from "@freeepg/epg-sources";
 import { CountryCard } from "@/components/country/CountryCard";
 import { countryEpgPaths } from "@/lib/utils";
 
@@ -10,7 +10,7 @@ export const dynamic = "force-dynamic";
 export default async function CountriesPage() {
   const db = getDatabase();
 
-  let countries = EPG_PW_COUNTRIES.map((code) => {
+  let countries = SUPPORTED_EPG_COUNTRIES.map((code) => {
     const paths = countryEpgPaths(code);
     return {
       code,
@@ -34,7 +34,7 @@ export default async function CountriesPage() {
     const files = await db.select().from(generatedFiles);
     const fileMap = new Map(files.map((f) => [f.country, f]));
 
-    countries = EPG_PW_COUNTRIES.map((code) => {
+    countries = SUPPORTED_EPG_COUNTRIES.map((code) => {
       const stat = stats.find((s) => s.country === code);
       const file = fileMap.get(code);
       const paths = countryEpgPaths(code);
@@ -56,7 +56,7 @@ export default async function CountriesPage() {
       <header className="mb-10">
         <h1 className="text-3xl sm:text-4xl font-semibold tracking-tight">Alle Länder</h1>
         <p className="text-[var(--muted-foreground)] mt-2 max-w-2xl">
-          {EPG_PW_COUNTRIES.length} unterstützte Regionen mit XMLTV- und Rytec-Feeds.
+          {SUPPORTED_EPG_COUNTRIES.length} unterstützte Regionen mit XMLTV- und Rytec-Feeds.
         </p>
       </header>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">

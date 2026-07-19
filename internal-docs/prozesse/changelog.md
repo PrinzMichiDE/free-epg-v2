@@ -38,6 +38,20 @@ Nicht im Scope: Jeder Einzel-Commit ohne betriebliche Relevanz.
 
 ## Detailbeschreibung
 
+### Eintrag CHG-2026-017: Zusätzliche EPG-Quelle iptv-epg.org und erweiterte Länderabdeckung
+
+| Feld | Inhalt |
+|------|--------|
+| Datum | 2026-07-19 |
+| Version | App-Release (epg-sources, worker, web) |
+| Begründung | Nutzerwunsch „Weitere Quellen nutzen“: bisher nur epg.pw und xmltv.se aktiv; iptv-epg.org bietet ~70 Länder-Feeds |
+| Auswirkung | Neuer `IptvEpgOrgAdapter` (priority 4, Basis-Layer); `fetchMergedCountryEpg` zentralisiert Merge; `SUPPORTED_EPG_COUNTRIES` (~83 Regionen); xmltv.se (priority 2) gewinnt bei Konflikten in DACH/EU; Worker/Web nutzen gemergte Quellen |
+| Risiko | mittel (mehr externe Abhängigkeiten, längere Fetch-Zeiten für große Feeds wie US) |
+| Betroffene Komponenten | `packages/epg-sources`, `apps/worker`, `apps/web`, `packages/db/seed.ts` |
+| Prüfung | `npm run typecheck`; Worker-Job `fetch-country` für DE/IT; API `/api/epg/de.xml` |
+| Freigabe | Product Owner |
+| Rollback | Vorheriges Image; EPG-Dateien unter `/data/epg` neu generieren |
+
 ### Eintrag CHG-2026-016: XMLTV-Zeitstempel epg.pw korrigieren (+8h UTC-Fix)
 
 | Feld | Inhalt |

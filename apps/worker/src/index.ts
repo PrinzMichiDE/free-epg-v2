@@ -13,11 +13,10 @@ import {
   channels,
   programmes,
 } from "@freeepg/db";
-import { buildXmltv, mergeXmltvDocs, parseXmltv, buildRytecXmltv, rytecXmlFileName, parseXmltvDateString } from "@freeepg/epg-core";
+import { buildXmltv, parseXmltv, buildRytecXmltv, rytecXmlFileName, parseXmltvDateString } from "@freeepg/epg-core";
 import {
-  getDefaultAdapters,
-  EPG_PW_COUNTRIES,
-  EpgPwAdapter,
+  SUPPORTED_EPG_COUNTRIES,
+  fetchMergedCountryEpg,
   refreshPlaylistCaches,
 } from "@freeepg/epg-sources";
 import { syncIptvOrgChannels } from "@freeepg/db/seed";
@@ -93,18 +92,11 @@ async function fetchCountryEpg(country: string) {
     .returning();
 
   try {
-    const adapters = getDefaultAdapters().sort((a, b) => a.priority - b.priority);
-    let merged = { channels: [] as ReturnType<typeof parseXmltv>["channels"], programmes: [] as ReturnType<typeof parseXmltv>["programmes"] };
-
-    for (const adapter of adapters.reverse()) {
-      const doc = await adapter.fetchCountry(country);
-      if (!doc) continue;
-      merged = mergeXmltvDocs(doc, merged, "primary");
-    }
-
-    if (merged.channels.length === 0) {
+    const result = await fetchMergedCountryEpg(country);
+    if (!result) {
       throw new Error(`No EPG data for ${country}`);
     }
+    const merged = result.doc;
 
     const saved = await saveXml(country, merged);
     const previewXml = buildXmltv(merged);
@@ -121,14 +113,21 @@ async function fetchCountryEpg(country: string) {
       .set({
         status: "completed",
         finishedAt: new Date(),
-        metadata: { channels: merged.channels.length, programmes: merged.programmes.length, ...saved },
+        metadata: {
+          channels: merged.channels.length,
+          programmes: merged.programmes.length,
+          sources: result.sources,
+          ...saved,
+        },
       })
       .where(eq(epgJobs.id, job.id));
 
-    await db
-      .update(epgSources)
-      .set({ lastFetch: new Date(), status: "healthy", channelCount: merged.channels.length })
-      .where(eq(epgSources.name, "epg.pw"));
+    for (const src of result.sources) {
+      await db
+        .update(epgSources)
+        .set({ lastFetch: new Date(), status: "healthy", channelCount: src.channels })
+        .where(eq(epgSources.name, src.name));
+    }
 
     await redisClient.del(`freeepg:meta:${country.toUpperCase()}`);
     console.log(`[EPG] ${country}: ${merged.channels.length} channels, ${merged.programmes.length} programmes`);
@@ -189,7 +188,7 @@ async function storeProgrammePreview(country: string, xml: string) {
       title: prog.title,
       description: prog.desc ?? null,
       category: prog.category ?? null,
-      source: "epg.pw",
+      source: "merged",
     });
   }
 
@@ -259,7 +258,7 @@ const worker = new Worker(
         await fetchCountryEpg(job.data.country as string);
         break;
       case "fetch-all-countries":
-        for (const cc of EPG_PW_COUNTRIES) {
+        for (const cc of SUPPORTED_EPG_COUNTRIES) {
           await epgQueue.add("fetch-country", { country: cc }, { attempts: 2 });
         }
         break;

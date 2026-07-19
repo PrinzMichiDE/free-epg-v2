@@ -11,7 +11,7 @@ FreeEPG ist ein TypeScript-Monorepo zur Aggregation, Speicherung und Auslieferun
 - Monorepo-Struktur `apps/*` und `packages/*`
 - Entwicklungs-Stack (`docker-compose.yml`, Port 3000)
 - Produktions-Stack (`docker-compose.prod.yml`, Traefik, `free-epg.de`)
-- Externe Integrationen (epg.pw, xmltv.se, iptv-org)
+- Externe Integrationen (epg.pw, xmltv.se, iptv-epg.org, iptv-org)
 
 ## Begriffe und Definitionen
 
@@ -62,7 +62,7 @@ C4Context
 | `apps/worker` | `@freeepg/worker` | BullMQ Worker, Cron, EPG-Fetch, Analytics-Jobs |
 | `packages/db` | `@freeepg/db` | Drizzle Schema, Migrationen, Seed |
 | `packages/epg-core` | `@freeepg/epg-core` | XMLTV parse/build, Kanal-Matching |
-| `packages/epg-sources` | `@freeepg/epg-sources` | Adapter: epg.pw, xmltv.se, iptv-org API |
+| `packages/epg-sources` | `@freeepg/epg-sources` | Adapter: iptv-epg.org, epg.pw, xmltv.se; iptv-org API |
 | `packages/analytics` | `@freeepg/analytics` | Event-Tracking, Redis-Buffer, DB-Aggregation |
 | `packages/m3u-matcher` | `@freeepg/m3u-matcher` | M3U parse, match, enrich |
 
@@ -96,7 +96,7 @@ Volumes: `pgdata`, `redisdata`, `epg-data` (XMLTV-Dateien unter `/data/epg`).
 #### EPG-Land-Abruf (Worker, scheduled)
 
 1. Cron (`CRON_COUNTRY_FETCH`, Default `0 */6 * * *`) enqueued `fetch-all-countries`.
-2. Pro Land: Adapter `epg.pw` (priority 2) und `xmltv.se` (priority 3) werden abgefragt.
+2. Pro Land: Adapter `iptv-epg.org` (priority 4), `epg.pw` (priority 3) und `xmltv.se` (priority 2) werden via `fetchMergedCountryEpg` abgefragt und gemergt (niedrigere Priority gewinnt bei Konflikten).
 3. `mergeXmltvDocs` fusioniert Dokumente; `buildXmltv` erzeugt XML.
 4. Speicherung: `/data/epg/{cc}.xml` + `.gz`, Metadaten in `generated_files`.
 5. Cache-Invalidierung: Redis-Key `freeepg:meta:{CC}` gelöscht.
@@ -104,7 +104,7 @@ Volumes: `pgdata`, `redisdata`, `epg-data` (XMLTV-Dateien unter `/data/epg`).
 #### EPG-Land-Abruf (API, on-demand)
 
 1. `GET /api/epg/[country]` prüft Datei via `countryXmlPath`.
-2. Falls fehlend: `EpgPwAdapter.fetchCountry` synchron, Datei schreiben.
+2. Falls fehlend: `fetchMergedCountryEpg` synchron, Datei schreiben.
 3. Response via `streamFileResponse` mit ETag, optional gzip.
 
 #### M3U-Matching
@@ -196,6 +196,7 @@ Kerntabellen (Drizzle `packages/db/src/schema.ts`):
 
 | System | Protokoll | Richtung |
 |--------|-----------|----------|
+| iptv-epg.org | HTTPS GET | Outbound |
 | epg.pw | HTTPS GET | Outbound |
 | xmltv.se | HTTPS GET | Outbound |
 | iptv-org.github.io | HTTPS GET | Outbound |

@@ -2,7 +2,7 @@ import { NextRequest } from "next/server";
 import { eq } from "drizzle-orm";
 import { buildRytecChannelsXml } from "@freeepg/epg-core";
 import { channels } from "@freeepg/db";
-import { EPG_PW_COUNTRIES } from "@freeepg/epg-sources";
+import { SUPPORTED_EPG_COUNTRIES } from "@freeepg/epg-sources";
 import { getDatabase } from "@/lib/db";
 import { parseRytecChannelsRequest } from "@/lib/ensure-epg";
 
@@ -18,7 +18,7 @@ export async function GET(
     paramCountry
   );
 
-  if (!EPG_PW_COUNTRIES.includes(country)) {
+  if (!SUPPORTED_EPG_COUNTRIES.includes(country)) {
     return new Response("Unknown country", { status: 404 });
   }
 

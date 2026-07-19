@@ -1,5 +1,5 @@
 import { buildRytecSourcesXml, rytecCountryCode } from "@freeepg/epg-core";
-import { EPG_PW_COUNTRIES } from "@freeepg/epg-sources";
+import { SUPPORTED_EPG_COUNTRIES } from "@freeepg/epg-sources";
 import { BASE_URL } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
@@ -28,7 +28,7 @@ const COUNTRY_LABELS: Record<string, string> = {
 };
 
 export async function GET() {
-  const entries = EPG_PW_COUNTRIES.map((country) => {
+  const entries = SUPPORTED_EPG_COUNTRIES.map((country) => {
     const cc = country.toLowerCase();
     const label = COUNTRY_LABELS[country] ?? country;
     return {

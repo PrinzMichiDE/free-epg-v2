@@ -1,5 +1,5 @@
 import { NextRequest } from "next/server";
-import { EPG_PW_COUNTRIES } from "@freeepg/epg-sources";
+import { SUPPORTED_EPG_COUNTRIES } from "@freeepg/epg-sources";
 import {
   parseRytecCountryRequest,
   readCountryRytecPayload,
@@ -23,7 +23,7 @@ export async function GET(
   const wantsGzip =
     gzipFromPath || format === "gz" || request.nextUrl.searchParams.get("gzip") === "1";
 
-  if (!EPG_PW_COUNTRIES.includes(country)) {
+  if (!SUPPORTED_EPG_COUNTRIES.includes(country)) {
     return new Response(`Unknown country: ${raw}`, { status: 404 });
   }
 

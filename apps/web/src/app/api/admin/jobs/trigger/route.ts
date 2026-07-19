@@ -3,7 +3,7 @@ import { Queue } from "bullmq";
 import { authOptions } from "@/lib/auth";
 import { getDatabase } from "@/lib/db";
 import { epgJobs } from "@freeepg/db";
-import { EPG_PW_COUNTRIES } from "@freeepg/epg-sources";
+import { SUPPORTED_EPG_COUNTRIES } from "@freeepg/epg-sources";
 
 export async function POST(request: Request) {
   const session = await getServerSession(authOptions);
@@ -46,7 +46,7 @@ export async function POST(request: Request) {
     return Response.json({ message: "Fetch all countries queued" });
   }
 
-  if (country && EPG_PW_COUNTRIES.includes(country.toUpperCase())) {
+  if (country && SUPPORTED_EPG_COUNTRIES.includes(country.toUpperCase())) {
     await queue.add("fetch-country", { country: country.toUpperCase() }, { attempts: 2 });
     const db = getDatabase();
     await db.insert(epgJobs).values({

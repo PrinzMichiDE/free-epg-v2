@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { Globe2, Radio, Server } from "lucide-react";
-import { EPG_PW_COUNTRIES } from "@freeepg/epg-sources";
+import { SUPPORTED_EPG_COUNTRIES } from "@freeepg/epg-sources";
 import { CountryCard } from "@/components/country/CountryCard";
 import { Button } from "@/components/ui/Button";
 import { StatCard } from "@/components/ui/StatCard";
@@ -103,7 +103,7 @@ export function HomePageContent({
               href="/countries"
               className="text-sm font-medium text-[var(--primary)] hover:underline underline-offset-4 shrink-0"
             >
-              {t("home.viewAllCountries", { count: EPG_PW_COUNTRIES.length })}
+              {t("home.viewAllCountries", { count: SUPPORTED_EPG_COUNTRIES.length })}
             </Link>
           </div>
 

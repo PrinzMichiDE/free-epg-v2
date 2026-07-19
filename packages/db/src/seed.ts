@@ -25,8 +25,9 @@ async function fetchCountries(): Promise<Array<{ code: string; name: string }>> 
 async function ensureEpgSources() {
   const db = getDb();
   const sources = [
-    { name: "epg.pw", type: "http", priority: 2, enabled: true, url: "https://epg.pw/xmltv/" },
-    { name: "xmltv.se", type: "http", priority: 3, enabled: true, url: "https://xmltv.se/" },
+    { name: "iptv-epg.org", type: "http", priority: 4, enabled: true, url: "https://iptv-epg.org/files/" },
+    { name: "epg.pw", type: "http", priority: 3, enabled: true, url: "https://epg.pw/xmltv/" },
+    { name: "xmltv.se", type: "http", priority: 2, enabled: true, url: "https://xmltv.se/" },
     { name: "iptv-org/epg", type: "grabber", priority: 1, enabled: true, url: null },
     { name: "iptv-org/api", type: "metadata", priority: 1, enabled: true, url: "https://iptv-org.github.io/api/" },
   ];
