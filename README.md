@@ -1,44 +1,44 @@
 # FreeEPG
 
-**Weltweites TV-Programm — kostenlos, sofort nutzbar, ohne Installation.**
+**Worldwide TV listings — free, ready to use, no installation required.**
 
 👉 **[https://www.free-epg.de/](https://www.free-epg.de/)**
 
 ---
 
-## Was ist FreeEPG?
+## What is FreeEPG?
 
-[FreeEPG](https://www.free-epg.de/) liefert aktuelle EPG-Daten (Elektronischer Programmführer) für tausende Sender weltweit — fertig aufbereitet für IPTV, Kodi, VLC und Enigma2.
+[FreeEPG](https://www.free-epg.de/) delivers up-to-date EPG data (Electronic Program Guide) for thousands of channels worldwide — ready to use with IPTV, Kodi, VLC, and Enigma2.
 
-Kein manuelles Zusammensuchen von XML-Dateien. Kein Server-Setup. Einfach die passende URL kopieren und in deiner App eintragen.
+No hunting for XML files. No server setup. Just copy the right URL and add it to your app.
 
-## Was du bekommst
+## What you get
 
-- **XMLTV & Rytec** — EPG-Feeds pro Land, direkt abrufbar
-- **Playlisten weltweit** — fertige M3U-Playlists mit passender EPG-Verknüpfung
-- **TV Player** — Sender direkt im Browser ansehen
-- **Programm-Suche** — Was läuft gerade? Was kommt als Nächstes?
-- **M3U Matcher** — eigene Playlist hochladen und automatisch mit EPG verknüpfen
-- **20 Sprachen** — Oberfläche international nutzbar
+- **XMLTV & Rytec** — EPG feeds per country, available instantly
+- **Playlists worldwide** — ready-made M3U playlists with matching EPG links
+- **TV Player** — watch channels directly in your browser
+- **Program search** — what's on now? what's coming next?
+- **M3U Matcher** — upload your own playlist and link it to EPG automatically
+- **20 languages** — use the interface internationally
 
-## Für wen?
+## Who is it for?
 
-| Nutzer | Vorteil |
-|--------|---------|
-| **IPTV-Nutzer** | EPG-URL in TiviMate, OTT Navigator & Co. einfügen — fertig |
-| **Enigma2 / Dreambox** | Rytec-kompatible Feeds für EPGImport |
-| **Kodi / VLC** | XMLTV-URLs für den Programmführer |
-| **Entwickler** | Stabile REST-API für EPG- und Playlist-Daten |
+| User | Benefit |
+|------|---------|
+| **IPTV users** | paste the EPG URL into TiviMate, OTT Navigator, and similar apps — done |
+| **Enigma2 / Dreambox** | Rytec-compatible feeds for EPGImport |
+| **Kodi / VLC** | XMLTV URLs for the program guide |
+| **Developers** | stable REST API for EPG and playlist data |
 
-## Jetzt starten
+## Get started
 
-Alles läuft unter **[https://www.free-epg.de/](https://www.free-epg.de/)** — kostenlos, ohne Registrierung.
+Everything runs at **[https://www.free-epg.de/](https://www.free-epg.de/)** — free, no registration required.
 
-1. Land wählen oder Playlist öffnen
-2. EPG- oder M3U-URL kopieren
-3. In deiner App eintragen — fertig
+1. Pick a country or open a playlist
+2. Copy the EPG or M3U URL
+3. Add it to your app — done
 
-**[→ Zu FreeEPG](https://www.free-epg.de/)**
+**[→ Go to FreeEPG](https://www.free-epg.de/)**
 
 ---
 
