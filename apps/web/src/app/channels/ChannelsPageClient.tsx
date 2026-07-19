@@ -20,17 +20,14 @@ interface Channel {
 export default function ChannelsPageClient() {
   const { t } = useI18n();
   const searchParams = useSearchParams();
+  const countryFromUrl = searchParams.get("country")?.toUpperCase() ?? "";
+
   const [q, setQ] = useState("");
-  const [country, setCountry] = useState("");
+  const [country, setCountry] = useState(countryFromUrl);
   const [channels, setChannels] = useState<Channel[]>([]);
   const [loading, setLoading] = useState(false);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-
-  useEffect(() => {
-    const fromUrl = searchParams.get("country")?.toUpperCase() ?? "";
-    if (fromUrl) setCountry(fromUrl);
-  }, [searchParams]);
 
   const search = useCallback(async () => {
     setLoading(true);
@@ -49,10 +46,6 @@ export default function ChannelsPageClient() {
     const timer = setTimeout(search, 300);
     return () => clearTimeout(timer);
   }, [search]);
-
-  useEffect(() => {
-    setPage(1);
-  }, [q, country]);
 
   return (
     <div className="page-shell py-10 sm:py-14">
@@ -79,7 +72,10 @@ export default function ChannelsPageClient() {
           type="search"
           placeholder={t("channels.searchPlaceholder")}
           value={q}
-          onChange={(e) => setQ(e.target.value)}
+          onChange={(e) => {
+            setQ(e.target.value);
+            setPage(1);
+          }}
           className="flex-1 px-4 py-3 rounded-lg border border-[var(--border)] bg-[var(--card)]"
           autoFocus
         />
@@ -87,7 +83,10 @@ export default function ChannelsPageClient() {
           type="text"
           placeholder={t("channels.countryPlaceholder")}
           value={country}
-          onChange={(e) => setCountry(e.target.value.toUpperCase())}
+          onChange={(e) => {
+            setCountry(e.target.value.toUpperCase());
+            setPage(1);
+          }}
           maxLength={2}
           className="w-24 px-4 py-3 rounded-lg border border-[var(--border)] bg-[var(--card)] uppercase"
         />

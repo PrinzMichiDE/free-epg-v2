@@ -32,7 +32,11 @@ function resetVideoElement(video: HTMLVideoElement) {
   video.load();
 }
 
-export function TvPlayer({
+export function TvPlayer(props: TvPlayerProps) {
+  return <TvPlayerInner key={props.channel?.id ?? "none"} {...props} />;
+}
+
+function TvPlayerInner({
   channel,
   className,
   onError,
@@ -41,7 +45,7 @@ export function TvPlayer({
 }: TvPlayerProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const hlsRef = useRef<Hls | null>(null);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(() => Boolean(channel?.url));
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -52,10 +56,8 @@ export function TvPlayer({
     hlsRef.current = null;
     resetVideoElement(video);
     configureAirPlayVideo(video);
-    setError(null);
 
     if (!channel?.url) {
-      setLoading(false);
       return;
     }
 
@@ -65,7 +67,6 @@ export function TvPlayer({
     });
 
     let cancelled = false;
-    setLoading(true);
 
     const fail = (message: string) => {
       if (cancelled) return;

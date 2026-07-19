@@ -1,7 +1,13 @@
 import { Suspense } from "react";
 import ChannelsPageClient from "./ChannelsPageClient";
 
-export default function ChannelsPage() {
+export default async function ChannelsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ country?: string }>;
+}) {
+  const { country } = await searchParams;
+
   return (
     <Suspense
       fallback={
@@ -15,7 +21,7 @@ export default function ChannelsPage() {
         </div>
       }
     >
-      <ChannelsPageClient />
+      <ChannelsPageClient key={country?.toUpperCase() ?? "all"} />
     </Suspense>
   );
 }

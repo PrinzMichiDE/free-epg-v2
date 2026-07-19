@@ -49,21 +49,16 @@ function detectLocale(): LocaleCode {
 }
 
 export function I18nProvider({ children }: { children: ReactNode }) {
-  const [locale, setLocaleState] = useState<LocaleCode>(DEFAULT_LOCALE);
-  const [ready, setReady] = useState(false);
+  const [locale, setLocaleState] = useState<LocaleCode>(() =>
+    typeof window !== "undefined" ? detectLocale() : DEFAULT_LOCALE
+  );
 
   useEffect(() => {
-    setLocaleState(detectLocale());
-    setReady(true);
-  }, []);
-
-  useEffect(() => {
-    if (!ready) return;
     const meta = getLocaleMeta(locale);
     document.documentElement.lang = locale;
     document.documentElement.dir = meta.dir;
     writeCookie(LOCALE_COOKIE, locale);
-  }, [locale, ready]);
+  }, [locale]);
 
   const setLocale = useCallback((next: LocaleCode) => {
     setLocaleState(next);

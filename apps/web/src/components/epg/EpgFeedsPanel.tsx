@@ -49,12 +49,22 @@ export function EpgFeedsPanel({
               </Link>
             </li>
             <li>
-              <a href={`/api/epg/rytec/channels/${cc}.xml`} className="text-[var(--primary)] hover:underline underline-offset-4">
+              <a
+                href={`/api/epg/rytec/channels/${cc}.xml`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-[var(--primary)] hover:underline underline-offset-4"
+              >
                 Channel-Map Vorlage ({cc.toUpperCase()})
               </a>
             </li>
             <li>
-              <a href="/api/epg/rytec/sources" className="text-[var(--primary)] hover:underline underline-offset-4">
+              <a
+                href="/api/epg/rytec/sources"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-[var(--primary)] hover:underline underline-offset-4"
+              >
                 sources.xml (alle Länder)
               </a>
             </li>

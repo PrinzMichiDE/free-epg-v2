@@ -68,10 +68,6 @@ export function ProgrammesPageClient() {
     return () => clearTimeout(timer);
   }, [load]);
 
-  useEffect(() => {
-    setPage(1);
-  }, [q, country, when]);
-
   const filters: { value: WhenFilter; label: string }[] = [
     { value: "now", label: t("programmes.filterNow") },
     { value: "upcoming", label: t("programmes.filterUpcoming") },
@@ -102,7 +98,10 @@ export function ProgrammesPageClient() {
           <input
             type="search"
             value={q}
-            onChange={(e) => setQ(e.target.value)}
+            onChange={(e) => {
+              setQ(e.target.value);
+              setPage(1);
+            }}
             placeholder={t("programmes.searchPlaceholder")}
             className="w-full h-11 pl-9 pr-3 rounded-lg border border-[var(--border)] bg-[var(--card)]"
             autoFocus
@@ -111,7 +110,10 @@ export function ProgrammesPageClient() {
         <input
           type="text"
           value={country}
-          onChange={(e) => setCountry(e.target.value.toUpperCase())}
+          onChange={(e) => {
+            setCountry(e.target.value.toUpperCase());
+            setPage(1);
+          }}
           placeholder={t("programmes.countryFilter")}
           maxLength={2}
           className="w-full lg:w-28 h-11 px-3 rounded-lg border border-[var(--border)] bg-[var(--card)] uppercase"
@@ -123,7 +125,10 @@ export function ProgrammesPageClient() {
           <button
             key={filter.value}
             type="button"
-            onClick={() => setWhen(filter.value)}
+            onClick={() => {
+              setWhen(filter.value);
+              setPage(1);
+            }}
             className={cn(
               "px-4 py-2 rounded-full text-sm font-medium transition-colors min-h-[40px]",
               when === filter.value
