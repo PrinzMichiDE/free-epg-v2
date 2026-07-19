@@ -1,76 +1,10 @@
-import { parseXmltv, normalizeEpgPwDocument, type XmltvDocument } from "@freeepg/epg-core";
-
-export interface EpgSourceAdapter {
-  name: string;
-  type: string;
-  priority: number;
-  fetchCountry(countryCode: string): Promise<XmltvDocument | null>;
-  fetchGlobal?(): Promise<XmltvDocument | null>;
-}
-
-export class EpgPwAdapter implements EpgSourceAdapter {
-  name = "epg.pw";
-  type = "http";
-  priority = 2;
-
-  async fetchCountry(countryCode: string): Promise<XmltvDocument | null> {
-    const cc = countryCode.toUpperCase();
-    const url = `https://epg.pw/xmltv/epg_${cc}.xml`;
-    try {
-      const res = await fetch(url, {
-        signal: AbortSignal.timeout(120_000),
-        headers: { "User-Agent": "FreeEPG/1.0" },
-      });
-      if (!res.ok) return null;
-      return normalizeEpgPwDocument(parseXmltv(await res.text()));
-    } catch {
-      return null;
-    }
-  }
-
-  async fetchGlobal(): Promise<XmltvDocument | null> {
-    try {
-      const res = await fetch("https://epg.pw/xmltv/epg_lite.xml", {
-        signal: AbortSignal.timeout(180_000),
-        headers: { "User-Agent": "FreeEPG/1.0" },
-      });
-      if (!res.ok) return null;
-      return normalizeEpgPwDocument(parseXmltv(await res.text()));
-    } catch {
-      return null;
-    }
-  }
-}
-
-export class XmltvSeAdapter implements EpgSourceAdapter {
-  name = "xmltv.se";
-  type = "http";
-  priority = 3;
-
-  private countryUrls: Record<string, string> = {
-    DE: "https://xmltv.se/almanac/DEFULL.xml",
-    AT: "https://xmltv.se/almanac/ATFULL.xml",
-    CH: "https://xmltv.se/almanac/CHFULL.xml",
-    GB: "https://xmltv.se/almanac/GBFULL.xml",
-    FR: "https://xmltv.se/almanac/FRFULL.xml",
-    NL: "https://xmltv.se/almanac/NLFULL.xml",
-  };
-
-  async fetchCountry(countryCode: string): Promise<XmltvDocument | null> {
-    const url = this.countryUrls[countryCode.toUpperCase()];
-    if (!url) return null;
-    try {
-      const res = await fetch(url, {
-        signal: AbortSignal.timeout(120_000),
-        headers: { "User-Agent": "FreeEPG/1.0" },
-      });
-      if (!res.ok) return null;
-      return parseXmltv(await res.text());
-    } catch {
-      return null;
-    }
-  }
-}
+export type { EpgSourceAdapter } from "./types.js";
+export {
+  EpgPwAdapter,
+  IptvEpgOrgAdapter,
+  XmltvSeAdapter,
+  getDefaultAdapters,
+} from "./adapters.js";
 
 export class IptvOrgApiAdapter {
   name = "iptv-org/api";
@@ -147,13 +81,28 @@ export interface IptvStream {
   label?: string | null;
 }
 
-export function getDefaultAdapters(): EpgSourceAdapter[] {
-  return [new EpgPwAdapter(), new XmltvSeAdapter()];
-}
-
+/** Countries with feeds on epg.pw (subset of supported regions). */
 export const EPG_PW_COUNTRIES = [
   "AU", "BR", "CA", "CN", "DE", "FR", "GB", "HK", "ID", "IN",
   "JP", "MY", "NZ", "PH", "RU", "SG", "TW", "US", "VN", "ZA",
-];
+] as const;
 
+/** Countries with per-country XML on iptv-epg.org (see https://iptv-epg.org/). */
+export const IPTV_EPG_ORG_COUNTRIES = [
+  "AE", "AL", "AM", "AR", "AT", "AU", "BA", "BE", "BG", "BO", "BR", "BS", "BY",
+  "CA", "CH", "CL", "CO", "CR", "CW", "CZ", "DE", "DK", "DO", "EG", "ES", "FI",
+  "FR", "GB", "GE", "GH", "GR", "GT", "HN", "HK", "HR", "HU", "ID", "IL", "IN",
+  "IS", "IT", "JM", "KR", "LB", "LT", "LU", "ME", "MK", "MT", "MX", "MY", "NG",
+  "NI", "NL", "NO", "NZ", "PA", "PE", "PH", "PL", "PT", "PY", "RO", "RS", "RU",
+  "SE", "SG", "SI", "SV", "TH", "TR", "TT", "TW", "UA", "UG", "US", "UY", "VE",
+  "ZA", "ZW",
+] as const;
+
+/** All regions for which merged country EPG can be built from configured adapters. */
+export const SUPPORTED_EPG_COUNTRIES = [
+  ...new Set([...EPG_PW_COUNTRIES, ...IPTV_EPG_ORG_COUNTRIES]),
+].sort() as string[];
+
+export { fetchMergedCountryEpg } from "./merge.js";
+export type { MergedEpgResult, MergedEpgSourceStats } from "./merge.js";
 export { getPlaylistsCacheDir, refreshPlaylistCaches } from "./playlist-cache.js";

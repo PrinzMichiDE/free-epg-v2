@@ -10,7 +10,7 @@ import { ButtonLink } from "@/components/ui/ButtonLink";
 import { getCountryName } from "@/lib/countries";
 import { getPlaylistCountry } from "@/lib/playlists";
 import { countryEpgPaths } from "@/lib/utils";
-import { EPG_PW_COUNTRIES } from "@freeepg/epg-sources";
+import { SUPPORTED_EPG_COUNTRIES } from "@freeepg/epg-sources";
 
 export const dynamic = "force-dynamic";
 
@@ -31,7 +31,7 @@ export default async function PlaylistDetailPage({
     notFound();
   }
 
-  const hasCountryEpg = EPG_PW_COUNTRIES.includes(cc);
+  const hasCountryEpg = SUPPORTED_EPG_COUNTRIES.includes(cc);
   const epgPaths = hasCountryEpg ? countryEpgPaths(cc) : null;
 
   return (

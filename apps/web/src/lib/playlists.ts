@@ -3,7 +3,7 @@ import { mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { eq } from "drizzle-orm";
 import {
-  EPG_PW_COUNTRIES,
+  SUPPORTED_EPG_COUNTRIES,
   IptvOrgApiAdapter,
   type IptvStream,
 } from "@freeepg/epg-sources";
@@ -112,7 +112,7 @@ async function loadChannelCountryMap(): Promise<Map<string, string>> {
 
 function resolveEpgUrl(countryCode: string): string {
   const cc = countryCode.toUpperCase();
-  if (EPG_PW_COUNTRIES.includes(cc)) {
+  if (SUPPORTED_EPG_COUNTRIES.includes(cc)) {
     return `${BASE_URL}${countryEpgPaths(cc).xmlUrl}`;
   }
   return `${BASE_URL}/api/epg`;
@@ -151,7 +151,7 @@ export async function getPlaylistCountries(): Promise<PlaylistCountry[]> {
       name: playlistName(code, worldNames),
       streamCount,
       channelCount: channelCounts.get(code)?.size ?? 0,
-      hasEpg: EPG_PW_COUNTRIES.includes(code),
+      hasEpg: SUPPORTED_EPG_COUNTRIES.includes(code),
       m3uUrl: `/api/playlists/${code.toLowerCase()}.m3u`,
       epgUrl: resolveEpgUrl(code),
     }))

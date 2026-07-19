@@ -2,7 +2,7 @@ import Link from "next/link";
 import { EpgFeedsPanel } from "@/components/epg/EpgFeedsPanel";
 import { CountryFlag } from "@/components/country/CountryFlag";
 import { getCountryName } from "@/lib/countries";
-import { EPG_PW_COUNTRIES } from "@freeepg/epg-sources";
+import { SUPPORTED_EPG_COUNTRIES } from "@freeepg/epg-sources";
 import { notFound } from "next/navigation";
 import { CountryChannelsSection } from "./CountryChannelsSection";
 import { NowPlayingSection } from "@/components/country/NowPlayingSection";
@@ -20,7 +20,7 @@ export default async function CountryDetailPage({
   const { page: pageParam } = await searchParams;
   const cc = code.toUpperCase();
 
-  if (!EPG_PW_COUNTRIES.includes(cc)) {
+  if (!SUPPORTED_EPG_COUNTRIES.includes(cc)) {
     notFound();
   }
 

@@ -6,7 +6,7 @@ import {
   buildXmltv,
   parseXmltv,
 } from "@freeepg/epg-core";
-import { EpgPwAdapter } from "@freeepg/epg-sources";
+import { fetchMergedCountryEpg } from "@freeepg/epg-sources";
 import path from "node:path";
 import {
   countryGzipPath,
@@ -21,9 +21,9 @@ export async function ensureCountryXml(country: string): Promise<string> {
   const filePath = countryXmlPath(cc);
   if (existsSync(filePath)) return filePath;
 
-  const adapter = new EpgPwAdapter();
-  const doc = await adapter.fetchCountry(cc);
-  if (!doc) throw new Error("EPG not available");
+  const result = await fetchMergedCountryEpg(cc);
+  if (!result) throw new Error("EPG not available");
+  const doc = result.doc;
 
   const xml = buildXmltv(doc);
   await mkdir(path.dirname(filePath), { recursive: true });
