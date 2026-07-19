@@ -21,6 +21,7 @@ const primaryNav: { href: string; labelKey: MessageKey }[] = [
 ];
 
 const secondaryNav: { href: string; labelKey: MessageKey }[] = [
+  { href: "/programmes", labelKey: "nav.programmes" },
   { href: "/m3u", labelKey: "nav.m3u" },
   { href: "/lists/new", labelKey: "nav.lists" },
   { href: "/docs", labelKey: "nav.docs" },

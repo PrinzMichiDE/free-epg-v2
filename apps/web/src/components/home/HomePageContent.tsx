@@ -64,6 +64,11 @@ export function HomePageContent({
                   {t("home.ctaDocs")}
                 </Button>
               </Link>
+              <Link href="/programmes" className="w-full xs:w-auto">
+                <Button variant="outline" size="lg" className="w-full xs:w-auto">
+                  {t("home.ctaProgrammes")}
+                </Button>
+              </Link>
             </div>
           </div>
         </div>

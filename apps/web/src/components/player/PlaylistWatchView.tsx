@@ -2,12 +2,13 @@
 
 import { useMemo, useState } from "react";
 import Link from "next/link";
-import { ChevronLeft, Play, Search, Tv } from "lucide-react";
+import { ChevronLeft, Play, Search, Star, Tv } from "lucide-react";
 import { TvPlayer } from "@/components/player/TvPlayer";
 import { ChannelEpgPanel } from "@/components/player/ChannelEpgPanel";
 import { cn } from "@/lib/utils";
 import { useI18n } from "@/lib/i18n/I18nProvider";
 import type { PlaylistPlayerData, PlaylistPlayerEntry } from "@/lib/playlists";
+import { usePlaylistFavorites } from "@/lib/player/favorites";
 
 interface PlaylistWatchViewProps {
   playlist: PlaylistPlayerData;
@@ -19,6 +20,10 @@ export function PlaylistWatchView({ playlist, backHref }: PlaylistWatchViewProps
   const [query, setQuery] = useState("");
   const [activeId, setActiveId] = useState<string | null>(
     playlist.entries[0]?.id ?? null
+  );
+
+  const { favorites, toggleFavorite, isFavorite } = usePlaylistFavorites(
+    playlist.code
   );
 
   const filtered = useMemo(() => {
@@ -38,14 +43,22 @@ export function PlaylistWatchView({ playlist, backHref }: PlaylistWatchViewProps
     null;
 
   const groups = useMemo(() => {
+    const favoriteEntries = filtered.filter((entry) => favorites.has(entry.id));
     const map = new Map<string, PlaylistPlayerEntry[]>();
+
+    if (favoriteEntries.length > 0) {
+      map.set(t("player.favorites"), favoriteEntries);
+    }
+
     for (const entry of filtered) {
+      if (favorites.has(entry.id)) continue;
       const key = entry.groupTitle ?? t("player.allChannels");
       if (!map.has(key)) map.set(key, []);
       map.get(key)!.push(entry);
     }
+
     return [...map.entries()];
-  }, [filtered, t]);
+  }, [filtered, favorites, t]);
 
   return (
     <div className="page-shell py-4 sm:py-6 lg:py-8">
@@ -118,20 +131,45 @@ export function PlaylistWatchView({ playlist, backHref }: PlaylistWatchViewProps
                     const isActive = entry.id === activeChannel?.id;
                     return (
                       <li key={entry.id}>
-                        <button
-                          type="button"
-                          onClick={() => setActiveId(entry.id)}
-                          className={cn(
-                            "w-full text-left px-3 py-3 rounded-lg text-sm transition-colors",
-                            "flex items-center gap-2 min-h-[44px]",
-                            isActive
-                              ? "bg-[var(--primary)] text-[var(--primary-foreground)]"
-                              : "text-[var(--foreground)] hover:bg-[var(--surface-muted)] active:bg-[var(--surface-muted)]"
-                          )}
-                        >
-                          <Play className="h-3.5 w-3.5 shrink-0 opacity-70" aria-hidden />
-                          <span className="truncate">{entry.title}</span>
-                        </button>
+                        <div className="flex items-center gap-0.5">
+                          <button
+                            type="button"
+                            onClick={() => toggleFavorite(entry.id)}
+                            className={cn(
+                              "shrink-0 min-h-[44px] min-w-[44px] flex items-center justify-center rounded-lg transition-colors",
+                              isFavorite(entry.id)
+                                ? "text-amber-400"
+                                : "text-[var(--muted-foreground)] hover:text-amber-400"
+                            )}
+                            aria-label={
+                              isFavorite(entry.id)
+                                ? t("player.removeFavorite")
+                                : t("player.addFavorite")
+                            }
+                          >
+                            <Star
+                              className={cn(
+                                "h-4 w-4",
+                                isFavorite(entry.id) && "fill-current"
+                              )}
+                              aria-hidden
+                            />
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setActiveId(entry.id)}
+                            className={cn(
+                              "flex-1 text-left px-3 py-3 rounded-lg text-sm transition-colors",
+                              "flex items-center gap-2 min-h-[44px]",
+                              isActive
+                                ? "bg-[var(--primary)] text-[var(--primary-foreground)]"
+                                : "text-[var(--foreground)] hover:bg-[var(--surface-muted)] active:bg-[var(--surface-muted)]"
+                            )}
+                          >
+                            <Play className="h-3.5 w-3.5 shrink-0 opacity-70" aria-hidden />
+                            <span className="truncate">{entry.title}</span>
+                          </button>
+                        </div>
                       </li>
                     );
                   })}

@@ -5,6 +5,7 @@ import { getCountryName } from "@/lib/countries";
 import { EPG_PW_COUNTRIES } from "@freeepg/epg-sources";
 import { notFound } from "next/navigation";
 import { CountryChannelsSection } from "./CountryChannelsSection";
+import { NowPlayingSection } from "@/components/country/NowPlayingSection";
 
 export const dynamic = "force-dynamic";
 
@@ -47,6 +48,7 @@ export default async function CountryDetailPage({
         </div>
 
         <div className="lg:col-span-3">
+          <NowPlayingSection countryCode={cc} />
           <CountryChannelsSection code={code} countryCode={cc} page={page} />
         </div>
       </div>

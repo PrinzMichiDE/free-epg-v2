@@ -18,7 +18,11 @@ export async function GET(request: NextRequest) {
     conditions.push(
       or(
         ilike(channels.name, `%${q}%`),
-        ilike(channels.xmltvId, `%${q}%`)
+        ilike(channels.xmltvId, `%${q}%`),
+        sql`EXISTS (
+          SELECT 1 FROM jsonb_array_elements_text(${channels.altNames}) AS alt
+          WHERE alt ILIKE ${`%${q}%`}
+        )`
       )!
     );
   }
