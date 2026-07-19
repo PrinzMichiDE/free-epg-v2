@@ -1,69 +1,45 @@
 # FreeEPG
 
-Weltweite EPG-Daten im XMLTV-Format — self-hosted Next.js Plattform.
+**Weltweites TV-Programm — kostenlos, sofort nutzbar, ohne Installation.**
 
-## Features
+👉 **[https://www.free-epg.de/](https://www.free-epg.de/)**
 
-- **XMLTV API** — EPG pro Land (`/api/epg/de.xml`, gzip, ETag/304)
-- **M3U Matcher** — Upload, auto tvg-id matching, angereicherte M3U
-- **Playlisten weltweit** — fertige Land-M3U aus iptv-org mit EPG-Verknüpfung
-- **Custom Lists** — personalisierte EPG-URLs
-- **Admin Dashboard** — Quellen, Jobs, Analytics
-- **Docker Compose** — Web + Worker + PostgreSQL + Redis
-- **Traefik** — Prod-Deployment via `proxy-public` / `free-epg.de`
+---
 
-## Quickstart (Dev)
+## Was ist FreeEPG?
 
-```bash
-cp .env.example .env
-docker compose up -d --build
-# → http://localhost:3000
-```
+[FreeEPG](https://www.free-epg.de/) liefert aktuelle EPG-Daten (Elektronischer Programmführer) für tausende Sender weltweit — fertig aufbereitet für IPTV, Kodi, VLC und Enigma2.
 
-## Prod (Docker Hub + Traefik)
+Kein manuelles Zusammensuchen von XML-Dateien. Kein Server-Setup. Einfach die passende URL kopieren und in deiner App eintragen.
 
-Deploy the stack from the **Git repository** (Portainer: Stack → Git repository), not only pasted compose text — `db-init` mounts `packages/db/drizzle/0000_init.sql` from the repo.
+## Was du bekommst
 
-```bash
-cp stack.env.example stack.env
-# POSTGRES_PASSWORD, NEXTAUTH_SECRET, ADMIN_PASSWORD in stack.env setzen
-docker compose --env-file stack.env -f docker-compose.prod.yml pull
-docker compose --env-file stack.env -f docker-compose.prod.yml up -d
-# → https://free-epg.de
-```
+- **XMLTV & Rytec** — EPG-Feeds pro Land, direkt abrufbar
+- **Playlisten weltweit** — fertige M3U-Playlists mit passender EPG-Verknüpfung
+- **TV Player** — Sender direkt im Browser ansehen
+- **Programm-Suche** — Was läuft gerade? Was kommt als Nächstes?
+- **M3U Matcher** — eigene Playlist hochladen und automatisch mit EPG verknüpfen
+- **20 Sprachen** — Oberfläche international nutzbar
 
-## Monorepo
+## Für wen?
 
-```
-apps/web      — Next.js 15 (UI + API)
-apps/worker   — BullMQ EPG Fetch + Analytics
-packages/db   — Drizzle Schema
-packages/epg-core, epg-sources, analytics, m3u-matcher
-```
+| Nutzer | Vorteil |
+|--------|---------|
+| **IPTV-Nutzer** | EPG-URL in TiviMate, OTT Navigator & Co. einfügen — fertig |
+| **Enigma2 / Dreambox** | Rytec-kompatible Feeds für EPGImport |
+| **Kodi / VLC** | XMLTV-URLs für den Programmführer |
+| **Entwickler** | Stabile REST-API für EPG- und Playlist-Daten |
 
-## API
+## Jetzt starten
 
-| Endpoint | Beschreibung |
-|----------|--------------|
-| `GET /api/epg/{country}.xml` | Land-EPG |
-| `GET /api/epg/{country}.xml.gz` | gzip |
-| `POST /api/m3u/upload` | M3U Matching |
-| `GET /api/playlists` | Playlist-Metadaten (JSON) |
-| `GET /api/playlists/{country}.m3u` | Land-Playlist M3U |
-| `GET /api/health` | Health Check |
+Alles läuft unter **[https://www.free-epg.de/](https://www.free-epg.de/)** — kostenlos, ohne Registrierung.
 
-## Seed
+1. Land wählen oder Playlist öffnen
+2. EPG- oder M3U-URL kopieren
+3. In deiner App eintragen — fertig
 
-On first deploy the stack auto-migrates and seeds channel metadata (`SEED_ON_START=true` in `stack.env`).
-The worker fetches EPG XML on start when `FETCH_ON_START=true`.
+**[→ Zu FreeEPG](https://www.free-epg.de/)**
 
-Manual:
+---
 
-```bash
-npm run db:migrate
-npm run db:seed
-```
-
-## License
-
-Unlicense (EPG data from third-party sources — see `/internal-docs`)
+*FreeEPG — Open Source EPG Infrastructure*
