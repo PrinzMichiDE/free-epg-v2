@@ -4,7 +4,7 @@ import path from "node:path";
 import { gzipSync } from "node:zlib";
 import { Worker, Queue } from "bullmq";
 import cron from "node-cron";
-import { eq } from "drizzle-orm";
+import { eq, and, gt, inArray } from "drizzle-orm";
 import {
   getDb,
   epgJobs,
@@ -105,6 +105,8 @@ async function fetchCountryEpg(country: string) {
     }
 
     const saved = await saveXml(country, merged);
+    const previewXml = buildXmltv(merged);
+    await storeProgrammePreview(country, previewXml);
 
     const channelIds = new Set(merged.channels.map((c) => c.id));
     await db
@@ -146,31 +148,55 @@ async function storeProgrammePreview(country: string, xml: string) {
   const db = getDb();
   const now = new Date();
   const tomorrow = new Date(now.getTime() + 24 * 60 * 60 * 1000);
+  const cc = country.toUpperCase();
 
   const countryChannels = await db
-    .select()
+    .select({ id: channels.id, xmltvId: channels.xmltvId })
     .from(channels)
-    .where(eq(channels.country, country.toUpperCase()))
-    .limit(500);
+    .where(eq(channels.country, cc));
 
   const chMap = new Map(countryChannels.map((c) => [c.xmltvId, c.id]));
+  const channelIds = countryChannels.map((c) => c.id);
 
-  for (const prog of doc.programmes.slice(0, 5000)) {
+  if (channelIds.length > 0) {
+    await db
+      .delete(programmes)
+      .where(and(inArray(programmes.channelId, channelIds), gt(programmes.stop, now)));
+  }
+
+  const batch: Array<{
+    channelId: number;
+    start: Date;
+    stop: Date;
+    title: string;
+    description: string | null;
+    category: string | null;
+    source: string;
+  }> = [];
+
+  for (const prog of doc.programmes) {
     const channelId = chMap.get(prog.channel);
     if (!channelId) continue;
     const start = parseXmltvDate(prog.start);
     const stop = parseXmltvDate(prog.stop);
     if (!start || !stop || start > tomorrow) continue;
-    await db.insert(programmes).values({
+    batch.push({
       channelId,
       start,
       stop,
       title: prog.title,
-      description: prog.desc,
-      category: prog.category,
+      description: prog.desc ?? null,
+      category: prog.category ?? null,
       source: "epg.pw",
     });
   }
+
+  const chunkSize = 200;
+  for (let i = 0; i < batch.length; i += chunkSize) {
+    await db.insert(programmes).values(batch.slice(i, i + chunkSize));
+  }
+
+  console.log(`[EPG] ${cc}: stored ${batch.length} programme previews`);
 }
 
 function parseXmltvDate(s: string): Date | null {
