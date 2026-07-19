@@ -36,6 +36,22 @@ Nicht im Scope: Jeder Einzel-Commit ohne betriebliche Relevanz.
 
 ## Detailbeschreibung
 
+## Detailbeschreibung
+
+### Eintrag CHG-2026-016: XMLTV-Zeitstempel epg.pw korrigieren (+8h UTC-Fix)
+
+| Feld | Inhalt |
+|------|--------|
+| Datum | 2026-07-19 |
+| Version | App-Release (epg-core, epg-sources, worker) |
+| Begründung | GitHub Issue #1: deutsche EPG-Feeds lieferten Sendezeiten 8 Stunden zu spät (`+0000` falsch); Ursache: epg.pw liefert UTC+8-Wandzeiten mit UTC-Suffix |
+| Auswirkung | `normalizeEpgPwDocument` zieht 8h von allen epg.pw-Programmzeiten ab; korrekte UTC-Ausgabe in `/api/epg/de.xml` und Rytec-Feeds nach Worker-Neulauf |
+| Risiko | niedrig (betrifft nur epg.pw-Quelle; xmltv.se unverändert) |
+| Betroffene Komponenten | `packages/epg-core/src/xmltv-dates.ts`, `packages/epg-sources`, `apps/worker` |
+| Prüfung | Unit-Tests ARD/RTL-Beispiele aus Issue #1; `npm run test -w @freeepg/epg-core` |
+| Freigabe | Product Owner |
+| Rollback | Vorheriges Worker/Web-Image; EPG-Dateien unter `/data/epg` neu generieren |
+
 ### Eintrag CHG-2026-015: Programm-Suche, EPG-UI und Player-Favoriten
 
 | Feld | Inhalt |
