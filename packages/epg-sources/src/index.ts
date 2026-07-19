@@ -1,6 +1,7 @@
 export type { EpgSourceAdapter } from "./types.js";
 export {
   EpgPwAdapter,
+  GlobetvAppAdapter,
   IptvEpgOrgAdapter,
   XmltvSeAdapter,
   getDefaultAdapters,
@@ -83,6 +84,7 @@ export interface IptvStream {
 
 export {
   EPG_PW_COUNTRIES,
+  GLOBETV_APP_COUNTRIES,
   IPTV_EPG_ORG_COUNTRIES,
   SUPPORTED_EPG_COUNTRIES,
 } from "./constants.js";

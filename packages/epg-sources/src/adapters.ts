@@ -1,5 +1,14 @@
-import { parseXmltv, normalizeEpgPwDocument, type XmltvDocument } from "@freeepg/epg-core";
+import {
+  mergeXmltvDocs,
+  parseXmltv,
+  normalizeEpgPwDocument,
+  type XmltvDocument,
+} from "@freeepg/epg-core";
 import type { EpgSourceAdapter } from "./types.js";
+import { GLOBETV_FOLDERS_BY_COUNTRY } from "./globetv-countries.js";
+
+const GLOBETV_RAW_BASE = "https://raw.githubusercontent.com/globetvapp/epg/main";
+const FETCH_HEADERS = { "User-Agent": "FreeEPG/1.0" };
 
 export class EpgPwAdapter implements EpgSourceAdapter {
   name = "epg.pw";
@@ -57,6 +66,40 @@ export class IptvEpgOrgAdapter implements EpgSourceAdapter {
   }
 }
 
+export class GlobetvAppAdapter implements EpgSourceAdapter {
+  name = "globetv.app";
+  type = "http";
+  priority = 5;
+
+  async fetchCountry(countryCode: string): Promise<XmltvDocument | null> {
+    const folders = GLOBETV_FOLDERS_BY_COUNTRY[countryCode.toUpperCase()];
+    if (!folders?.length) return null;
+
+    let merged: XmltvDocument = { channels: [], programmes: [] };
+
+    for (const folder of folders) {
+      const prefix = folder.toLowerCase();
+      for (let index = 1; index <= 12; index++) {
+        const url = `${GLOBETV_RAW_BASE}/${folder}/${prefix}${index}.xml`;
+        try {
+          const res = await fetch(url, {
+            signal: AbortSignal.timeout(120_000),
+            headers: FETCH_HEADERS,
+          });
+          if (!res.ok) break;
+          const doc = parseXmltv(await res.text());
+          if (doc.channels.length === 0 && doc.programmes.length === 0) break;
+          merged = mergeXmltvDocs(doc, merged, "primary");
+        } catch {
+          break;
+        }
+      }
+    }
+
+    return merged.channels.length > 0 ? merged : null;
+  }
+}
+
 export class XmltvSeAdapter implements EpgSourceAdapter {
   name = "xmltv.se";
   type = "http";
@@ -88,5 +131,10 @@ export class XmltvSeAdapter implements EpgSourceAdapter {
 }
 
 export function getDefaultAdapters(): EpgSourceAdapter[] {
-  return [new IptvEpgOrgAdapter(), new EpgPwAdapter(), new XmltvSeAdapter()];
+  return [
+    new GlobetvAppAdapter(),
+    new IptvEpgOrgAdapter(),
+    new EpgPwAdapter(),
+    new XmltvSeAdapter(),
+  ];
 }
