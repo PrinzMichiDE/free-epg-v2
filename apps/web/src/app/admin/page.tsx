@@ -76,6 +76,12 @@ export default function AdminPage() {
           >
             Alle Länder refreshen
           </button>
+          <button
+            onClick={() => fetch("/api/admin/jobs/trigger", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ iptvOrg: true }) })}
+            className="px-4 py-2 rounded-lg border border-[var(--border)] hover:bg-[var(--card)]"
+          >
+            iptv-org Sync (Kanäle &amp; Playlists)
+          </button>
         </div>
       </section>
     </div>

@@ -88,6 +88,7 @@ services:
       FETCH_ON_START: ${FETCH_ON_START:-true}
       SEED_ON_START: ${SEED_ON_START:-true}
       CRON_COUNTRY_FETCH: ${CRON_COUNTRY_FETCH:-0 */6 * * *}
+      CRON_IPTV_ORG_GRAB: ${CRON_IPTV_ORG_GRAB:-0 2 * * *}
     volumes:
       - epg-data:/data/epg
     depends_on:

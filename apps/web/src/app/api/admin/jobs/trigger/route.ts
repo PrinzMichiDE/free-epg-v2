@@ -12,13 +12,28 @@ export async function POST(request: Request) {
   }
 
   const body = await request.json();
-  const { country, all } = body as { country?: string; all?: boolean };
+  const { country, all, iptvOrg } = body as {
+    country?: string;
+    all?: boolean;
+    iptvOrg?: boolean;
+  };
 
   const connection = {
     url: process.env.REDIS_URL ?? "redis://localhost:6379",
     maxRetriesPerRequest: null,
   };
   const queue = new Queue("epg-jobs", { connection });
+
+  if (iptvOrg) {
+    await queue.add("iptv-org-grab", {}, { attempts: 2 });
+    const db = getDatabase();
+    await db.insert(epgJobs).values({
+      jobType: "iptv_org_grab",
+      status: "pending",
+    });
+    await queue.close();
+    return Response.json({ message: "iptv-org sync queued" });
+  }
 
   if (all) {
     await queue.add("fetch-all-countries", {}, { attempts: 1 });
