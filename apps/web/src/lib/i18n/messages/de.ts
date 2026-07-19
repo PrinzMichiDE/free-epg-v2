@@ -118,6 +118,12 @@ export const de = {
   "player.favorites": "Favoriten",
   "player.addFavorite": "Zu Favoriten hinzufügen",
   "player.removeFavorite": "Aus Favoriten entfernen",
+  "player.favoritesOnly": "Nur Favoriten",
+  "player.prevChannel": "Vorheriger Sender",
+  "player.nextChannel": "Nächster Sender",
+  "player.keyboardHint": "Tipp: ↑ / ↓ wechselt Sender, wenn das Suchfeld nicht aktiv ist.",
+  "player.retry": "Erneut versuchen",
+  "player.pip": "Bild-in-Bild",
   "programmes.badge": "TV-Programm",
   "programmes.title": "Was läuft gerade?",
   "programmes.subtitle":
