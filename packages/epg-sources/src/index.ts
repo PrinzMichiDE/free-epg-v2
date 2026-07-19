@@ -1,4 +1,4 @@
-import { parseXmltv, type XmltvDocument } from "@freeepg/epg-core";
+import { parseXmltv, normalizeEpgPwDocument, type XmltvDocument } from "@freeepg/epg-core";
 
 export interface EpgSourceAdapter {
   name: string;
@@ -22,7 +22,7 @@ export class EpgPwAdapter implements EpgSourceAdapter {
         headers: { "User-Agent": "FreeEPG/1.0" },
       });
       if (!res.ok) return null;
-      return parseXmltv(await res.text());
+      return normalizeEpgPwDocument(parseXmltv(await res.text()));
     } catch {
       return null;
     }
@@ -35,7 +35,7 @@ export class EpgPwAdapter implements EpgSourceAdapter {
         headers: { "User-Agent": "FreeEPG/1.0" },
       });
       if (!res.ok) return null;
-      return parseXmltv(await res.text());
+      return normalizeEpgPwDocument(parseXmltv(await res.text()));
     } catch {
       return null;
     }
