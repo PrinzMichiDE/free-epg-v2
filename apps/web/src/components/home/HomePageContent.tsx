@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { Globe2, Radio, Server } from "lucide-react";
-import { SUPPORTED_EPG_COUNTRIES } from "@freeepg/epg-sources";
+import { SUPPORTED_EPG_COUNTRIES } from "@freeepg/epg-sources/constants";
 import { CountryCard } from "@/components/country/CountryCard";
 import { Button } from "@/components/ui/Button";
 import { StatCard } from "@/components/ui/StatCard";
