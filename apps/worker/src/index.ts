@@ -13,7 +13,7 @@ import {
   channels,
   programmes,
 } from "@freeepg/db";
-import { buildXmltv, mergeXmltvDocs, parseXmltv, buildRytecXmltv, rytecXmlFileName } from "@freeepg/epg-core";
+import { buildXmltv, mergeXmltvDocs, parseXmltv, buildRytecXmltv, rytecXmlFileName, parseXmltvDateString } from "@freeepg/epg-core";
 import {
   getDefaultAdapters,
   EPG_PW_COUNTRIES,
@@ -202,14 +202,7 @@ async function storeProgrammePreview(country: string, xml: string) {
 }
 
 function parseXmltvDate(s: string): Date | null {
-  if (s.length < 14) return null;
-  const y = s.slice(0, 4);
-  const mo = s.slice(4, 6);
-  const d = s.slice(6, 8);
-  const h = s.slice(8, 10);
-  const mi = s.slice(10, 12);
-  const se = s.slice(12, 14);
-  return new Date(`${y}-${mo}-${d}T${h}:${mi}:${se}Z`);
+  return parseXmltvDateString(s);
 }
 
 async function runIptvOrgGrab() {
