@@ -36,6 +36,20 @@ Nicht im Scope: Jeder Einzel-Commit ohne betriebliche Relevanz.
 
 ## Detailbeschreibung
 
+### Eintrag CHG-2026-015: Programm-Suche, EPG-UI und Player-Favoriten
+
+| Feld | Inhalt |
+|------|--------|
+| Datum | 2026-07-19 |
+| Version | App-Release (Web + Worker) |
+| Begründung | Nutzer sollen Sendungen finden, Sender-EPG sehen und Lieblingssender im Player speichern können; `programmes`-Tabelle war bisher nicht befüllt |
+| Auswirkung | Worker speichert 24h-Programmvorschau; neue Seite `/programmes` mit Suche; Sender-Detail mit Logo/Kategorien/EPG-Panel; TV-Player-Favoriten (localStorage); „Jetzt im TV“ auf Länderseiten; verbesserte Sender-Suche |
+| Risiko | niedrig (Favoriten nur clientseitig; Programmdaten abhängig vom EPG-Worker-Lauf) |
+| Betroffene Komponenten | `apps/worker`, `apps/web` (programmes, channels, player, countries) |
+| Prüfung | `npm run typecheck`; manuell `/programmes`, Sender-Detail, Player-Favoriten |
+| Freigabe | Product Owner |
+| Rollback | Vorheriges Web- und Worker-Image |
+
 ### Eintrag CHG-2026-014: Chromecast und AirPlay im TV Player
 
 | Feld | Inhalt |
