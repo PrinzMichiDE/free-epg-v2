@@ -59,17 +59,24 @@ function ProgrammeRow({
   );
 }
 
-export function ChannelEpgPanel({ tvgId, channelTitle, className }: ChannelEpgPanelProps) {
+function ChannelEpgPanelInner({
+  tvgId,
+  channelTitle,
+  className,
+}: ChannelEpgPanelProps) {
   const { t, locale } = useI18n();
   const [epg, setEpg] = useState<ChannelEpgResponse | null>(null);
   const [loading, setLoading] = useState(true);
-  const [progress, setProgress] = useState(0);
+  const [tick, setTick] = useState(0);
 
   const intlLocale = locale === "de" ? "de-DE" : locale;
+  const progress =
+    epg?.current && tick >= 0
+      ? programmeProgress(epg.current.start, epg.current.stop)
+      : 0;
 
   useEffect(() => {
     let cancelled = false;
-    setLoading(true);
 
     async function load() {
       try {
@@ -91,18 +98,10 @@ export function ChannelEpgPanel({ tvgId, channelTitle, className }: ChannelEpgPa
   }, [tvgId]);
 
   useEffect(() => {
-    if (!epg?.current) {
-      setProgress(0);
-      return;
-    }
-
-    const update = () => {
-      setProgress(programmeProgress(epg.current!.start, epg.current!.stop));
-    };
-    update();
-    const timer = window.setInterval(update, 30_000);
+    if (!epg?.current) return;
+    const timer = window.setInterval(() => setTick((value) => value + 1), 30_000);
     return () => window.clearInterval(timer);
-  }, [epg?.current]);
+  }, [epg?.current?.start, epg?.current?.stop]);
 
   if (loading) {
     return (
@@ -172,4 +171,8 @@ export function ChannelEpgPanel({ tvgId, channelTitle, className }: ChannelEpgPa
       )}
     </div>
   );
+}
+
+export function ChannelEpgPanel(props: ChannelEpgPanelProps) {
+  return <ChannelEpgPanelInner key={props.tvgId} {...props} />;
 }

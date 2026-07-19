@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 
 const STORAGE_PREFIX = "freeepg:favorites:";
 
@@ -26,10 +26,6 @@ export function usePlaylistFavorites(playlistCode: string) {
   const [favorites, setFavorites] = useState<Set<string>>(() =>
     readFavorites(playlistCode)
   );
-
-  useEffect(() => {
-    setFavorites(readFavorites(playlistCode));
-  }, [playlistCode]);
 
   const toggleFavorite = useCallback(
     (entryId: string) => {

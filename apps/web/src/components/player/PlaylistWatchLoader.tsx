@@ -85,5 +85,11 @@ export function PlaylistWatchLoader({
     );
   }
 
-  return <PlaylistWatchView playlist={playlist} backHref={backHref} />;
+  return (
+    <PlaylistWatchView
+      key={playlist.code}
+      playlist={playlist}
+      backHref={backHref}
+    />
+  );
 }
