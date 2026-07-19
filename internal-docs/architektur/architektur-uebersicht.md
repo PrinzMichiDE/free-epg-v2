@@ -123,6 +123,13 @@ Volumes: `pgdata`, `redisdata`, `epg-data` (XMLTV-Dateien unter `/data/epg`).
 3. Worker flush alle 30s → `analytics_events`.
 4. Tägliche Aggregation → `analytics_daily`; wöchentlicher Cleanup (90 Tage).
 
+#### iptv-org Tages-Sync (Worker, scheduled)
+
+1. Cron (`CRON_IPTV_ORG_GRAB`, Default `0 2 * * *`) enqueued `iptv-org-grab`.
+2. `syncIptvOrgChannels` aktualisiert Kanal-Metadaten aus der iptv-org API in `channels`.
+3. `refreshPlaylistCaches` schreibt `streams.json` und `country-names.json` nach `/data/epg/playlists/`.
+4. Job-Status in `epg_jobs` (`job_type: iptv_org_grab`); manueller Trigger via Admin (`iptvOrg: true`).
+
 ### Schnittstellen (API)
 
 | Methode | Pfad | Auth | Beschreibung |

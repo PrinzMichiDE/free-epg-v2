@@ -18,7 +18,9 @@ import {
   getDefaultAdapters,
   EPG_PW_COUNTRIES,
   EpgPwAdapter,
+  refreshPlaylistCaches,
 } from "@freeepg/epg-sources";
+import { syncIptvOrgChannels } from "@freeepg/db/seed";
 import { AnalyticsTracker } from "@freeepg/analytics";
 
 import { Redis } from "ioredis";
@@ -184,6 +186,46 @@ function parseXmltvDate(s: string): Date | null {
   return new Date(`${y}-${mo}-${d}T${h}:${mi}:${se}Z`);
 }
 
+async function runIptvOrgGrab() {
+  const db = getDb();
+  const [job] = await db
+    .insert(epgJobs)
+    .values({
+      jobType: "iptv_org_grab",
+      status: "running",
+      startedAt: new Date(),
+    })
+    .returning();
+
+  try {
+    const channelResult = await syncIptvOrgChannels();
+    const cacheResult = await refreshPlaylistCaches(epgDataDir);
+
+    await db
+      .update(epgJobs)
+      .set({
+        status: "completed",
+        finishedAt: new Date(),
+        metadata: { ...channelResult, ...cacheResult },
+      })
+      .where(eq(epgJobs.id, job.id));
+
+    console.log(
+      `[iptv-org] Sync complete: ${channelResult.channelCount} channels, ${cacheResult.streamCount} streams`
+    );
+  } catch (err) {
+    await db
+      .update(epgJobs)
+      .set({
+        status: "failed",
+        finishedAt: new Date(),
+        error: err instanceof Error ? err.message : String(err),
+      })
+      .where(eq(epgJobs.id, job.id));
+    throw err;
+  }
+}
+
 async function main() {
   await runDockerInit();
 
@@ -214,6 +256,9 @@ const worker = new Worker(
       case "analytics-cleanup":
         await analytics.cleanupOldEvents(90);
         break;
+      case "iptv-org-grab":
+        await runIptvOrgGrab();
+        break;
       default:
         console.warn(`Unknown job: ${job.name}`);
     }
@@ -238,6 +283,10 @@ cron.schedule(process.env.CRON_ANALYTICS_AGG ?? "0 2 * * *", () => {
 
 cron.schedule(process.env.CRON_ANALYTICS_CLEANUP ?? "0 3 * * 0", () => {
   epgQueue.add("analytics-cleanup", {}, { attempts: 1 });
+});
+
+cron.schedule(process.env.CRON_IPTV_ORG_GRAB ?? "0 2 * * *", () => {
+  epgQueue.add("iptv-org-grab", {}, { attempts: 2 });
 });
 
 if (process.env.FETCH_ON_START === "true") {

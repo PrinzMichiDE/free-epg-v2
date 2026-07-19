@@ -155,3 +155,5 @@ export const EPG_PW_COUNTRIES = [
   "AU", "BR", "CA", "CN", "DE", "FR", "GB", "HK", "ID", "IN",
   "JP", "MY", "NZ", "PH", "RU", "SG", "TW", "US", "VN", "ZA",
 ];
+
+export { getPlaylistsCacheDir, refreshPlaylistCaches } from "./playlist-cache.js";

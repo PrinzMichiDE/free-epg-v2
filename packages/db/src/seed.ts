@@ -1,3 +1,4 @@
+import { sql, eq } from "drizzle-orm";
 import { getDb, channels, epgSources, closeDb } from "./index.js";
 
 interface IptvChannel {
@@ -21,16 +22,33 @@ async function fetchCountries(): Promise<Array<{ code: string; name: string }>> 
   return res.json() as Promise<Array<{ code: string; name: string }>>;
 }
 
-export async function runSeed() {
+async function ensureEpgSources() {
+  const db = getDb();
+  const sources = [
+    { name: "epg.pw", type: "http", priority: 2, enabled: true, url: "https://epg.pw/xmltv/" },
+    { name: "xmltv.se", type: "http", priority: 3, enabled: true, url: "https://xmltv.se/" },
+    { name: "iptv-org/epg", type: "grabber", priority: 1, enabled: true, url: null },
+    { name: "iptv-org/api", type: "metadata", priority: 1, enabled: true, url: "https://iptv-org.github.io/api/" },
+  ];
+
+  for (const src of sources) {
+    await db.insert(epgSources).values(src).onConflictDoNothing();
+  }
+}
+
+export async function syncIptvOrgChannels(): Promise<{
+  channelCount: number;
+  countryCount: number;
+}> {
   const db = getDb();
 
-  console.log("Fetching iptv-org metadata...");
+  console.log("[iptv-org] Fetching channel metadata...");
   const [channelData, countryData] = await Promise.all([
     fetchChannels(),
     fetchCountries(),
   ]);
 
-  console.log(`Importing ${channelData.length} channels...`);
+  console.log(`[iptv-org] Importing ${channelData.length} channels...`);
   const batchSize = 500;
   for (let i = 0; i < channelData.length; i += batchSize) {
     const batch = channelData.slice(i, i + batchSize);
@@ -51,29 +69,34 @@ export async function runSeed() {
       .onConflictDoUpdate({
         target: channels.xmltvId,
         set: {
-          name: channels.name,
-          altNames: channels.altNames,
-          country: channels.country,
-          categories: channels.categories,
-          website: channels.website,
+          name: sql`excluded.name`,
+          altNames: sql`excluded.alt_names`,
+          country: sql`excluded.country`,
+          categories: sql`excluded.categories`,
+          website: sql`excluded.website`,
           updatedAt: new Date(),
         },
       });
-    console.log(`  ${Math.min(i + batchSize, channelData.length)}/${channelData.length}`);
+    console.log(`[iptv-org]   ${Math.min(i + batchSize, channelData.length)}/${channelData.length}`);
   }
 
-  console.log("Seeding EPG sources...");
-  const sources = [
-    { name: "epg.pw", type: "http", priority: 2, enabled: true, url: "https://epg.pw/xmltv/" },
-    { name: "xmltv.se", type: "http", priority: 3, enabled: true, url: "https://xmltv.se/" },
-    { name: "iptv-org/epg", type: "grabber", priority: 1, enabled: true, url: null },
-  ];
+  await ensureEpgSources();
 
-  for (const src of sources) {
-    await db.insert(epgSources).values(src).onConflictDoNothing();
-  }
+  await db
+    .update(epgSources)
+    .set({
+      lastFetch: new Date(),
+      status: "healthy",
+      channelCount: channelData.length,
+    })
+    .where(eq(epgSources.name, "iptv-org/api"));
 
-  console.log(`Seeded ${channelData.length} channels, ${countryData.length} countries`);
+  return { channelCount: channelData.length, countryCount: countryData.length };
+}
+
+export async function runSeed() {
+  const result = await syncIptvOrgChannels();
+  console.log(`Seeded ${result.channelCount} channels, ${result.countryCount} countries`);
   await closeDb();
 }
 

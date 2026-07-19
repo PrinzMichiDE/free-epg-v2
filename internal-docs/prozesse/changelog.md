@@ -92,6 +92,20 @@ Nicht im Scope: Jeder Einzel-Commit ohne betriebliche Relevanz.
 | Freigabe | Product Owner |
 | Rollback | Vorheriges Web-Image |
 
+### Eintrag CHG-2026-011: Tägliche iptv-org-Aktualisierung (Worker-Cron)
+
+| Feld | Inhalt |
+|------|--------|
+| Datum | 2026-07-19 |
+| Version | App-Release (Worker, Web Admin) |
+| Begründung | Kanal-Metadaten und Playlist-Streams sollen täglich automatisch synchronisiert werden; `CRON_IPTV_ORG_GRAB` war in `.env.example` dokumentiert, aber nicht implementiert |
+| Auswirkung | Neuer BullMQ-Job `iptv-org-grab` (täglich 02:00 Uhr, konfigurierbar via `CRON_IPTV_ORG_GRAB`); aktualisiert `channels` aus iptv-org API und schreibt `streams.json`/`country-names.json` nach `/data/epg/playlists/`; Admin-Trigger `iptvOrg: true` |
+| Risiko | niedrig (idempotenter Upsert; erhöhte Netzwerklast einmal täglich) |
+| Betroffene Komponenten | `apps/worker`, `packages/db/src/seed.ts`, `packages/epg-sources`, `apps/web` (Admin), `docker-compose.yml` |
+| Prüfung | `npm run typecheck`; Worker-Log `[iptv-org] Sync complete`; manuell Admin-Button „iptv-org Sync“ |
+| Freigabe | Product Owner |
+| Rollback | Vorheriges Worker-Image; Cron-Variable entfernen oder deaktivieren |
+
 ### Eintrag CHG-2026-010: App-Icon und Favicon
 
 | Feld | Inhalt |
