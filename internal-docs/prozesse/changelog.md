@@ -36,6 +36,20 @@ Nicht im Scope: Jeder Einzel-Commit ohne betriebliche Relevanz.
 
 ## Detailbeschreibung
 
+### Eintrag CHG-2026-020: XMLTV-Kompatibilität für Dispatcharr und Emby
+
+| Feld | Inhalt |
+|------|--------|
+| Datum | 2026-07-20 |
+| Version | App-Release (epg-core, web) |
+| Begründung | Kompatibilitätsprüfung für Dispatcharr/Emby: XMLTV-Parser serialisierte `<category lang="de">` und leere `<desc lang="en"/>` als `[object Object]` (~100k fehlerhafte Einträge im DE-Feed) |
+| Auswirkung | `textValue()`/`optionalText()` parsen Arrays und attribut-only Elemente korrekt; XML-Ausgabe enthält keine `[object Object]`-Strings mehr; Kategorien und Beschreibungen valide; Dokumentation unter `/docs/dispatcharr` und `/docs/emby` |
+| Risiko | niedrig (reines Parsing/Serialisierungs-Fix, keine API-Änderung) |
+| Betroffene Komponenten | `packages/epg-core/src/xmltv.ts`, `xmltv.test.ts`, `apps/web/src/app/docs/dispatcharr`, `emby` |
+| Prüfung | Unit-Tests Dispatcharr/Emby-Kompatibilität; Live-Check `buildXmltv(fetchMergedCountryEpg('DE'))` → 0× `[object Object]`, 0 orphan programmes |
+| Freigabe | Product Owner |
+| Rollback | Vorheriges Image; EPG neu generieren |
+
 ### Eintrag CHG-2026-019: NDR-Kanal-Alias und lokale XMLTV-Zeitzone für Deutschland
 
 | Feld | Inhalt |
