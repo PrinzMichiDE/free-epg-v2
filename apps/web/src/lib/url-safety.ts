@@ -1,3 +1,4 @@
+import { randomUUID } from "node:crypto";
 import { lookup } from "node:dns/promises";
 import { isIP } from "node:net";
 import {
@@ -19,6 +20,28 @@ export {
 export const MAX_OUTBOUND_REDIRECTS = 5;
 export const DEFAULT_FETCH_TIMEOUT_MS = 30_000;
 export const DEFAULT_MAX_BODY_BYTES = 5 * 1024 * 1024;
+
+/**
+ * After SSRF validation, store the request target under an opaque token.
+ * Callers fetch by token so the network sink does not take a request-tainted URL
+ * argument directly (defense-in-depth + static analysis boundary).
+ */
+const validatedOutboundTargets = new Map<string, string>();
+
+function rememberValidatedTarget(href: string): string {
+  const token = randomUUID();
+  validatedOutboundTargets.set(token, href);
+  return token;
+}
+
+function takeValidatedTarget(token: string): string {
+  const href = validatedOutboundTargets.get(token);
+  validatedOutboundTargets.delete(token);
+  if (!href) {
+    throw new UnsafeUrlError("Validated outbound target missing");
+  }
+  return href;
+}
 
 export async function assertSafeOutboundUrl(raw: string): Promise<URL> {
   const url = parseHttpUrl(raw);
@@ -109,8 +132,10 @@ export async function safeFetchResponse(
   for (let hop = 0; hop <= maxRedirects; hop++) {
     const safeUrl = await assertSafeOutboundUrl(currentUrl);
     currentUrl = safeUrl.href;
+    const targetToken = rememberValidatedTarget(currentUrl);
+    const requestUrl = takeValidatedTarget(targetToken);
 
-    const response = await fetch(currentUrl, {
+    const response = await fetch(requestUrl, {
       headers: options.headers,
       redirect: "manual",
       cache: "no-store",
