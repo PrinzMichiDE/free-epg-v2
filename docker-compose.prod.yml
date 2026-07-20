@@ -138,7 +138,7 @@ services:
 
   redis:
     image: redis:7-alpine
-    command: redis-server --maxmemory 200mb --maxmemory-policy allkeys-lru
+    command: redis-server --maxmemory 256mb --maxmemory-policy noeviction
     volumes:
       - redisdata:/data
     networks:

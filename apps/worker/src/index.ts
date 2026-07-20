@@ -1,7 +1,8 @@
 import { createHash } from "node:crypto";
 import { mkdir, writeFile } from "node:fs/promises";
 import path from "node:path";
-import { gzipSync } from "node:zlib";
+import { gzip } from "node:zlib";
+import { promisify } from "node:util";
 import { Worker, Queue } from "bullmq";
 import cron from "node-cron";
 import { eq, and, gt, inArray } from "drizzle-orm";
@@ -36,8 +37,22 @@ const connection = {
   maxRetriesPerRequest: null as null,
 };
 
+const gzipAsync = promisify(gzip);
+
+function yieldToEventLoop(): Promise<void> {
+  return new Promise((resolve) => setImmediate(resolve));
+}
+
+const workerConcurrency = parseInt(process.env.WORKER_CONCURRENCY ?? "1", 10);
+const workerLockDurationMs = parseInt(process.env.WORKER_LOCK_DURATION_MS ?? "600000", 10);
+
 const epgQueue = new Queue("epg-jobs", { connection });
 const analytics = new AnalyticsTracker(redisUrl);
+
+async function gzipToFile(filePath: string, data: string): Promise<void> {
+  const gzipped = await gzipAsync(Buffer.from(data, "utf-8"));
+  await writeFile(filePath, gzipped);
+}
 
 async function ensureDir(dir: string) {
   await mkdir(dir, { recursive: true });
@@ -51,14 +66,15 @@ async function saveXml(country: string, doc: ReturnType<typeof parseXmltv>) {
   const filePath = path.join(epgDataDir, `${cc}.xml`);
   const gzipPath = `${filePath}.gz`;
   await writeFile(filePath, xml, "utf-8");
-  const gzipped = gzipSync(Buffer.from(xml, "utf-8"));
-  await writeFile(gzipPath, gzipped);
+  await yieldToEventLoop();
+  await gzipToFile(gzipPath, xml);
 
   const rytecXml = buildRytecXmltv(doc);
   const rytecPath = path.join(epgDataDir, rytecXmlFileName(country));
   const rytecGzipPath = `${rytecPath}.gz`;
   await writeFile(rytecPath, rytecXml, "utf-8");
-  await writeFile(rytecGzipPath, gzipSync(Buffer.from(rytecXml, "utf-8")));
+  await yieldToEventLoop();
+  await gzipToFile(rytecGzipPath, rytecXml);
 
   const checksum = createHash("md5").update(xml).digest("hex");
   const db = getDb();
@@ -93,15 +109,19 @@ async function fetchCountryEpg(country: string) {
     .returning();
 
   try {
+    console.log(`[EPG] ${country}: fetching merged sources...`);
     const result = await fetchMergedCountryEpg(country);
     if (!result) {
       throw new Error(`No EPG data for ${country}`);
     }
     const merged = result.doc;
+    await yieldToEventLoop();
 
+    console.log(`[EPG] ${country}: writing XML files...`);
     const saved = await saveXml(country, merged);
-    const previewXml = buildXmltv(merged);
-    await storeProgrammePreview(country, previewXml);
+    console.log(`[EPG] ${country}: files written (${saved.size} bytes)`);
+
+    await storeProgrammePreview(country, merged);
 
     const channelIds = new Set(merged.channels.map((c) => c.id));
     await db
@@ -145,8 +165,7 @@ async function fetchCountryEpg(country: string) {
   }
 }
 
-async function storeProgrammePreview(country: string, xml: string) {
-  const doc = parseXmltv(xml);
+async function storeProgrammePreview(country: string, doc: ReturnType<typeof parseXmltv>) {
   const db = getDb();
   const now = new Date();
   const tomorrow = new Date(now.getTime() + 24 * 60 * 60 * 1000);
@@ -176,7 +195,13 @@ async function storeProgrammePreview(country: string, xml: string) {
     source: string;
   }> = [];
 
+  let scanned = 0;
   for (const prog of doc.programmes) {
+    scanned += 1;
+    if (scanned % 5000 === 0) {
+      await yieldToEventLoop();
+    }
+
     const channelId = chMap.get(prog.channel);
     if (!channelId) continue;
     const start = parseXmltvDate(prog.start);
@@ -196,6 +221,9 @@ async function storeProgrammePreview(country: string, xml: string) {
   const chunkSize = 200;
   for (let i = 0; i < batch.length; i += chunkSize) {
     await db.insert(programmes).values(batch.slice(i, i + chunkSize));
+    if (i % (chunkSize * 10) === 0) {
+      await yieldToEventLoop();
+    }
   }
 
   console.log(`[EPG] ${cc}: stored ${batch.length} programme previews`);
@@ -260,7 +288,11 @@ const worker = new Worker(
         break;
       case "fetch-all-countries":
         for (const cc of SUPPORTED_EPG_COUNTRIES) {
-          await epgQueue.add("fetch-country", { country: cc }, { attempts: 2 });
+          await epgQueue.add(
+            "fetch-country",
+            { country: cc },
+            { attempts: 2, jobId: `fetch-${cc}`, priority: 10 }
+          );
         }
         break;
       case "analytics-flush":
@@ -285,7 +317,7 @@ const worker = new Worker(
         console.warn(`Unknown job: ${job.name}`);
     }
   },
-  { connection, concurrency: 3 }
+  { connection, concurrency: workerConcurrency, lockDuration: workerLockDurationMs, maxStalledCount: 3 }
 );
 
 worker.on("completed", (job) => console.log(`Job ${job.name} completed`));
@@ -317,10 +349,22 @@ cron.schedule(process.env.CRON_M3U_CLEANUP ?? "15 3 * * *", () => {
 
 if (process.env.FETCH_ON_START === "true") {
   // Regenerate DE first (most requested); stale pre-v2 files need a quick refresh.
-  await epgQueue.add("fetch-country", { country: "DE" }, { attempts: 2, priority: 1 });
-  await epgQueue.add("fetch-country", { country: "AT" }, { attempts: 2, priority: 2 });
-  await epgQueue.add("fetch-country", { country: "CH" }, { attempts: 2, priority: 2 });
-  epgQueue.add("fetch-all-countries", {}, { attempts: 1, priority: 10 });
+  await epgQueue.add(
+    "fetch-country",
+    { country: "DE" },
+    { attempts: 2, priority: 1, jobId: "fetch-DE" }
+  );
+  await epgQueue.add(
+    "fetch-country",
+    { country: "AT" },
+    { attempts: 2, priority: 2, jobId: "fetch-AT" }
+  );
+  await epgQueue.add(
+    "fetch-country",
+    { country: "CH" },
+    { attempts: 2, priority: 2, jobId: "fetch-CH" }
+  );
+  epgQueue.add("fetch-all-countries", {}, { attempts: 1, priority: 20, jobId: "fetch-all" });
 }
 }
 
