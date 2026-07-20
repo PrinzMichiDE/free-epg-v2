@@ -1,0 +1,17 @@
+---
+description: Commit and push changes directly to main
+alwaysApply: true
+---
+
+# Git: immer auf main pushen
+
+Für dieses Repository gelten folgende Git-Regeln:
+
+1. **Basis-Branch:** `main` ist der einzige Arbeits- und Ziel-Branch, sofern der Nutzer nicht ausdrücklich einen anderen Branch verlangt.
+2. **Keine Feature-Branches:** Keine `cursor/…`-Branches und keine separaten PR-Branches anlegen, es sei denn, der Nutzer fordert das ausdrücklich.
+3. **Workflow:** Änderungen direkt auf `main` committen und mit `git push origin main` veröffentlichen.
+4. **Keine PR-Pflicht:** Pull Requests nur erstellen, wenn der Nutzer das explizit wünscht. Standard ist direkter Push nach `main`.
+5. **Vor dem Push:** `git pull origin main` (oder rebase), damit `main` aktuell ist; danach committen und pushen.
+6. **Commit-Nachrichten:** Klar und beschreibend, auf Englisch oder Deutsch je nach Projektkonvention.
+
+Ausnahme: Wenn Branch-Schutz auf `main` aktiv ist und Push fehlschlägt, den Nutzer informieren und nach Freigabe oder PR-Workflow fragen.
