@@ -38,6 +38,20 @@ Nicht im Scope: Jeder Einzel-Commit ohne betriebliche Relevanz.
 
 ## Detailbeschreibung
 
+### Eintrag CHG-2026-018: globetv.app als EPG-Quelle und 106 unterstützte Länder
+
+| Feld | Inhalt |
+|------|--------|
+| Datum | 2026-07-19 |
+| Version | App-Release (epg-sources, worker, web) |
+| Begründung | Nutzerwunsch „Mehr Länder weltweit“; bisher ~83 Regionen, Lücken z. B. Irland, Slowakei, Pakistan, Marokko |
+| Auswirkung | Neuer `GlobetvAppAdapter` (priority 5, Basis) mit GitHub-Feeds von globetvapp/epg; `SUPPORTED_EPG_COUNTRIES` auf 106 Regionen erweitert |
+| Risiko | mittel (zusätzliche GitHub-Abhängigkeit, größerer Worker-Lauf bei `fetch-all-countries`) |
+| Betroffene Komponenten | `packages/epg-sources`, `packages/db/seed.ts` |
+| Prüfung | `fetchMergedCountryEpg` für IE/SK/EC; `npm run typecheck` |
+| Freigabe | Product Owner |
+| Rollback | Vorheriges Image; EPG-Dateien neu generieren |
+
 ### Eintrag CHG-2026-017: Zusätzliche EPG-Quelle iptv-epg.org und erweiterte Länderabdeckung
 
 | Feld | Inhalt |

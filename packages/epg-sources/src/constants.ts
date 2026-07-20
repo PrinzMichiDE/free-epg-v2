@@ -1,3 +1,5 @@
+import { GLOBETV_APP_COUNTRIES } from "./globetv-countries.js";
+
 /** Countries with feeds on epg.pw (subset of supported regions). */
 export const EPG_PW_COUNTRIES = [
   "AU", "BR", "CA", "CN", "DE", "FR", "GB", "HK", "ID", "IN",
@@ -15,7 +17,13 @@ export const IPTV_EPG_ORG_COUNTRIES = [
   "ZA", "ZW",
 ] as const;
 
+export { GLOBETV_APP_COUNTRIES };
+
 /** All regions for which merged country EPG can be built from configured adapters. */
 export const SUPPORTED_EPG_COUNTRIES = [
-  ...new Set([...EPG_PW_COUNTRIES, ...IPTV_EPG_ORG_COUNTRIES]),
+  ...new Set([
+    ...EPG_PW_COUNTRIES,
+    ...IPTV_EPG_ORG_COUNTRIES,
+    ...GLOBETV_APP_COUNTRIES,
+  ]),
 ].sort() as string[];
