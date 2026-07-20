@@ -17,6 +17,10 @@ RUN --mount=type=cache,target=/root/.npm \
 
 FROM base AS builder
 ENV NPM_CONFIG_PRODUCTION=false
+ARG GIT_SHA=dev
+ARG APP_VERSION=0.1.0
+ENV NEXT_PUBLIC_GIT_SHA=$GIT_SHA
+ENV NEXT_PUBLIC_APP_VERSION=$APP_VERSION
 COPY --from=deps /app/node_modules ./node_modules
 COPY --from=deps /app/package.json /app/package-lock.json* /app/tsconfig.base.json /app/turbo.json ./
 COPY . .

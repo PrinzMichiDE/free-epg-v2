@@ -5,6 +5,7 @@ import { Github } from "lucide-react";
 import { DonateButton } from "@/components/layout/DonateButton";
 import { AffiliateLinks } from "@/components/layout/AffiliateLinks";
 import { useI18n } from "@/lib/i18n/I18nProvider";
+import { getAppVersionInfo } from "@/lib/app-version";
 import type { MessageKey } from "@/lib/i18n/messages";
 
 const footerLinks: { href: string; labelKey: MessageKey }[] = [
@@ -16,6 +17,7 @@ const footerLinks: { href: string; labelKey: MessageKey }[] = [
 
 export function Footer() {
   const { t } = useI18n();
+  const version = getAppVersionInfo();
 
   return (
     <footer className="border-t border-[var(--border)] bg-[var(--card)] mt-auto">
@@ -74,8 +76,13 @@ export function Footer() {
       </div>
 
       <div className="border-t border-[var(--border)]">
-        <div className="page-shell py-4 text-xs text-[var(--muted-foreground)]">
-          © {new Date().getFullYear()} FreeEPG · {t("footer.copyright")}
+        <div className="page-shell py-4 flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between text-xs text-[var(--muted-foreground)]">
+          <p>
+            © {new Date().getFullYear()} FreeEPG · {t("footer.copyright")}
+          </p>
+          <p className="tabular-nums" title="App · EPG pipeline · Git commit">
+            {version.label}
+          </p>
         </div>
       </div>
     </footer>
