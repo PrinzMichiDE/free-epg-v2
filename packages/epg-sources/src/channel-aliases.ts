@@ -19,6 +19,8 @@ export const CHANNEL_PROGRAMME_ALIASES: Readonly<Record<string, readonly string[
     "NDR.de",
     "76748",
   ],
+  /** epg.pw uses numeric id 76748; iptv-epg uses NDR.de */
+  "NDR.de": ["76748"],
 };
 
 const channelById = (channels: XmltvChannel[]): Map<string, XmltvChannel> =>

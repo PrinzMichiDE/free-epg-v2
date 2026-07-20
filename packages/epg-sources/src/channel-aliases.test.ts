@@ -22,6 +22,24 @@ describe("channel-aliases", () => {
     assert.equal(ndr[0]?.start, "20260720122000 +0200");
   });
 
+  it("copies programmes from 76748 to NDR.de when NDR.de is empty", () => {
+    const doc = applyChannelAliases({
+      channels: [{ id: "76748", displayName: "NDR" }],
+      programmes: [
+        {
+          channel: "76748",
+          start: "20260720122000 +0200",
+          stop: "20260720131000 +0200",
+          title: "In aller Freundschaft",
+        },
+      ],
+    });
+
+    const ndr = doc.programmes.filter((programme) => programme.channel === "NDR.de");
+    assert.equal(ndr.length, 1);
+    assert.equal(ndr[0]?.title, "In aller Freundschaft");
+  });
+
   it("does not duplicate when target channel already has programmes", () => {
     const doc = applyChannelAliases({
       channels: [{ id: "NDRFernsehen.de", displayName: "NDR Fernsehen" }],
