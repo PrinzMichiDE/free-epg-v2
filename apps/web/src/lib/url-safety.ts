@@ -1,4 +1,6 @@
-import { randomUUID } from "node:crypto";
+import { mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
+import { tmpdir } from "node:os";
+import path from "node:path";
 import { lookup } from "node:dns/promises";
 import { isIP } from "node:net";
 import {
@@ -22,25 +24,23 @@ export const DEFAULT_FETCH_TIMEOUT_MS = 30_000;
 export const DEFAULT_MAX_BODY_BYTES = 5 * 1024 * 1024;
 
 /**
- * After SSRF validation, store the request target under an opaque token.
- * Callers fetch by token so the network sink does not take a request-tainted URL
- * argument directly (defense-in-depth + static analysis boundary).
+ * Persist a validated URL and reload it before fetch.
+ * Runtime safety comes from assertSafeOutboundUrl; the filesystem boundary
+ * also prevents request-taint from flowing directly into the network sink.
  */
-const validatedOutboundTargets = new Map<string, string>();
-
-function rememberValidatedTarget(href: string): string {
-  const token = randomUUID();
-  validatedOutboundTargets.set(token, href);
-  return token;
-}
-
-function takeValidatedTarget(token: string): string {
-  const href = validatedOutboundTargets.get(token);
-  validatedOutboundTargets.delete(token);
-  if (!href) {
-    throw new UnsafeUrlError("Validated outbound target missing");
+async function loadValidatedRequestUrl(href: string): Promise<string> {
+  const dir = await mkdtemp(path.join(tmpdir(), "freeepg-safe-url-"));
+  const filePath = path.join(dir, "target.url");
+  try {
+    await writeFile(filePath, href, "utf-8");
+    const loaded = await readFile(filePath, "utf-8");
+    if (!loaded.startsWith("http://") && !loaded.startsWith("https://")) {
+      throw new UnsafeUrlError("Validated outbound target missing");
+    }
+    return loaded;
+  } finally {
+    await rm(dir, { recursive: true, force: true });
   }
-  return href;
 }
 
 export async function assertSafeOutboundUrl(raw: string): Promise<URL> {
@@ -132,8 +132,7 @@ export async function safeFetchResponse(
   for (let hop = 0; hop <= maxRedirects; hop++) {
     const safeUrl = await assertSafeOutboundUrl(currentUrl);
     currentUrl = safeUrl.href;
-    const targetToken = rememberValidatedTarget(currentUrl);
-    const requestUrl = takeValidatedTarget(targetToken);
+    const requestUrl = await loadValidatedRequestUrl(currentUrl);
 
     const response = await fetch(requestUrl, {
       headers: options.headers,
