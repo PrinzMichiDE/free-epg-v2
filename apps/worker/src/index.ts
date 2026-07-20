@@ -24,6 +24,7 @@ import { AnalyticsTracker } from "@freeepg/analytics";
 
 import { Redis } from "ioredis";
 import { runDockerInit } from "@freeepg/db/init";
+import { cleanupExpiredM3uPlaylists } from "./m3u-cleanup.js";
 
 const redisUrl = process.env.REDIS_URL ?? "redis://localhost:6379";
 const redisClient = new Redis(redisUrl);
@@ -277,6 +278,9 @@ const worker = new Worker(
       case "iptv-org-grab":
         await runIptvOrgGrab();
         break;
+      case "m3u-cleanup":
+        await cleanupExpiredM3uPlaylists(epgDataDir);
+        break;
       default:
         console.warn(`Unknown job: ${job.name}`);
     }
@@ -305,6 +309,10 @@ cron.schedule(process.env.CRON_ANALYTICS_CLEANUP ?? "0 3 * * 0", () => {
 
 cron.schedule(process.env.CRON_IPTV_ORG_GRAB ?? "0 2 * * *", () => {
   epgQueue.add("iptv-org-grab", {}, { attempts: 2 });
+});
+
+cron.schedule(process.env.CRON_M3U_CLEANUP ?? "15 3 * * *", () => {
+  epgQueue.add("m3u-cleanup", {}, { attempts: 1, removeOnComplete: true });
 });
 
 if (process.env.FETCH_ON_START === "true") {
