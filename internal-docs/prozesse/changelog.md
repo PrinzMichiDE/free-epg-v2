@@ -50,17 +50,31 @@ Nicht im Scope: Jeder Einzel-Commit ohne betriebliche Relevanz.
 | Freigabe | Product Owner |
 | Rollback | Vorheriges Image; ggf. manuell `de.xml` löschen und neu generieren |
 
+### Eintrag CHG-2026-020: XMLTV-Kompatibilität für Dispatcharr und Emby
+
+| Feld | Inhalt |
+|------|--------|
+| Datum | 2026-07-20 |
+| Version | App-Release (epg-core, web) |
+| Begründung | Kompatibilitätsprüfung für Dispatcharr/Emby: XMLTV-Parser serialisierte `<category lang="de">` und leere `<desc lang="en"/>` als `[object Object]` (~100k fehlerhafte Einträge im DE-Feed) |
+| Auswirkung | `textValue()`/`optionalText()` parsen Arrays und attribut-only Elemente korrekt; XML-Ausgabe enthält keine `[object Object]`-Strings mehr; Kategorien und Beschreibungen valide; Dokumentation unter `/docs/dispatcharr` und `/docs/emby` |
+| Risiko | niedrig (reines Parsing/Serialisierungs-Fix, keine API-Änderung) |
+| Betroffene Komponenten | `packages/epg-core/src/xmltv.ts`, `xmltv.test.ts`, `apps/web/src/app/docs/dispatcharr`, `emby` |
+| Prüfung | Unit-Tests Dispatcharr/Emby-Kompatibilität; Live-Check `buildXmltv(fetchMergedCountryEpg('DE'))` → 0× `[object Object]`, 0 orphan programmes |
+| Freigabe | Product Owner |
+| Rollback | Vorheriges Image; EPG neu generieren |
+
 ### Eintrag CHG-2026-019: NDR-Kanal-Alias und lokale XMLTV-Zeitzone für Deutschland
 
 | Feld | Inhalt |
 |------|--------|
 | Datum | 2026-07-20 |
 | Version | App-Release (epg-core, epg-sources, worker) |
-| Begründung | `NDRFernsehen.de` und `NDR.de` zeigten falsche Sendezeiten in IPTV-Playern; Quellen nutzen abweichende Kanal-IDs (`NDR.de`, `76748`, `NDRFernsehenNiedersachsen.de`). UTC-Zeitstempel (`+0000`) wurden von vielen Playern als lokale Wandzeit gelesen (z. B. 10:20 statt 12:20); epg.pw liefert `76748` mit +8h-Fehler vor Normalisierung |
-| Auswirkung | `applyChannelAliases()` kopiert Programme auf iptv-org-Kanal-IDs; `localizeXmltvTimestamps()` formatiert Ausgabe für DE/AT/CH/GB/FR/NL in konfigurierter IANA-Zeitzone; `NDRFernsehen.de` zeigt z. B. am 20.07.2026 12:20–13:10 „In aller Freundschaft“ |
+| Begründung | Playlist-Kanal `76748` (epg.pw-ID für NDR) und verwandte IDs (`NDR.de`, `NDRFernsehen.de`) zeigten falsche Sendezeiten in IPTV-Playern. UTC-Zeitstempel (`20260720102000 +0000`) wurden als lokale Wandzeit gelesen (10:20 statt 12:20 MESZ); vor der epg.pw-Normalisierung lag der Fehler bei +8h (20:20) |
+| Auswirkung | `applyChannelAliases()` kopiert Programme auf iptv-org-Kanal-IDs; `localizeXmltvTimestamps()` formatiert Ausgabe für DE/AT/CH/GB/FR/NL in konfigurierter IANA-Zeitzone; `76748` zeigt z. B. am 20.07.2026 12:20–13:10 „In aller Freundschaft“ |
 | Risiko | niedrig (nur Post-Processing nach Merge; bestehende epg.pw-Korrektur bleibt unverändert) |
 | Betroffene Komponenten | `packages/epg-core/src/xmltv-dates.ts`, `packages/epg-sources/src/channel-aliases.ts`, `country-timezones.ts`, `merge.ts` |
-| Prüfung | Unit-Tests `localizeXmltvTimestamps` (CEST 12:20), `applyChannelAliases` (NDR); Live-Check `fetchMergedCountryEpg('DE')` → `NDRFernsehen.de` 20260720122000 +0200 |
+| Prüfung | Unit-Tests `localizeXmltvTimestamps` (CEST 12:20), `applyChannelAliases`; Live-Check `fetchMergedCountryEpg('DE')` → `76748` und `NDRFernsehen.de` 20260720122000 +0200 |
 | Freigabe | Product Owner |
 | Rollback | Vorheriges Image; EPG für DE neu generieren (`fetch-country DE`) |
 
@@ -447,6 +461,8 @@ Auto-Migration beim Web-Start: `apps/web/docker-entrypoint.sh`.
 
 | Datum | Autor/Rolle | Änderung | Anlass |
 |-------|-------------|----------|--------|
+| 2026-07-20 | Cursor Agent / Entwicklung | CHG-2026-021 EPG-Stale-Refresh + Parser-Fix | Hofgeschichten statt IAF auf 76748 (Production) |
+| 2026-07-20 | Cursor Agent / Entwicklung | CHG-2026-020 XMLTV-Kompatibilität Dispatcharr/Emby | `[object Object]` in category/desc |
 | 2026-07-20 | Cursor Agent / Entwicklung | CHG-2026-019 NDR-Kanal-Alias und lokale XMLTV-Zeitzone | EPG-Fehlzeit NDRFernsehen.de |
 | 2026-07-20 | Cursor Agent / Daily Evolution | CHG-2026-018 SSRF-Härtung, M3U-Cleanup, Drizzle-CVE | Daily Evolution Pipeline |
 | 2026-07-12 | Cursor Agent / Entwicklung | CHG-2026-003 Playlisten weltweit | Feature-Release |

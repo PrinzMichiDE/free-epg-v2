@@ -18,6 +18,7 @@ export default function DocsPage() {
         <li><code>GET /api/epg/de.xml</code> — XMLTV für Deutschland</li>
         <li><code>GET /api/epg/de.xml.gz</code> — XMLTV gzip-komprimiert</li>
         <li><code>GET /api/epg/rytec/de.xml.gz</code> — Rytec für Enigma2</li>
+        <li>Integration: <a href="/docs/dispatcharr">Dispatcharr</a>, <a href="/docs/emby">Emby/Jellyfin</a>, <a href="/docs/kodi">Kodi</a></li>
         <li><code>GET /api/epg/rytec/sources</code> — EPGImport sources.xml</li>
         <li><code>GET /api/epg.xml</code> — Global Lite Feed</li>
         <li><code>POST /api/m3u/upload</code> — M3U hochladen & matchen</li>
