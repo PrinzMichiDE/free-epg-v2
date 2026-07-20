@@ -24,6 +24,7 @@ ENV NEXT_PUBLIC_APP_VERSION=$APP_VERSION
 COPY --from=deps /app/node_modules ./node_modules
 COPY --from=deps /app/package.json /app/package-lock.json* /app/tsconfig.base.json /app/turbo.json ./
 COPY . .
+RUN node scripts/write-build-info.mjs
 RUN npm run build -w @freeepg/db
 RUN npm run build -w @freeepg/epg-core
 RUN npm run build -w @freeepg/epg-sources

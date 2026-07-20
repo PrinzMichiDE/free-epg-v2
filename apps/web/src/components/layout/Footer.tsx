@@ -5,8 +5,8 @@ import { Github } from "lucide-react";
 import { DonateButton } from "@/components/layout/DonateButton";
 import { AffiliateLinks } from "@/components/layout/AffiliateLinks";
 import { useI18n } from "@/lib/i18n/I18nProvider";
-import { getAppVersionInfo } from "@/lib/app-version";
 import type { MessageKey } from "@/lib/i18n/messages";
+import type { ReactNode } from "react";
 
 const footerLinks: { href: string; labelKey: MessageKey }[] = [
   { href: "/docs", labelKey: "footer.docs" },
@@ -15,9 +15,8 @@ const footerLinks: { href: string; labelKey: MessageKey }[] = [
   { href: "/countries", labelKey: "footer.countryFeeds" },
 ];
 
-export function Footer() {
+export function Footer({ versionSlot }: { versionSlot: ReactNode }) {
   const { t } = useI18n();
-  const version = getAppVersionInfo();
 
   return (
     <footer className="border-t border-[var(--border)] bg-[var(--card)] mt-auto">
@@ -80,9 +79,7 @@ export function Footer() {
           <p>
             © {new Date().getFullYear()} FreeEPG · {t("footer.copyright")}
           </p>
-          <p className="tabular-nums" title="App · EPG pipeline · Git commit">
-            {version.label}
-          </p>
+          {versionSlot}
         </div>
       </div>
     </footer>
