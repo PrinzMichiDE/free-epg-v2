@@ -9,6 +9,8 @@ const sections = [
   { href: "/docs/xmltv", title: "XMLTV Format" },
   { href: "/docs/m3u", title: "M3U + tvg-id" },
   { href: "/docs/kodi", title: "Kodi Integration" },
+  { href: "/docs/dispatcharr", title: "Dispatcharr" },
+  { href: "/docs/emby", title: "Emby / Jellyfin" },
   { href: "/docs/enigma2", title: "Enigma2 / Rytec" },
   { href: "/docs/api", title: "API Referenz" },
 ];

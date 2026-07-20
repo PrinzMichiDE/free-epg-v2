@@ -15,10 +15,26 @@ const builder = new XMLBuilder({
   suppressEmptyNode: true,
 });
 
+function optionalText(node: unknown): string | undefined {
+  if (node === undefined || node === null) return undefined;
+  const value = textValue(node);
+  return value || undefined;
+}
+
 function textValue(node: unknown): string {
   if (typeof node === "string") return node;
-  if (node && typeof node === "object" && "#text" in node) {
-    return String((node as { "#text": string })["#text"]);
+  if (Array.isArray(node)) {
+    for (const item of node) {
+      const value = textValue(item);
+      if (value) return value;
+    }
+    return "";
+  }
+  if (node && typeof node === "object") {
+    if ("#text" in node) {
+      return String((node as { "#text": string })["#text"]);
+    }
+    return "";
   }
   return String(node ?? "");
 }
@@ -51,8 +67,8 @@ export function parseXmltv(xml: string): XmltvDocument {
     start: String(p["@_start"] ?? ""),
     stop: String(p["@_stop"] ?? ""),
     title: textValue(p.title),
-    desc: p.desc ? textValue(p.desc) : undefined,
-    category: p.category ? textValue(p.category) : undefined,
+    desc: optionalText(p.desc),
+    category: optionalText(p.category),
   }));
 
   return { channels, programmes };
