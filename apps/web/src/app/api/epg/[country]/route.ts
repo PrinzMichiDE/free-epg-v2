@@ -15,8 +15,7 @@ export async function GET(
   const wantsGzip =
     raw.endsWith(".gz") ||
     format === "gz" ||
-    request.nextUrl.searchParams.get("gzip") === "1" ||
-    request.headers.get("accept-encoding")?.includes("gzip") === true;
+    request.nextUrl.searchParams.get("gzip") === "1";
 
   try {
     await ensureCountryXml(country);
