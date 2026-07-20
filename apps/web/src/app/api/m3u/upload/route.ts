@@ -23,6 +23,8 @@ import path from "node:path";
 import { gzipSync } from "node:zlib";
 import { BASE_URL } from "@/lib/utils";
 import { m3uXmlPath } from "@/lib/epg-paths";
+import { MAX_M3U_BYTES, MAX_M3U_ENTRIES } from "@/lib/m3u-access";
+import { safeFetchText, UnsafeUrlError } from "@/lib/url-safety";
 
 export async function POST(request: NextRequest) {
   const db = getDatabase();
@@ -30,24 +32,57 @@ export async function POST(request: NextRequest) {
   let content = "";
   let name = "Uploaded Playlist";
 
-  if (contentType.includes("application/json")) {
-    const body = await request.json();
-    if (body.url) {
-      const res = await fetch(body.url, { signal: AbortSignal.timeout(30_000) });
-      content = await res.text();
-      name = body.name ?? new URL(body.url).hostname;
-    } else if (body.content) {
-      content = body.content;
-      name = body.name ?? "Uploaded Playlist";
+  try {
+    if (contentType.includes("application/json")) {
+      const body = await request.json();
+      if (typeof body.url === "string" && body.url.trim()) {
+        const { text, finalUrl } = await safeFetchText(body.url.trim(), {
+          maxBytes: MAX_M3U_BYTES,
+          timeoutMs: 30_000,
+        });
+        content = text;
+        name =
+          typeof body.name === "string" && body.name.trim()
+            ? body.name.trim().slice(0, 200)
+            : new URL(finalUrl).hostname;
+      } else if (typeof body.content === "string") {
+        if (Buffer.byteLength(body.content, "utf-8") > MAX_M3U_BYTES) {
+          return Response.json(
+            { error: `M3U content exceeds ${MAX_M3U_BYTES} bytes` },
+            { status: 413 }
+          );
+        }
+        content = body.content;
+        name =
+          typeof body.name === "string" && body.name.trim()
+            ? body.name.trim().slice(0, 200)
+            : "Uploaded Playlist";
+      } else {
+        return Response.json(
+          { error: "Provide content or a url field" },
+          { status: 400 }
+        );
+      }
+    } else {
+      const form = await request.formData();
+      const file = form.get("file") as File | null;
+      if (!file) {
+        return Response.json({ error: "No file provided" }, { status: 400 });
+      }
+      if (file.size > MAX_M3U_BYTES) {
+        return Response.json(
+          { error: `M3U file exceeds ${MAX_M3U_BYTES} bytes` },
+          { status: 413 }
+        );
+      }
+      content = await file.text();
+      name = file.name.replace(/\.m3u8?$/i, "").slice(0, 200);
     }
-  } else {
-    const form = await request.formData();
-    const file = form.get("file") as File | null;
-    if (!file) {
-      return Response.json({ error: "No file provided" }, { status: 400 });
+  } catch (error) {
+    if (error instanceof UnsafeUrlError) {
+      return Response.json({ error: error.message }, { status: 400 });
     }
-    content = await file.text();
-    name = file.name.replace(/\.m3u8?$/i, "");
+    throw error;
   }
 
   if (!content.includes("#EXTM3U") && !content.includes("#EXTINF:")) {
@@ -55,6 +90,16 @@ export async function POST(request: NextRequest) {
   }
 
   const entries = parseM3u(content);
+  if (entries.length === 0) {
+    return Response.json({ error: "M3U contains no entries" }, { status: 400 });
+  }
+  if (entries.length > MAX_M3U_ENTRIES) {
+    return Response.json(
+      { error: `M3U exceeds maximum of ${MAX_M3U_ENTRIES} entries` },
+      { status: 413 }
+    );
+  }
+
   const catalog = await db.select().from(channels).limit(10000);
   const catalogRecords = catalog.map((c) => ({
     xmltvId: c.xmltvId,
@@ -121,6 +166,7 @@ export async function POST(request: NextRequest) {
     epgUrl,
     reviewUrl: `/m3u/${id}`,
     downloadUrl: `/api/m3u/${id}/download.m3u`,
+    expiresAt: expiresAt.toISOString(),
     enrichedPreview: enriched.split("\n").slice(0, 5).join("\n"),
   });
 }

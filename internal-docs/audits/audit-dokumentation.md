@@ -109,7 +109,9 @@ Diese Audit-Dokumentation definiert Prüfumfang, Auditkriterien, Evidence-Pfade,
 | ID | Severity | Finding | Massnahme | Verantwortlich | Status |
 |----|----------|---------|-----------|----------------|--------|
 | F-001 | hoch | Keine LICENSE-Datei trotz README-Unlicense | LICENSE hinzufügen | Entwicklung | offen |
-| F-002 | hoch | M3U `expiresAt` ohne automatischen Cleanup-Job | Worker-Cron für Expired-M3U-Löschung | Entwicklung | offen |
+| F-002 | hoch | M3U `expiresAt` ohne automatischen Cleanup-Job | Worker-Cron `m3u-cleanup` + HTTP 410 bei abgelaufenen Reads | Entwicklung | geschlossen (2026-07-20) |
+| F-009 | hoch | SSRF über M3U-URL-Import und Stream-Proxy | `url-safety` mit DNS-/Private-IP-Checks und Redirect-Revalidierung | Entwicklung | geschlossen (2026-07-20) |
+| F-010 | hoch | Unauthentifizierter Write in globale `m3u_match_overrides` | Rematch nur playlist-scoped | Entwicklung | geschlossen (2026-07-20) |
 | F-003 | mittel | Kein dokumentiertes Backup-Verfahren | pg_dump + Volume-Backup dokumentieren | Betrieb | offen |
 | F-004 | mittel | Admin-Login ohne Rate-Limit / MFA | Traefik rate limit + MFA-Roadmap | Betrieb/Entwicklung | offen |
 | F-005 | mittel | iptv-org/epg in DB registriert, nicht im Worker | Implementieren oder deaktivieren | Entwicklung | offen |
@@ -156,4 +158,5 @@ Diese Audit-Dokumentation definiert Prüfumfang, Auditkriterien, Evidence-Pfade,
 
 | Datum | Autor/Rolle | Änderung | Anlass |
 |-------|-------------|----------|--------|
+| 2026-07-20 | Cursor Agent / Daily Evolution | F-002 geschlossen; F-009/F-010 (SSRF, globale Match-Overrides) erfasst und geschlossen | CHG-2026-018 |
 | 2026-07-12 | Cursor Agent / Dokumentation | Erstversion inkl. Initial-Findings | Erstaudit-Vorbereitung auf Codebase-Basis |

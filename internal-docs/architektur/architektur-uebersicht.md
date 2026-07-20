@@ -123,6 +123,13 @@ Volumes: `pgdata`, `redisdata`, `epg-data` (XMLTV-Dateien unter `/data/epg`).
 3. Worker flush alle 30s → `analytics_events`.
 4. Tägliche Aggregation → `analytics_daily`; wöchentlicher Cleanup (90 Tage).
 
+#### M3U-Expiry-Cleanup (Worker, scheduled)
+
+1. Cron (`CRON_M3U_CLEANUP`, Default `15 3 * * *`) enqueued `m3u-cleanup`.
+2. Worker selektiert `m3u_playlists` mit `expires_at < now`, löscht zugehörige XML/GZ-Dateien unter `{EPG_DATA_DIR}/m3u/` und entfernt DB-Zeilen (Cascade auf `m3u_entries`).
+3. Web-Read-Pfade (`/api/m3u/{id}`, Download, `/api/epg/m3u/{id}`) prüfen Expiry und antworten mit HTTP 410, bevor Dateien ausgeliefert werden.
+4. Job-Metadaten werden in `epg_jobs` mit `jobType=m3u_cleanup` protokolliert.
+
 #### iptv-org Tages-Sync (Worker, scheduled)
 
 1. Cron (`CRON_IPTV_ORG_GRAB`, Default `0 2 * * *`) enqueued `iptv-org-grab`.
@@ -238,4 +245,5 @@ Kerntabellen (Drizzle `packages/db/src/schema.ts`):
 
 | Datum | Autor/Rolle | Änderung | Anlass |
 |-------|-------------|----------|--------|
+| 2026-07-20 | Cursor Agent / Daily Evolution | Datenfluss M3U-Expiry-Cleanup ergänzt | CHG-2026-018 |
 | 2026-07-12 | Cursor Agent / Dokumentation | Erstversion | Architektur-Dokumentation aus Codebase |

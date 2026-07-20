@@ -155,16 +155,19 @@ Docker Healthchecks: web, postgres, redis in Compose.
 |-------|---------|
 | npm Dependencies | Manuell / Dependabot **nicht im Repo konfiguriert** |
 | Base Images | Rebuild bei `docker compose build`; Tags `postgres:16-alpine`, `node:22-alpine` |
-| CI | Build + Lint + Typecheck on push/PR | `.github/workflows/ci.yml` |
+| CI | Build + Lint + Typecheck + Unit-Tests on push/PR | `.github/workflows/ci.yml` |
 
-Empfehlung: `npm audit` in CI, regelmäßige Image-Updates.
+Empfehlung: `npm audit` als eigenen CI-Step ergänzen; regelmäßige Image-Updates. High-CVE `drizzle-orm <0.45.2` ist mit Override auf `0.45.2` geschlossen.
 
 ### API-Sicherheit
 
 | Endpoint | Massnahmen |
 |----------|------------|
 | EPG XML | ETag/304, Cache-Control 3600s | `xml-response.ts` |
-| M3U Upload | Max 5000 Einträge, Timeout 30s bei URL-Fetch | `m3u-matcher`, upload route |
+| M3U Upload | Max 5000 Einträge, Max 5 MB, Timeout 30s, SSRF-sichere URL-Fetches (DNS/Private-IP/Redirects) | `url-safety.ts`, upload route |
+| M3U Rematch | Nur playlist-scoped; kein Write auf globale `m3u_match_overrides` | `entries/[entryId]/route.ts` |
+| M3U Read/Download/EPG | Abgelaufene Playlists → HTTP 410; ID-Pattern gegen Path-Traversal | `m3u-access.ts` |
+| Stream Proxy | Gleiche URL-Safety inkl. Redirect-Hop-Validierung | `stream/route.ts`, `url-safety.ts` |
 | Admin Jobs | Session required | `/api/admin/jobs/trigger` |
 
 Kein WAF im Repository; Traefik kann Middleware ergänzen.
@@ -204,4 +207,5 @@ Kein WAF im Repository; Traefik kann Middleware ergänzen.
 
 | Datum | Autor/Rolle | Änderung | Anlass |
 |-------|-------------|----------|--------|
+| 2026-07-20 | Cursor Agent / Daily Evolution | API-Sicherheit: SSRF, M3U-Limits, Rematch-Scope, Drizzle-CVE | CHG-2026-018 |
 | 2026-07-12 | Cursor Agent / Dokumentation | Erstversion | Sicherheits-Ist-Analyse aus Codebase |

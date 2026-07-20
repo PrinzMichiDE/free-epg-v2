@@ -1,12 +1,21 @@
 import { eq } from "drizzle-orm";
 import { getDatabase } from "@/lib/db";
 import { m3uPlaylists, m3uEntries } from "@freeepg/db";
+import {
+  expiredPlaylistResponse,
+  isPlaylistExpired,
+  isValidM3uId,
+} from "@/lib/m3u-access";
 
 export async function GET(
   _request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
   const { id } = await params;
+  if (!isValidM3uId(id)) {
+    return Response.json({ error: "Invalid playlist id" }, { status: 400 });
+  }
+
   const db = getDatabase();
 
   const [playlist] = await db
@@ -17,6 +26,9 @@ export async function GET(
 
   if (!playlist) {
     return Response.json({ error: "Not found" }, { status: 404 });
+  }
+  if (isPlaylistExpired(playlist.expiresAt)) {
+    return expiredPlaylistResponse();
   }
 
   const entries = await db
@@ -39,6 +51,7 @@ export async function GET(
       name: playlist.name,
       entryCount: playlist.entryCount,
       matchedCount: playlist.matchedCount,
+      expiresAt: playlist.expiresAt,
       epgUrl: `/api/epg/m3u/${id}.xml`,
       downloadUrl: `/api/m3u/${id}/download.m3u`,
     },

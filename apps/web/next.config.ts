@@ -37,6 +37,14 @@ const nextConfig: NextConfig = {
         source: "/api/playlists/:country.m3u",
         destination: "/api/playlists/:country",
       },
+      {
+        source: "/api/epg/m3u/:id.xml.gz",
+        destination: "/api/epg/m3u/:id?format=gz",
+      },
+      {
+        source: "/api/epg/m3u/:id.xml",
+        destination: "/api/epg/m3u/:id",
+      },
     ];
   },
 };

@@ -4,6 +4,7 @@ import {
   isHlsManifest,
   rewriteHlsPlaylist,
 } from "@/lib/player/stream-proxy";
+import { safeFetchResponse, UnsafeUrlError } from "@/lib/url-safety";
 
 export const dynamic = "force-dynamic";
 export const maxDuration = 60;
@@ -22,10 +23,9 @@ export async function GET(request: Request) {
   };
 
   try {
-    const upstream = await fetch(targetUrl, {
+    const { response: upstream, finalUrl } = await safeFetchResponse(targetUrl, {
       headers: buildUpstreamHeaders(opts),
-      redirect: "follow",
-      cache: "no-store",
+      timeoutMs: 30_000,
     });
 
     if (!upstream.ok) {
@@ -36,10 +36,10 @@ export async function GET(request: Request) {
 
     const contentType = upstream.headers.get("content-type");
 
-    if (isHlsManifest(targetUrl, contentType)) {
+    if (isHlsManifest(finalUrl, contentType) || isHlsManifest(targetUrl, contentType)) {
       const text = await upstream.text();
       const requestOrigin = new URL(request.url).origin;
-      const rewritten = rewriteHlsPlaylist(text, targetUrl, opts, requestOrigin);
+      const rewritten = rewriteHlsPlaylist(text, finalUrl, opts, requestOrigin);
 
       return new Response(rewritten, {
         headers: {
@@ -60,6 +60,9 @@ export async function GET(request: Request) {
       headers,
     });
   } catch (error) {
+    if (error instanceof UnsafeUrlError) {
+      return new Response("Invalid stream URL", { status: 400 });
+    }
     console.error("Stream proxy failed:", error);
     return new Response("Stream proxy failed", { status: 502 });
   }

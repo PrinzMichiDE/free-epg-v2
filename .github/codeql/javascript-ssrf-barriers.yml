@@ -1,0 +1,35 @@
+# Models-as-Data: treat FreeEPG outbound URL validators as request-forgery barriers.
+# Used when CodeQL loads this extension pack / config.
+extensions:
+  - addsTo:
+      pack: codeql/javascript-all
+      extensible: barrierGuardModel
+    data:
+      - [
+          "@freeepg/web",
+          "Member[isAllowedHttpUrl]",
+          "Argument[0]",
+          true,
+          "request-forgery",
+        ]
+      - [
+          "@freeepg/web",
+          "Member[isAllowedStreamUrl]",
+          "Argument[0]",
+          true,
+          "request-forgery",
+        ]
+  - addsTo:
+      pack: codeql/javascript-all
+      extensible: barrierModel
+    data:
+      - [
+          "@freeepg/web",
+          "Member[assertSafeOutboundUrl].ReturnValue",
+          "request-forgery",
+        ]
+      - [
+          "@freeepg/web",
+          "Member[parseHttpUrl].ReturnValue",
+          "request-forgery",
+        ]

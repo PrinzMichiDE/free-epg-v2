@@ -15,26 +15,27 @@ export interface M3uEntry {
   rawExtinf: string;
 }
 
-const EXTINF_RE =
-  /#EXTINF:.*?tvg-id="([^"]*)".*?tvg-name="([^"]*)".*?(?:tvg-logo="([^"]*)")?.*?(?:group-title="([^"]*)")?.*,(.+)$/i;
-
-const EXTINF_SIMPLE = /#EXTINF:[^,]*,(.+)$/i;
+function readQuotedAttr(line: string, name: string): string | undefined {
+  const key = `${name}="`;
+  const start = line.toLowerCase().indexOf(key);
+  if (start < 0) return undefined;
+  const valueStart = start + key.length;
+  const valueEnd = line.indexOf('"', valueStart);
+  if (valueEnd < 0) return undefined;
+  const value = line.slice(valueStart, valueEnd);
+  return value || undefined;
+}
 
 function parseExtinf(line: string): Partial<M3uEntry> {
-  const match = line.match(EXTINF_RE);
-  if (match) {
-    return {
-      tvgId: match[1] || undefined,
-      tvgName: match[2] || undefined,
-      tvgLogo: match[3] || undefined,
-      groupTitle: match[4] || undefined,
-      displayName: match[5]?.trim(),
-      rawExtinf: line,
-    };
-  }
-  const simple = line.match(EXTINF_SIMPLE);
+  const comma = line.lastIndexOf(",");
+  const displayName = comma >= 0 ? line.slice(comma + 1).trim() : undefined;
+
   return {
-    displayName: simple?.[1]?.trim(),
+    tvgId: readQuotedAttr(line, "tvg-id"),
+    tvgName: readQuotedAttr(line, "tvg-name"),
+    tvgLogo: readQuotedAttr(line, "tvg-logo"),
+    groupTitle: readQuotedAttr(line, "group-title"),
+    displayName: displayName || undefined,
     rawExtinf: line,
   };
 }

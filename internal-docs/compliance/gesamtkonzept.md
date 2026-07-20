@@ -69,7 +69,7 @@ FreeEPG wird als Container-Stack betrieben:
 | Öffentliche EPG-Daten | XMLTV pro Land | niedrig | Aggregierte Drittanbieter-Daten, öffentlich abrufbar |
 | Betriebsmetadaten | Job-Status, Quellen-Health | mittel | Integrität für Service-Verfügbarkeit |
 | Admin-Zugangsdaten | `ADMIN_EMAIL`, `ADMIN_PASSWORD`, `NEXTAUTH_SECRET` | hoch | Vollzugriff auf Admin-Funktionen |
-| M3U-Uploads | Stream-URLs, Kanalnamen | mittel | Nutzerinhalte, 30-Tage-Ablauf (`expiresAt`) |
+| M3U-Uploads | Stream-URLs, Kanalnamen | mittel | Nutzerinhalte, 30-Tage-Ablauf (`expiresAt`) mit Worker-Cleanup `m3u-cleanup` |
 | Analytics-Rohdaten | IP-Hash, User-Agent, Referrer | mittel | Pseudonymisierte Nutzungsdaten, 90-Tage-Retention |
 
 ### Risikoakzeptanzniveau
@@ -167,4 +167,5 @@ flowchart LR
 
 | Datum | Autor/Rolle | Änderung | Anlass |
 |-------|-------------|----------|--------|
+| 2026-07-20 | Cursor Agent / Daily Evolution | Schutzbedarf M3U-Uploads um Cleanup-Job ergänzt | CHG-2026-018 |
 | 2026-07-12 | Cursor Agent / Dokumentation | Erstversion | Initiale Erstellung der `/internal-docs`-Struktur auf Basis des Codebase-Standes |

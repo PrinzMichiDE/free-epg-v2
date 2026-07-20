@@ -61,12 +61,12 @@ Implementierung: `apps/web/src/middleware.ts`, `packages/analytics/src/index.ts`
 | Datenkategorien | Kanalnamen, Stream-URLs, tvg-id, group-title, Upload-Metadaten |
 | Betroffene | Nutzer, die M3U hochladen (nicht registriert; keine Kontodaten) |
 | Rechtsgrundlage | Art. 6 Abs. 1 lit. b DSGVO (Vertrag/ vorvertragliche Maßnahme) bzw. lit. f (Servicebereitstellung) |
-| Speicherdauer | 30 Tage (`expiresAt` bei Upload) – **automatische Löschung nicht im Code verifiziert** (Offener Punkt) |
+| Speicherdauer | 30 Tage (`expiresAt` bei Upload); automatische Löschung durch Worker-Job `m3u-cleanup` (Cron `CRON_M3U_CLEANUP`, Default täglich 03:15 UTC) inkl. XML-Artefakte unter `/data/epg/m3u/` |
 | Empfänger | Keine Weitergabe; lokale DB und Dateisystem |
 | Drittlandtransfer | Nein |
-| TOMs | Kein öffentliches Listing fremder URLs; ID-basierter Zugriff |
+| TOMs | Kein öffentliches Listing fremder URLs; ID-basierter Zugriff; SSRF-Härtung beim URL-Import; abgelaufene Playlists antworten mit HTTP 410 |
 
-Implementierung: `apps/web/src/app/api/m3u/upload/route.ts`, Tabellen `m3u_playlists`, `m3u_entries`.
+Implementierung: `apps/web/src/app/api/m3u/upload/route.ts`, `apps/worker/src/m3u-cleanup.ts`, Tabellen `m3u_playlists`, `m3u_entries`.
 
 #### VT-3: Admin-Authentifizierung
 
@@ -159,7 +159,7 @@ Empfehlung: Kurze dokumentierte DSFA-Vorprüfung jährlich wiederholen.
 | Risiko | Auswirkung | Eintrittswahrscheinlichkeit | Massnahme | Kontrolle | Nachweis |
 |--------|------------|----------------------------|-----------|-----------|----------|
 | Fehlende Privacy Policy | Transparenzmangel, Abmahnung | mittel | Datenschutzerklärung auf Website veröffentlichen | Legal-Review | **Offener Punkt** |
-| M3U-Daten nach 30 Tagen nicht gelöscht | Speicherung über Zweck hinaus | mittel | Expiry-Cleanup-Job implementieren | Cron + DB-Query | `expiresAt` in Schema |
+| M3U-Daten nach 30 Tagen nicht gelöscht | Speicherung über Zweck hinaus | niedrig | Worker-Job `m3u-cleanup` + HTTP 410 auf Read-Pfaden | Cron + Job-Metadaten in `epg_jobs` | `apps/worker/src/m3u-cleanup.ts` |
 | IP als personenbezogen eingestuft | Auskunftspflichten | mittel | Dokumentierte Anonymisierung | Code-Review | `anonymizeIp()` |
 | GitHub/Docker Hub US-Transfer | DSGVO-Kapitel-V-Risiko | niedrig | AVV/SCCs mit Anbietern | Vertragsprüfung | Anbieter-DPA |
 | Admin-E-Mail in Logs | Unnötige PII | niedrig | Log-Redaction | Log-Review | Worker/Web Logs |
@@ -175,4 +175,5 @@ Empfehlung: Kurze dokumentierte DSFA-Vorprüfung jährlich wiederholen.
 
 | Datum | Autor/Rolle | Änderung | Anlass |
 |-------|-------------|----------|--------|
+| 2026-07-20 | Cursor Agent / Daily Evolution | VT-2 Speicherdauer/Cleanup und Risiko M3U-Retention aktualisiert | CHG-2026-018 M3U-Expiry-Cleanup |
 | 2026-07-12 | Cursor Agent / Dokumentation | Erstversion | DSGVO-Analyse basierend auf Schema und Analytics-Code |
