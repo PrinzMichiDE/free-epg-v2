@@ -1,7 +1,7 @@
 import { NextRequest } from "next/server";
 import { streamFileResponse } from "@/lib/xml-response";
 import { countryGzipPath, countryXmlPath } from "@/lib/epg-paths";
-import { ensureCountryXml } from "@/lib/ensure-epg";
+import { EpgNotReadyError, ensureCountryXml } from "@/lib/ensure-epg";
 
 export async function GET(
   request: NextRequest,
@@ -20,7 +20,19 @@ export async function GET(
 
   try {
     await ensureCountryXml(country);
-  } catch {
+  } catch (err) {
+    if (err instanceof EpgNotReadyError) {
+      return new Response(
+        `EPG for ${country} is being generated. Please retry in a few minutes.`,
+        {
+          status: 503,
+          headers: {
+            "Retry-After": "120",
+            "Content-Type": "text/plain; charset=utf-8",
+          },
+        }
+      );
+    }
     return new Response("EPG not found for this country", { status: 404 });
   }
 

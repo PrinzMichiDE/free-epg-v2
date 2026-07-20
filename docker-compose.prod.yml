@@ -51,6 +51,7 @@ services:
 
   web:
     image: ${DOCKERHUB_USER:-freeepg}/freeepg-web:${IMAGE_TAG:-latest}
+    restart: unless-stopped
     env_file:
       - stack.env
     environment:
@@ -96,6 +97,7 @@ services:
 
   worker:
     image: ${DOCKERHUB_USER:-freeepg}/freeepg-worker:${IMAGE_TAG:-latest}
+    restart: unless-stopped
     env_file:
       - stack.env
     environment:

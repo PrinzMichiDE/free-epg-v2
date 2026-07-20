@@ -7,7 +7,6 @@ import {
   isCurrentEpgOutput,
   parseXmltv,
 } from "@freeepg/epg-core";
-import { fetchMergedCountryEpg } from "@freeepg/epg-sources";
 import path from "node:path";
 import {
   countryGzipPath,
@@ -16,21 +15,22 @@ import {
   countryXmlPath,
   epgDataDir,
 } from "./epg-paths";
+import { queueCountryEpgRefresh } from "./epg-queue";
 
-async function writeCountryEpgFiles(
-  country: string,
-  doc: ReturnType<typeof parseXmltv>
-): Promise<string> {
-  const cc = country.toUpperCase();
-  const filePath = countryXmlPath(cc);
-  const xml = buildXmltv(doc);
+export class EpgNotReadyError extends Error {
+  readonly country: string;
 
-  await mkdir(path.dirname(filePath), { recursive: true });
-  await writeFile(filePath, xml, "utf-8");
-  await writeFile(countryGzipPath(cc), gzipSync(Buffer.from(xml, "utf-8")));
-  await writeRytecFilesFromDoc(cc, doc);
+  constructor(country: string) {
+    super(`EPG for ${country} is not ready yet`);
+    this.name = "EpgNotReadyError";
+    this.country = country;
+  }
+}
 
-  return filePath;
+function queueRefresh(country: string): void {
+  void queueCountryEpgRefresh(country).catch((err) => {
+    console.warn(`[epg] failed to queue refresh for ${country}:`, err);
+  });
 }
 
 async function isStaleCountryXml(country: string): Promise<boolean> {
@@ -42,17 +42,24 @@ async function isStaleCountryXml(country: string): Promise<boolean> {
   return !isCurrentEpgOutput(sample);
 }
 
+/**
+ * Returns the on-disk country XML path. Serves cached files immediately (even if
+ * stale) and queues a worker refresh in the background. Never blocks on a full
+ * merge in the web process.
+ */
 export async function ensureCountryXml(country: string): Promise<string> {
   const cc = country.toUpperCase();
   const filePath = countryXmlPath(cc);
-  if (existsSync(filePath) && !(await isStaleCountryXml(cc))) {
+
+  if (existsSync(filePath)) {
+    if (await isStaleCountryXml(cc)) {
+      queueRefresh(cc);
+    }
     return filePath;
   }
 
-  const result = await fetchMergedCountryEpg(cc);
-  if (!result) throw new Error("EPG not available");
-
-  return writeCountryEpgFiles(cc, result.doc);
+  queueRefresh(cc);
+  throw new EpgNotReadyError(cc);
 }
 
 async function writeRytecFilesFromDoc(
@@ -80,7 +87,7 @@ export async function ensureCountryRytec(country: string): Promise<void> {
 
   const sourceXml = countryXmlPath(cc);
   if (!existsSync(sourceXml)) {
-    throw new Error(`Source XML missing for ${cc}`);
+    throw new EpgNotReadyError(cc);
   }
 
   const xml = await readFile(sourceXml, "utf-8");
