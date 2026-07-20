@@ -102,12 +102,28 @@ async function loadWorldCountryNames(): Promise<Record<string, string>> {
 }
 
 async function loadChannelCountryMap(): Promise<Map<string, string>> {
+  const meta = await loadChannelMetaMap();
+  return new Map([...meta.entries()].map(([id, value]) => [id, value.country]));
+}
+
+async function loadChannelMetaMap(): Promise<
+  Map<string, { country: string; logoUrl: string | null }>
+> {
   const db = getDatabase();
   const rows = await db
-    .select({ xmltvId: channels.xmltvId, country: channels.country })
+    .select({
+      xmltvId: channels.xmltvId,
+      country: channels.country,
+      logoUrl: channels.logoUrl,
+    })
     .from(channels);
 
-  return new Map(rows.map((r) => [r.xmltvId, r.country.toUpperCase()]));
+  return new Map(
+    rows.map((row) => [
+      row.xmltvId,
+      { country: row.country.toUpperCase(), logoUrl: row.logoUrl },
+    ])
+  );
 }
 
 function resolveEpgUrl(countryCode: string): string {
@@ -284,6 +300,7 @@ export interface PlaylistPlayerEntry {
   title: string;
   url: string;
   groupTitle?: string;
+  logoUrl?: string;
   referrer?: string;
   userAgent?: string;
 }
@@ -328,7 +345,8 @@ function pickBestEnrichedStreams(
 
 function toPlayerEntries(
   streams: EnrichedStreamCandidate[],
-  groupTitleFor?: (channelId: string) => string | undefined
+  groupTitleFor?: (channelId: string) => string | undefined,
+  metaFor?: (channelId: string) => { logoUrl?: string } | undefined
 ): PlaylistPlayerEntry[] {
   return streams.map((stream, index) => ({
     id: `${stream.channelId}-${index}`,
@@ -336,6 +354,7 @@ function toPlayerEntries(
     title: stream.title,
     url: stream.url,
     groupTitle: groupTitleFor?.(stream.channelId),
+    logoUrl: metaFor?.(stream.channelId)?.logoUrl ?? undefined,
     referrer: stream.referrer ?? undefined,
     userAgent: stream.userAgent ?? undefined,
   }));
@@ -345,16 +364,16 @@ export async function getCountryPlaylistPlayerData(
   countryCode: string
 ): Promise<PlaylistPlayerData | null> {
   const cc = countryCode.toUpperCase();
-  const [streams, channelMap, worldNames] = await Promise.all([
+  const [streams, channelMeta, worldNames] = await Promise.all([
     loadCachedStreams(),
-    loadChannelCountryMap(),
+    loadChannelMetaMap(),
     loadWorldCountryNames(),
   ]);
 
   const candidates: EnrichedStreamCandidate[] = streams
     .filter((stream) => {
       const channelId = stream.channel!;
-      return channelMap.get(channelId) === cc;
+      return channelMeta.get(channelId)?.country === cc;
     })
     .map((stream) => ({
       channelId: stream.channel!,
@@ -377,19 +396,25 @@ export async function getCountryPlaylistPlayerData(
     name: countryLabel,
     epgUrl: resolveEpgUrl(cc),
     m3uUrl: `/api/playlists/${cc.toLowerCase()}.m3u`,
-    entries: toPlayerEntries(picked, () => countryLabel),
+    entries: toPlayerEntries(
+      picked,
+      () => countryLabel,
+      (channelId) => ({
+        logoUrl: channelMeta.get(channelId)?.logoUrl ?? undefined,
+      })
+    ),
   };
 }
 
 export async function getWorldPlaylistPlayerData(): Promise<PlaylistPlayerData | null> {
-  const [streams, channelMap, worldNames] = await Promise.all([
+  const [streams, channelMeta, worldNames] = await Promise.all([
     loadCachedStreams(),
-    loadChannelCountryMap(),
+    loadChannelMetaMap(),
     loadWorldCountryNames(),
   ]);
 
   const candidates: EnrichedStreamCandidate[] = streams
-    .filter((stream) => channelMap.has(stream.channel!))
+    .filter((stream) => channelMeta.has(stream.channel!))
     .map((stream) => ({
       channelId: stream.channel!,
       title: stream.title,
@@ -405,8 +430,8 @@ export async function getWorldPlaylistPlayerData(): Promise<PlaylistPlayerData |
 
   const picked = pickBestEnrichedStreams(candidates, WORLD_PLAYLIST_MAX_ENTRIES);
   const sorted = [...picked].sort((a, b) => {
-    const countryA = playlistName(channelMap.get(a.channelId)!, worldNames);
-    const countryB = playlistName(channelMap.get(b.channelId)!, worldNames);
+    const countryA = playlistName(channelMeta.get(a.channelId)!.country, worldNames);
+    const countryB = playlistName(channelMeta.get(b.channelId)!.country, worldNames);
     return (
       countryA.localeCompare(countryB, "de") ||
       a.title.localeCompare(b.title, "de")
@@ -418,8 +443,12 @@ export async function getWorldPlaylistPlayerData(): Promise<PlaylistPlayerData |
     name: "Weltweit — alle Länder",
     epgUrl: `${BASE_URL}/api/epg`,
     m3uUrl: `/api/playlists/${WORLD_PLAYLIST_SLUG}.m3u`,
-    entries: toPlayerEntries(sorted, (channelId) =>
-      playlistName(channelMap.get(channelId)!, worldNames)
+    entries: toPlayerEntries(
+      sorted,
+      (channelId) => playlistName(channelMeta.get(channelId)!.country, worldNames),
+      (channelId) => ({
+        logoUrl: channelMeta.get(channelId)?.logoUrl ?? undefined,
+      })
     ),
   };
 }
