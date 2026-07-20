@@ -42,11 +42,11 @@ Nicht im Scope: Jeder Einzel-Commit ohne betriebliche Relevanz.
 |------|--------|
 | Datum | 2026-07-20 |
 | Version | App-Release (epg-core, epg-sources, worker) |
-| Begründung | `NDRFernsehen.de` und `NDR.de` zeigten falsche Sendezeiten in IPTV-Playern; Quellen nutzen abweichende Kanal-IDs (`NDR.de`, `76748`, `NDRFernsehenNiedersachsen.de`). UTC-Zeitstempel (`+0000`) wurden von vielen Playern als lokale Wandzeit gelesen (z. B. 10:20 statt 12:20); epg.pw liefert `76748` mit +8h-Fehler vor Normalisierung |
-| Auswirkung | `applyChannelAliases()` kopiert Programme auf iptv-org-Kanal-IDs; `localizeXmltvTimestamps()` formatiert Ausgabe für DE/AT/CH/GB/FR/NL in konfigurierter IANA-Zeitzone; `NDRFernsehen.de` zeigt z. B. am 20.07.2026 12:20–13:10 „In aller Freundschaft“ |
+| Begründung | Playlist-Kanal `76748` (epg.pw-ID für NDR) und verwandte IDs (`NDR.de`, `NDRFernsehen.de`) zeigten falsche Sendezeiten in IPTV-Playern. UTC-Zeitstempel (`20260720102000 +0000`) wurden als lokale Wandzeit gelesen (10:20 statt 12:20 MESZ); vor der epg.pw-Normalisierung lag der Fehler bei +8h (20:20) |
+| Auswirkung | `applyChannelAliases()` kopiert Programme auf iptv-org-Kanal-IDs; `localizeXmltvTimestamps()` formatiert Ausgabe für DE/AT/CH/GB/FR/NL in konfigurierter IANA-Zeitzone; `76748` zeigt z. B. am 20.07.2026 12:20–13:10 „In aller Freundschaft“ |
 | Risiko | niedrig (nur Post-Processing nach Merge; bestehende epg.pw-Korrektur bleibt unverändert) |
 | Betroffene Komponenten | `packages/epg-core/src/xmltv-dates.ts`, `packages/epg-sources/src/channel-aliases.ts`, `country-timezones.ts`, `merge.ts` |
-| Prüfung | Unit-Tests `localizeXmltvTimestamps` (CEST 12:20), `applyChannelAliases` (NDR); Live-Check `fetchMergedCountryEpg('DE')` → `NDRFernsehen.de` 20260720122000 +0200 |
+| Prüfung | Unit-Tests `localizeXmltvTimestamps` (CEST 12:20), `applyChannelAliases`; Live-Check `fetchMergedCountryEpg('DE')` → `76748` und `NDRFernsehen.de` 20260720122000 +0200 |
 | Freigabe | Product Owner |
 | Rollback | Vorheriges Image; EPG für DE neu generieren (`fetch-country DE`) |
 
