@@ -31,6 +31,60 @@ export function formatXmltvDateUtc(date: Date): string {
   return `${y}${mo}${d}${h}${mi}${s} +0000`;
 }
 
+function readTimeZoneOffset(value: string, timeZone: string): string {
+  const match = new Intl.DateTimeFormat("en-US", {
+    timeZone,
+    timeZoneName: "longOffset",
+  })
+    .formatToParts(new Date(value))
+    .find((part) => part.type === "timeZoneName")?.value;
+
+  const parsed = match?.match(/GMT([+-])(\d{2}):(\d{2})/);
+  if (!parsed) return "+0000";
+  return `${parsed[1]}${parsed[2]}${parsed[3]}`;
+}
+
+/** Formats an instant using wall-clock time in the given IANA timezone. */
+export function formatXmltvDateInTimeZone(date: Date, timeZone: string): string {
+  const parts = Object.fromEntries(
+    new Intl.DateTimeFormat("en-US", {
+      timeZone,
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+      hourCycle: "h23",
+    })
+      .formatToParts(date)
+      .filter((part) => part.type !== "literal")
+      .map((part) => [part.type, part.value])
+  );
+
+  const offset = readTimeZoneOffset(date.toISOString(), timeZone);
+  return `${parts.year}${parts.month}${parts.day}${parts.hour}${parts.minute}${parts.second} ${offset}`;
+}
+
+export function localizeXmltvTimestamps(
+  doc: XmltvDocument,
+  timeZone: string
+): XmltvDocument {
+  return {
+    ...doc,
+    programmes: doc.programmes.map((programme) => {
+      const start = parseXmltvDateString(programme.start);
+      const stop = parseXmltvDateString(programme.stop);
+      if (!start || !stop) return programme;
+      return {
+        ...programme,
+        start: formatXmltvDateInTimeZone(start, timeZone),
+        stop: formatXmltvDateInTimeZone(stop, timeZone),
+      };
+    }),
+  };
+}
+
 /**
  * Corrects epg.pw programme timestamps (see GitHub issue #1).
  * Their +0000 suffix is wrong: values are UTC+8 wall times, not real UTC.

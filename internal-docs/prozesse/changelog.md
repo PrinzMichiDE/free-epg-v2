@@ -36,6 +36,20 @@ Nicht im Scope: Jeder Einzel-Commit ohne betriebliche Relevanz.
 
 ## Detailbeschreibung
 
+### Eintrag CHG-2026-019: NDR-Kanal-Alias und lokale XMLTV-Zeitzone für Deutschland
+
+| Feld | Inhalt |
+|------|--------|
+| Datum | 2026-07-20 |
+| Version | App-Release (epg-core, epg-sources, worker) |
+| Begründung | `NDRFernsehen.de` (iptv-org Playlist-ID) hatte keine Programme im gemergten DE-Feed; Quellen nutzen abweichende Kanal-IDs (`NDR.de`, `76748`, `NDRFernsehenNiedersachsen.de`). Zusätzlich wurden UTC-Zeitstempel (`+0000`) nicht in lokale Wandzeit (`Europe/Berlin`, z. B. `+0200` CEST) ausgegeben — „In aller Freundschaft“ erschien fälschlich um 20:20 statt 12:20 Uhr |
+| Auswirkung | `applyChannelAliases()` kopiert Programme auf iptv-org-Kanal-IDs; `localizeXmltvTimestamps()` formatiert Ausgabe für DE/AT/CH/GB/FR/NL in konfigurierter IANA-Zeitzone; `NDRFernsehen.de` zeigt z. B. am 20.07.2026 12:20–13:10 „In aller Freundschaft“ |
+| Risiko | niedrig (nur Post-Processing nach Merge; bestehende epg.pw-Korrektur bleibt unverändert) |
+| Betroffene Komponenten | `packages/epg-core/src/xmltv-dates.ts`, `packages/epg-sources/src/channel-aliases.ts`, `country-timezones.ts`, `merge.ts` |
+| Prüfung | Unit-Tests `localizeXmltvTimestamps` (CEST 12:20), `applyChannelAliases` (NDR); Live-Check `fetchMergedCountryEpg('DE')` → `NDRFernsehen.de` 20260720122000 +0200 |
+| Freigabe | Product Owner |
+| Rollback | Vorheriges Image; EPG für DE neu generieren (`fetch-country DE`) |
+
 ### Eintrag CHG-2026-018: SSRF-Härtung, M3U-Expiry-Cleanup und Drizzle-CVE-Patch
 
 | Feld | Inhalt |
