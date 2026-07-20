@@ -1,4 +1,4 @@
-import { isAllowedHttpUrl } from "@/lib/url-safety";
+import { isAllowedHttpUrl } from "@/lib/url-safety-shared";
 
 export function isAllowedStreamUrl(raw: string): boolean {
   return isAllowedHttpUrl(raw);

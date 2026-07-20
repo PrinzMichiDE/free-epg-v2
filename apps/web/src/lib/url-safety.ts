@@ -1,107 +1,24 @@
 import { lookup } from "node:dns/promises";
 import { isIP } from "node:net";
+import {
+  isPrivateIpAddress,
+  parseHttpUrl,
+  UnsafeUrlError,
+} from "@/lib/url-safety-shared";
 
-const BLOCKED_HOSTS = new Set([
-  "localhost",
-  "localhost.localdomain",
-  "metadata.google.internal",
-  "metadata.goog",
-  "metadata",
-]);
-
-const BLOCKED_HOST_SUFFIXES = [".localhost", ".local", ".internal", ".lan"];
+export {
+  isAllowedHttpUrl,
+  isBlockedHostname,
+  isPrivateIpAddress,
+  isPrivateIpv4,
+  isPrivateIpv6,
+  parseHttpUrl,
+  UnsafeUrlError,
+} from "@/lib/url-safety-shared";
 
 export const MAX_OUTBOUND_REDIRECTS = 5;
 export const DEFAULT_FETCH_TIMEOUT_MS = 30_000;
 export const DEFAULT_MAX_BODY_BYTES = 5 * 1024 * 1024;
-
-export class UnsafeUrlError extends Error {
-  constructor(message: string) {
-    super(message);
-    this.name = "UnsafeUrlError";
-  }
-}
-
-export function isPrivateIpv4(host: string): boolean {
-  const parts = host.split(".").map(Number);
-  if (parts.length !== 4 || parts.some((p) => Number.isNaN(p) || p < 0 || p > 255)) {
-    return false;
-  }
-  const [a, b] = parts;
-  if (a === 0 || a === 10 || a === 127) return true;
-  if (a === 169 && b === 254) return true;
-  if (a === 172 && b >= 16 && b <= 31) return true;
-  if (a === 192 && b === 168) return true;
-  if (a === 100 && b >= 64 && b <= 127) return true; // CGNAT
-  if (a >= 224) return true; // multicast / reserved
-  return false;
-}
-
-export function isPrivateIpv6(host: string): boolean {
-  const normalized = host.toLowerCase();
-  if (normalized === "::" || normalized === "::1") return true;
-  if (normalized.startsWith("fe80:")) return true; // link-local
-  if (normalized.startsWith("fc") || normalized.startsWith("fd")) return true; // ULA
-  if (normalized.startsWith("ff")) return true; // multicast
-
-  // IPv4-mapped IPv6 (::ffff:x.x.x.x)
-  const mapped = normalized.match(/^::ffff:(\d+\.\d+\.\d+\.\d+)$/i);
-  if (mapped) return isPrivateIpv4(mapped[1]);
-
-  const mappedHex = normalized.match(/^::ffff:([0-9a-f]{1,4}):([0-9a-f]{1,4})$/i);
-  if (mappedHex) {
-    const hi = Number.parseInt(mappedHex[1], 16);
-    const lo = Number.parseInt(mappedHex[2], 16);
-    const ipv4 = `${(hi >> 8) & 255}.${hi & 255}.${(lo >> 8) & 255}.${lo & 255}`;
-    return isPrivateIpv4(ipv4);
-  }
-
-  return false;
-}
-
-export function isPrivateIpAddress(address: string): boolean {
-  const version = isIP(address);
-  if (version === 4) return isPrivateIpv4(address);
-  if (version === 6) return isPrivateIpv6(address);
-  return true;
-}
-
-export function isBlockedHostname(hostname: string): boolean {
-  const host = hostname.toLowerCase().replace(/\.$/, "");
-  if (!host) return true;
-  if (BLOCKED_HOSTS.has(host)) return true;
-  if (BLOCKED_HOST_SUFFIXES.some((suffix) => host.endsWith(suffix))) return true;
-  if (isIP(host) && isPrivateIpAddress(host)) return true;
-  return false;
-}
-
-export function parseHttpUrl(raw: string): URL {
-  let url: URL;
-  try {
-    url = new URL(raw);
-  } catch {
-    throw new UnsafeUrlError("Invalid URL");
-  }
-  if (url.protocol !== "http:" && url.protocol !== "https:") {
-    throw new UnsafeUrlError("Only http and https URLs are allowed");
-  }
-  if (url.username || url.password) {
-    throw new UnsafeUrlError("URLs with credentials are not allowed");
-  }
-  if (isBlockedHostname(url.hostname)) {
-    throw new UnsafeUrlError("URL host is not allowed");
-  }
-  return url;
-}
-
-export function isAllowedHttpUrl(raw: string): boolean {
-  try {
-    parseHttpUrl(raw);
-    return true;
-  } catch {
-    return false;
-  }
-}
 
 export async function assertSafeOutboundUrl(raw: string): Promise<URL> {
   const url = parseHttpUrl(raw);
@@ -175,16 +92,23 @@ async function readBodyWithLimit(
   return Buffer.concat(chunks.map((c) => Buffer.from(c))).toString("utf-8");
 }
 
+/**
+ * Server-only outbound fetch with SSRF controls.
+ * Callers must pass URLs that already passed `isAllowedHttpUrl` / `assertSafeOutboundUrl`.
+ */
 export async function safeFetchResponse(
   rawUrl: string,
   options: SafeFetchOptions = {}
 ): Promise<{ response: Response; finalUrl: string }> {
   const timeoutMs = options.timeoutMs ?? DEFAULT_FETCH_TIMEOUT_MS;
   const maxRedirects = options.maxRedirects ?? MAX_OUTBOUND_REDIRECTS;
+
+  // Validate before any network I/O; re-validate every redirect hop.
   let currentUrl = (await assertSafeOutboundUrl(rawUrl)).href;
 
   for (let hop = 0; hop <= maxRedirects; hop++) {
-    await assertSafeOutboundUrl(currentUrl);
+    const safeUrl = await assertSafeOutboundUrl(currentUrl);
+    currentUrl = safeUrl.href;
 
     const response = await fetch(currentUrl, {
       headers: options.headers,
