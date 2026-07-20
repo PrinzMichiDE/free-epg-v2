@@ -36,7 +36,19 @@ Nicht im Scope: Jeder Einzel-Commit ohne betriebliche Relevanz.
 
 ## Detailbeschreibung
 
-## Detailbeschreibung
+### Eintrag CHG-2026-018: SSRF-Härtung, M3U-Expiry-Cleanup und Drizzle-CVE-Patch
+
+| Feld | Inhalt |
+|------|--------|
+| Datum | 2026-07-20 |
+| Version | App-Release (web, worker, db, analytics, CI) |
+| Begründung | Daily Evolution: öffentliche URL-Fetches (M3U-Upload, Stream-Proxy) waren SSRF-anfällig; manuelle M3U-Rematches schrieben global in `m3u_match_overrides`; Audit-Finding F-002 (M3U-Expiry ohne Cleanup); High-CVE in drizzle-orm `<0.45.2` |
+| Auswirkung | Neues `url-safety`-Modul (Host-/IP-Blocklisten inkl. IPv6/ULA/CGNAT, DNS-Prüfung, Redirect-Revalidierung, Body-Limit 5 MB); M3U-Upload mit Entry-Limit 5000; Stream-Proxy nutzt sichere Redirect-Kette; manuelle Rematches nur playlist-scoped; Read-Pfade liefern HTTP 410 für abgelaufene Playlists; Worker-Job `m3u-cleanup` (Cron `CRON_M3U_CLEANUP`, Default 03:15 UTC) löscht DB-Zeilen und XML-Artefakte; drizzle-orm einheitlich `0.45.2` via npm overrides; CI führt Unit-Tests aus |
+| Risiko | niedrig–mittel (strengere URL-Policy kann interne/private Stream-Hosts blockieren; Cleanup ist irreversibel für abgelaufene Uploads) |
+| Betroffene Komponenten | `apps/web/src/lib/url-safety.ts`, `apps/web/src/lib/m3u-access.ts`, M3U-/Stream-API-Routen, `apps/worker/src/m3u-cleanup.ts`, `package.json` overrides, `.github/workflows/ci.yml` |
+| Prüfung | `npm test` (epg-core, web, worker); `npm run typecheck -w @freeepg/web`; `npm run typecheck -w @freeepg/worker`; `npm audit` ohne High/Critical |
+| Freigabe | Product Owner |
+| Rollback | Vorheriges Image; optional Cleanup-Cron deaktivieren (`CRON_M3U_CLEANUP` entfernen / Worker-Rollback) |
 
 ### Eintrag CHG-2026-017: Zusätzliche EPG-Quelle iptv-epg.org und erweiterte Länderabdeckung
 
@@ -393,5 +405,6 @@ Auto-Migration beim Web-Start: `apps/web/docker-entrypoint.sh`.
 
 | Datum | Autor/Rolle | Änderung | Anlass |
 |-------|-------------|----------|--------|
+| 2026-07-20 | Cursor Agent / Daily Evolution | CHG-2026-018 SSRF-Härtung, M3U-Cleanup, Drizzle-CVE | Daily Evolution Pipeline |
 | 2026-07-12 | Cursor Agent / Entwicklung | CHG-2026-003 Playlisten weltweit | Feature-Release |
 | 2026-07-12 | Cursor Agent / Dokumentation | Erstversion mit Baseline und CHG-2026-001 | Initiale Prozess-Dokumentation |
