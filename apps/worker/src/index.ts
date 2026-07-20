@@ -316,7 +316,11 @@ cron.schedule(process.env.CRON_M3U_CLEANUP ?? "15 3 * * *", () => {
 });
 
 if (process.env.FETCH_ON_START === "true") {
-  epgQueue.add("fetch-all-countries", {}, { attempts: 1 });
+  // Regenerate DE first (most requested); stale pre-v2 files need a quick refresh.
+  await epgQueue.add("fetch-country", { country: "DE" }, { attempts: 2, priority: 1 });
+  await epgQueue.add("fetch-country", { country: "AT" }, { attempts: 2, priority: 2 });
+  await epgQueue.add("fetch-country", { country: "CH" }, { attempts: 2, priority: 2 });
+  epgQueue.add("fetch-all-countries", {}, { attempts: 1, priority: 10 });
 }
 }
 

@@ -27,8 +27,8 @@ export class EpgNotReadyError extends Error {
   }
 }
 
-function queueRefresh(country: string): void {
-  void queueCountryEpgRefresh(country).catch((err) => {
+function queueRefresh(country: string, priority = 1): void {
+  void queueCountryEpgRefresh(country, { priority }).catch((err) => {
     console.warn(`[epg] failed to queue refresh for ${country}:`, err);
   });
 }
@@ -43,9 +43,8 @@ async function isStaleCountryXml(country: string): Promise<boolean> {
 }
 
 /**
- * Returns the on-disk country XML path. Serves cached files immediately (even if
- * stale) and queues a worker refresh in the background. Never blocks on a full
- * merge in the web process.
+ * Returns the on-disk country XML path when current. Outdated files (pre-FreeEPG/2)
+ * are not served — a worker refresh is queued and callers get EpgNotReadyError.
  */
 export async function ensureCountryXml(country: string): Promise<string> {
   const cc = country.toUpperCase();
@@ -54,6 +53,7 @@ export async function ensureCountryXml(country: string): Promise<string> {
   if (existsSync(filePath)) {
     if (await isStaleCountryXml(cc)) {
       queueRefresh(cc);
+      throw new EpgNotReadyError(cc);
     }
     return filePath;
   }

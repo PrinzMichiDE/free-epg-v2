@@ -56,4 +56,29 @@ describe("merged DE output for NDR.de", () => {
     assert.equal(iaf.start, "20260720122000 +0200");
     assert.equal(iaf.stop, "20260720131000 +0200");
   });
+
+  it("localizes epg.pw channel 76748 to 14:00–15:00 CEST for Camping am Salzhaff on 2026-07-20", () => {
+    const timeZone = getCountryOutputTimeZone("DE");
+    assert.ok(timeZone);
+
+    const localized = localizeXmltvTimestamps(
+      {
+        channels: [{ id: "76748", displayName: "NDR" }],
+        programmes: [
+          {
+            channel: "76748",
+            start: "20260720120000 +0000",
+            stop: "20260720130000 +0000",
+            title: "Camping am Salzhaff",
+          },
+        ],
+      },
+      timeZone
+    );
+
+    const camping = localized.programmes.find((programme) => programme.channel === "76748");
+    assert.ok(camping);
+    assert.equal(camping.start, "20260720140000 +0200");
+    assert.equal(camping.stop, "20260720150000 +0200");
+  });
 });
