@@ -27,6 +27,7 @@ describe("xmltv", () => {
   <programme start="20260720122000 +0200" stop="20260720131000 +0200" channel="76748">
     <title lang="de">In aller Freundschaft</title>
     <category lang="de">Serie</category>
+    <desc lang="en"/>
   </programme>
 </tv>`;
 

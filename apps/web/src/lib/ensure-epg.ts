@@ -4,6 +4,7 @@ import { gzipSync } from "node:zlib";
 import {
   buildRytecXmltv,
   buildXmltv,
+  isCurrentEpgOutput,
   parseXmltv,
 } from "@freeepg/epg-core";
 import { fetchMergedCountryEpg } from "@freeepg/epg-sources";
@@ -16,23 +17,42 @@ import {
   epgDataDir,
 } from "./epg-paths";
 
-export async function ensureCountryXml(country: string): Promise<string> {
+async function writeCountryEpgFiles(
+  country: string,
+  doc: ReturnType<typeof parseXmltv>
+): Promise<string> {
   const cc = country.toUpperCase();
   const filePath = countryXmlPath(cc);
-  if (existsSync(filePath)) return filePath;
-
-  const result = await fetchMergedCountryEpg(cc);
-  if (!result) throw new Error("EPG not available");
-  const doc = result.doc;
-
   const xml = buildXmltv(doc);
+
   await mkdir(path.dirname(filePath), { recursive: true });
   await writeFile(filePath, xml, "utf-8");
   await writeFile(countryGzipPath(cc), gzipSync(Buffer.from(xml, "utf-8")));
-
   await writeRytecFilesFromDoc(cc, doc);
 
   return filePath;
+}
+
+async function isStaleCountryXml(country: string): Promise<boolean> {
+  const filePath = countryXmlPath(country.toUpperCase());
+  if (!existsSync(filePath)) return true;
+
+  const head = await readFile(filePath, "utf-8");
+  const sample = head.slice(0, 4096);
+  return !isCurrentEpgOutput(sample);
+}
+
+export async function ensureCountryXml(country: string): Promise<string> {
+  const cc = country.toUpperCase();
+  const filePath = countryXmlPath(cc);
+  if (existsSync(filePath) && !(await isStaleCountryXml(cc))) {
+    return filePath;
+  }
+
+  const result = await fetchMergedCountryEpg(cc);
+  if (!result) throw new Error("EPG not available");
+
+  return writeCountryEpgFiles(cc, result.doc);
 }
 
 async function writeRytecFilesFromDoc(
@@ -54,18 +74,14 @@ export async function ensureCountryRytec(country: string): Promise<void> {
   const gzipPath = countryRytecGzipPath(cc);
   const xmlPath = countryRytecPath(cc);
 
+  await ensureCountryXml(cc);
+
   if (existsSync(gzipPath) && existsSync(xmlPath)) return;
 
   const sourceXml = countryXmlPath(cc);
   if (!existsSync(sourceXml)) {
-    await ensureCountryXml(cc);
-  }
-
-  if (!existsSync(sourceXml)) {
     throw new Error(`Source XML missing for ${cc}`);
   }
-
-  if (existsSync(gzipPath) && existsSync(xmlPath)) return;
 
   const xml = await readFile(sourceXml, "utf-8");
   await writeRytecFilesFromDoc(cc, parseXmltv(xml));

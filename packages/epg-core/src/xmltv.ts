@@ -1,5 +1,6 @@
 import { XMLParser, XMLBuilder } from "fast-xml-parser";
 import type { XmltvChannel, XmltvDocument, XmltvProgramme } from "./matcher.js";
+import { EPG_GENERATOR_NAME } from "./epg-version.js";
 
 const parser = new XMLParser({
   ignoreAttributes: false,
@@ -77,7 +78,7 @@ export function parseXmltv(xml: string): XmltvDocument {
 export function buildXmltv(doc: XmltvDocument): string {
   const tv = {
     tv: {
-      "@_generator-info-name": "FreeEPG",
+      "@_generator-info-name": EPG_GENERATOR_NAME,
       "@_generator-info-url": "https://free-epg.de",
       channel: doc.channels.map((ch) => ({
         "@_id": ch.id,

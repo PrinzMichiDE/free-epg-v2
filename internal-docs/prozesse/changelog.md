@@ -36,6 +36,20 @@ Nicht im Scope: Jeder Einzel-Commit ohne betriebliche Relevanz.
 
 ## Detailbeschreibung
 
+### Eintrag CHG-2026-021: Automatische EPG-Neugenerierung bei veralteter Pipeline-Version
+
+| Feld | Inhalt |
+|------|--------|
+| Datum | 2026-07-20 |
+| Version | App-Release (epg-core, web) |
+| Begründung | Production lieferte weiterhin alte `de.xml` mit unnormalisierten epg.pw-Zeiten (`Hofgeschichten` statt `In aller Freundschaft` auf `76748` um 12:54 MESZ); `ensureCountryXml` lieferte gecachte Dateien ohne Versionsprüfung |
+| Auswirkung | `EPG_OUTPUT_VERSION=2` in Generator-Metadaten (`FreeEPG/2`); `ensureCountryXml` regeneriert veraltete Dateien beim nächsten API-Abruf; XMLTV-Parser-Fix für `category`/`desc` mit `lang`-Attribut |
+| Risiko | niedrig (erster Request pro Land nach Deploy dauert länger) |
+| Betroffene Komponenten | `packages/epg-core/src/epg-version.ts`, `xmltv.ts`, `apps/web/src/lib/ensure-epg.ts` |
+| Prüfung | Live-Production-Analyse vs. `fetchMergedCountryEpg('DE')`; Unit-Tests `epg-version`, `xmltv` |
+| Freigabe | Product Owner |
+| Rollback | Vorheriges Image; ggf. manuell `de.xml` löschen und neu generieren |
+
 ### Eintrag CHG-2026-020: XMLTV-Kompatibilität für Dispatcharr und Emby
 
 | Feld | Inhalt |
@@ -447,6 +461,8 @@ Auto-Migration beim Web-Start: `apps/web/docker-entrypoint.sh`.
 
 | Datum | Autor/Rolle | Änderung | Anlass |
 |-------|-------------|----------|--------|
+| 2026-07-20 | Cursor Agent / Entwicklung | CHG-2026-021 EPG-Stale-Refresh + Parser-Fix | Hofgeschichten statt IAF auf 76748 (Production) |
+| 2026-07-20 | Cursor Agent / Entwicklung | CHG-2026-020 XMLTV-Kompatibilität Dispatcharr/Emby | `[object Object]` in category/desc |
 | 2026-07-20 | Cursor Agent / Entwicklung | CHG-2026-019 NDR-Kanal-Alias und lokale XMLTV-Zeitzone | EPG-Fehlzeit NDRFernsehen.de |
 | 2026-07-20 | Cursor Agent / Daily Evolution | CHG-2026-018 SSRF-Härtung, M3U-Cleanup, Drizzle-CVE | Daily Evolution Pipeline |
 | 2026-07-12 | Cursor Agent / Entwicklung | CHG-2026-003 Playlisten weltweit | Feature-Release |
