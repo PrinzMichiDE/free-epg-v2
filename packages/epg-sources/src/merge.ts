@@ -1,6 +1,8 @@
-import { mergeXmltvDocs, type XmltvDocument } from "@freeepg/epg-core";
+import { mergeXmltvDocs, localizeXmltvTimestamps, type XmltvDocument } from "@freeepg/epg-core";
 import type { EpgSourceAdapter } from "./types.js";
 import { getDefaultAdapters } from "./adapters.js";
+import { applyChannelAliases } from "./channel-aliases.js";
+import { getCountryOutputTimeZone } from "./country-timezones.js";
 
 export interface MergedEpgSourceStats {
   name: string;
@@ -39,5 +41,12 @@ export async function fetchMergedCountryEpg(
   }
 
   if (merged.channels.length === 0) return null;
+
+  merged = applyChannelAliases(merged);
+  const timeZone = getCountryOutputTimeZone(countryCode);
+  if (timeZone) {
+    merged = localizeXmltvTimestamps(merged, timeZone);
+  }
+
   return { doc: merged, sources };
 }

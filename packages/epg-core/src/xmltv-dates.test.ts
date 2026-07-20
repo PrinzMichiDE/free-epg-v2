@@ -3,6 +3,7 @@ import assert from "node:assert/strict";
 import {
   correctEpgPwTimestamp,
   formatXmltvDateUtc,
+  localizeXmltvTimestamps,
   parseXmltvDateString,
 } from "./xmltv-dates.js";
 
@@ -44,5 +45,25 @@ describe("xmltv-dates", () => {
       correctEpgPwTimestamp("20260719000500 +0000"),
       "20260718160500 +0000"
     );
+  });
+
+  it("localizes UTC timestamps to Europe/Berlin wall clock (CEST)", () => {
+    const doc = localizeXmltvTimestamps(
+      {
+        channels: [],
+        programmes: [
+          {
+            channel: "NDR.de",
+            start: "20260720102000 +0000",
+            stop: "20260720111000 +0000",
+            title: "In aller Freundschaft",
+          },
+        ],
+      },
+      "Europe/Berlin"
+    );
+
+    assert.equal(doc.programmes[0]?.start, "20260720122000 +0200");
+    assert.equal(doc.programmes[0]?.stop, "20260720131000 +0200");
   });
 });
