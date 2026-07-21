@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Menu, Radio, X } from "lucide-react";
+import { Menu, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/Button";
 import { DonateButton } from "@/components/layout/DonateButton";
@@ -35,22 +35,23 @@ export function Header() {
   const [open, setOpen] = useState(false);
 
   return (
-    <header className="sticky top-0 z-50 border-b border-[var(--border)] bg-[var(--card)]/90 backdrop-blur-md">
-      <div className="page-shell min-h-[var(--header-height)] grid grid-cols-[auto_1fr_auto] items-center gap-2 sm:gap-3 xl:gap-4 py-2 xl:py-0">
+    <header className="sticky top-0 z-50 border-b border-[var(--border)] bg-[var(--background)]">
+      <div className="page-shell min-h-[var(--header-height)] flex items-center justify-between gap-4">
         <Link
           href="/"
-          className="flex items-center gap-2 font-semibold text-[var(--foreground)] hover:opacity-90 transition-opacity shrink-0 min-w-0"
+          className="flex items-center gap-2.5 shrink-0 text-[var(--foreground)] hover:opacity-80 transition-opacity"
         >
-          <span className="flex h-8 w-8 sm:h-9 sm:w-9 items-center justify-center rounded-lg bg-[var(--primary)] text-[var(--primary-foreground)] shrink-0">
-            <Radio className="h-4 w-4" aria-hidden />
-          </span>
-          <span className="text-base sm:text-lg tracking-tight hidden xs:inline truncate">
+          <span
+            className="h-2 w-2 rounded-full bg-[var(--accent)] shrink-0"
+            aria-hidden
+          />
+          <span className="font-serif text-lg sm:text-xl font-semibold tracking-tight">
             FreeEPG
           </span>
         </Link>
 
         <nav
-          className="hidden xl:flex items-center justify-center gap-0.5 min-w-0"
+          className="hidden xl:flex items-center gap-1 min-w-0"
           aria-label={t("header.mainNav")}
         >
           {primaryNav.map((item) => {
@@ -61,10 +62,10 @@ export function Header() {
                 key={item.href}
                 href={item.href}
                 className={cn(
-                  "px-2.5 py-2 rounded-lg text-sm font-medium transition-colors duration-200 whitespace-nowrap shrink-0",
+                  "px-3 py-2 text-sm transition-colors border-b-2 -mb-px",
                   active
-                    ? "bg-[var(--surface-muted)] text-[var(--foreground)]"
-                    : "text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--surface-muted)]"
+                    ? "border-[var(--accent)] text-[var(--foreground)] font-medium"
+                    : "border-transparent text-[var(--muted-foreground)] hover:text-[var(--foreground)]"
                 )}
                 aria-current={active ? "page" : undefined}
               >
@@ -75,17 +76,17 @@ export function Header() {
           <NavMoreMenu items={secondaryNav} />
         </nav>
 
-        <div className="hidden xl:flex items-center justify-end gap-2 shrink-0">
+        <div className="hidden xl:flex items-center gap-2 shrink-0">
           <LanguageSwitcher compact />
           <Link href="/docs/enigma2">
-            <Button size="sm" className="whitespace-nowrap">
+            <Button size="sm" variant="outline" className="whitespace-nowrap">
               <span className="hidden 2xl:inline">{t("header.enigma2Setup")}</span>
               <span className="2xl:hidden">{t("header.enigma2Short")}</span>
             </Button>
           </Link>
         </div>
 
-        <div className="flex xl:hidden items-center justify-end gap-1 shrink-0">
+        <div className="flex xl:hidden items-center gap-1 shrink-0">
           <LanguageSwitcher />
           <Button
             variant="ghost"
@@ -104,7 +105,7 @@ export function Header() {
       {open && (
         <nav
           id="mobile-nav"
-          className="xl:hidden border-t border-[var(--border)] bg-[var(--card)] px-3 sm:px-4 py-4 space-y-1 max-h-[min(80vh,32rem)] overflow-y-auto overscroll-contain"
+          className="xl:hidden border-t border-[var(--border)] bg-[var(--background)] px-4 py-3 space-y-0.5 max-h-[min(80vh,32rem)] overflow-y-auto overscroll-contain"
           aria-label={t("header.mobileNav")}
         >
           {allNavItems.map((item) => {
@@ -116,17 +117,17 @@ export function Header() {
                 href={item.href}
                 onClick={() => setOpen(false)}
                 className={cn(
-                  "block px-3 py-3 rounded-lg text-sm font-medium min-h-[44px] flex items-center",
+                  "block px-2 py-3 text-sm min-h-[44px] flex items-center border-l-2",
                   active
-                    ? "bg-[var(--surface-muted)] text-[var(--foreground)]"
-                    : "text-[var(--muted-foreground)]"
+                    ? "border-[var(--accent)] text-[var(--foreground)] font-medium pl-3"
+                    : "border-transparent text-[var(--muted-foreground)]"
                 )}
               >
                 {t(item.labelKey)}
               </Link>
             );
           })}
-          <div className="pt-3 mt-2 border-t border-[var(--border)] space-y-3">
+          <div className="pt-4 mt-2 border-t border-[var(--border)] space-y-3">
             <DonateButton variant="outline" size="md" className="w-full" showAmount stacked />
             <AffiliateLinks variant="outline" size="md" className="w-full" stacked />
             <Link href="/docs/enigma2" onClick={() => setOpen(false)} className="block">

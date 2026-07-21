@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Globe2, Radio, Server } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { SUPPORTED_EPG_COUNTRIES } from "@freeepg/epg-sources/constants";
 import { CountryCard } from "@/components/country/CountryCard";
 import { Button } from "@/components/ui/Button";
@@ -35,108 +35,88 @@ export function HomePageContent({
 
   return (
     <>
-      <section className="relative border-b border-[var(--border)] overflow-hidden">
-        <div className="absolute inset-0 hero-grid pointer-events-none" aria-hidden />
-        <div className="page-shell relative py-12 sm:py-16 lg:py-24">
-          <div className="max-w-3xl">
-            <p className="text-xs sm:text-sm font-medium text-[var(--accent)] mb-3 sm:mb-4 tracking-wide uppercase">
-              {t("home.badge")}
-            </p>
-            <h1 className="text-3xl xs:text-4xl sm:text-5xl lg:text-6xl font-semibold tracking-tight text-[var(--foreground)] mb-4 sm:mb-5 text-balance">
+      <section className="border-b border-[var(--border)]">
+        <div className="page-shell py-12 sm:py-16 lg:py-20">
+          <div className="max-w-2xl">
+            <p className="section-kicker">{t("home.badge")}</p>
+            <h1 className="font-serif text-4xl sm:text-5xl lg:text-[3.25rem] font-semibold text-balance mb-5">
               {t("home.title")}
             </h1>
-            <p className="text-base sm:text-lg text-[var(--muted-foreground)] leading-relaxed mb-6 sm:mb-8 max-w-2xl">
+            <p className="text-base sm:text-lg text-[var(--muted-foreground)] leading-relaxed mb-8 max-w-xl">
               {t("home.subtitle")}
             </p>
-            <div className="flex flex-col xs:flex-row flex-wrap gap-3">
-              <Link href="/countries" className="w-full xs:w-auto">
-                <Button size="lg" className="w-full xs:w-auto">
-                  {t("home.ctaCountries")}
-                </Button>
+            <div className="flex flex-col xs:flex-row flex-wrap gap-2">
+              <Link href="/countries">
+                <Button size="lg">{t("home.ctaCountries")}</Button>
               </Link>
-              <Link href="/playlists" className="w-full xs:w-auto">
-                <Button variant="outline" size="lg" className="w-full xs:w-auto">
+              <Link href="/playlists">
+                <Button variant="outline" size="lg">
                   {t("home.ctaPlaylists")}
                 </Button>
               </Link>
-              <Link href="/docs" className="w-full xs:w-auto">
-                <Button variant="outline" size="lg" className="w-full xs:w-auto">
-                  {t("home.ctaDocs")}
-                </Button>
-              </Link>
-              <Link href="/programmes" className="w-full xs:w-auto">
-                <Button variant="outline" size="lg" className="w-full xs:w-auto">
+              <Link href="/programmes">
+                <Button variant="ghost" size="lg">
                   {t("home.ctaProgrammes")}
                 </Button>
               </Link>
             </div>
           </div>
+
+          <dl className="mt-12 pt-8 border-t border-[var(--border)] grid grid-cols-1 sm:grid-cols-3 sm:divide-x sm:divide-[var(--border)]">
+            <StatCard
+              label={t("home.statChannels")}
+              value={totalChannels.toLocaleString(numberLocale)}
+            />
+            <StatCard label={t("home.statCountries")} value={activeCountries} />
+            <StatCard label={t("home.statFeeds")} value={epgFeeds} />
+          </dl>
         </div>
       </section>
 
-      <div className="page-shell py-8 sm:py-12 lg:py-16 space-y-10 sm:space-y-14">
-        <section className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          <StatCard
-            label={t("home.statChannels")}
-            value={totalChannels.toLocaleString(numberLocale)}
-            icon={Radio}
-          />
-          <StatCard
-            label={t("home.statCountries")}
-            value={activeCountries}
-            icon={Globe2}
-          />
-          <StatCard label={t("home.statFeeds")} value={epgFeeds} icon={Server} />
-        </section>
-
+      <div className="page-shell py-12 sm:py-16 space-y-14 sm:space-y-16">
         <section>
-          <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-8">
+          <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-3 mb-6 border-b border-[var(--border)] pb-4">
             <div>
-              <h2 className="text-2xl sm:text-3xl font-semibold tracking-tight">
-                {t("home.sectionCountries")}
-              </h2>
-              <p className="text-[var(--muted-foreground)] mt-2 max-w-xl">
+              <h2 className="section-title">{t("home.sectionCountries")}</h2>
+              <p className="text-sm text-[var(--muted-foreground)] mt-2 max-w-xl">
                 {t("home.sectionCountriesDesc")}
               </p>
             </div>
             <Link
               href="/countries"
-              className="text-sm font-medium text-[var(--primary)] hover:underline underline-offset-4 shrink-0"
+              className="link-arrow inline-flex items-center gap-1 shrink-0"
             >
               {t("home.viewAllCountries", { count: SUPPORTED_EPG_COUNTRIES.length })}
+              <ArrowRight className="h-3.5 w-3.5" aria-hidden />
             </Link>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-            {countries.slice(0, 20).map((c) => (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+            {countries.slice(0, 12).map((c) => (
               <CountryCard key={c.code} {...c} />
             ))}
           </div>
         </section>
 
         <section>
-          <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-8">
+          <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-3 mb-6 border-b border-[var(--border)] pb-4">
             <div>
-              <h2 className="text-2xl sm:text-3xl font-semibold tracking-tight">
-                {t("home.sectionPlaylists")}
-              </h2>
-              <p className="text-[var(--muted-foreground)] mt-2 max-w-xl">
+              <h2 className="section-title">{t("home.sectionPlaylists")}</h2>
+              <p className="text-sm text-[var(--muted-foreground)] mt-2 max-w-xl">
                 {t("home.sectionPlaylistsDesc")}
               </p>
             </div>
-            <Link
-              href="/playlists"
-              className="text-sm font-medium text-[var(--primary)] hover:underline underline-offset-4 shrink-0"
-            >
+            <Link href="/playlists" className="link-arrow inline-flex items-center gap-1 shrink-0">
               {t("home.viewAllPlaylists")}
+              <ArrowRight className="h-3.5 w-3.5" aria-hidden />
             </Link>
           </div>
-          <div className="rounded-xl border border-[var(--border)] bg-[var(--surface-muted)]/40 p-4 sm:p-6 lg:p-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-            <p className="text-[var(--muted-foreground)] max-w-xl leading-relaxed text-sm sm:text-base">
+          <div className="surface-card p-5 sm:p-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <p className="text-sm text-[var(--muted-foreground)] max-w-xl leading-relaxed">
               {t("home.playlistsTeaser")}
             </p>
-            <Link href="/playlists" className="w-full sm:w-auto shrink-0">
-              <Button className="w-full sm:w-auto">{t("home.playlistsCta")}</Button>
+            <Link href="/playlists" className="shrink-0">
+              <Button variant="outline">{t("home.playlistsCta")}</Button>
             </Link>
           </div>
         </section>

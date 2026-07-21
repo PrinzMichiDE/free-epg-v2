@@ -43,10 +43,10 @@ export function NavMoreMenu({ items }: NavMoreMenuProps) {
         type="button"
         onClick={() => setOpen((v) => !v)}
         className={cn(
-          "inline-flex items-center gap-1 px-2.5 py-2 rounded-lg text-sm font-medium transition-colors duration-200 whitespace-nowrap",
+          "inline-flex items-center gap-1 px-3 py-2 text-sm transition-colors border-b-2 -mb-px whitespace-nowrap",
           active
-            ? "bg-[var(--surface-muted)] text-[var(--foreground)]"
-            : "text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--surface-muted)]"
+            ? "border-[var(--accent)] text-[var(--foreground)] font-medium"
+            : "border-transparent text-[var(--muted-foreground)] hover:text-[var(--foreground)]"
         )}
         aria-expanded={open}
         aria-haspopup="menu"
@@ -63,7 +63,7 @@ export function NavMoreMenu({ items }: NavMoreMenuProps) {
           role="menu"
           className={cn(
             "absolute z-50 left-0 top-full mt-1 min-w-[11rem]",
-            "rounded-lg border border-[var(--border)] bg-[var(--card)] shadow-md py-1"
+            "rounded-sm border border-[var(--border)] bg-[var(--card)] shadow-md py-1"
           )}
         >
           {items.map((item) => {

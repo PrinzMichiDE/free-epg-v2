@@ -5,54 +5,54 @@
 }
 
 :root {
-  --background: #f3f6f9;
-  --foreground: #0c1829;
-  --primary: #1e3a5f;
-  --primary-foreground: #ffffff;
-  --accent: #0d9488;
+  --background: #f3f0e8;
+  --foreground: #1a1917;
+  --primary: #1a1917;
+  --primary-foreground: #f9f7f2;
+  --accent: #c41e26;
   --accent-foreground: #ffffff;
-  --muted: #5c6b7a;
-  --muted-foreground: #5c6b7a;
-  --card: #ffffff;
-  --card-foreground: #0c1829;
-  --border: #d8e0e9;
-  --ring: #1e3a5f;
-  --success: #059669;
-  --success-muted: #ecfdf5;
-  --warning: #b45309;
-  --warning-muted: #fffbeb;
-  --destructive: #dc2626;
-  --surface-muted: #e8eef4;
-  --header-height: 4rem;
-  --radius: 0.75rem;
-  --shadow-sm: 0 1px 2px rgb(12 24 41 / 0.04);
-  --shadow-md: 0 4px 16px rgb(12 24 41 / 0.06);
-  --font-sans: var(--font-plus-jakarta), system-ui, sans-serif;
-  --font-mono: var(--font-jetbrains-mono), ui-monospace, monospace;
+  --muted: #6f6a62;
+  --muted-foreground: #6f6a62;
+  --card: #faf8f3;
+  --card-foreground: #1a1917;
+  --border: #d8d2c6;
+  --ring: #c41e26;
+  --success: #2d6a4f;
+  --success-muted: #e8f3ed;
+  --warning: #9a6700;
+  --warning-muted: #faf3e0;
+  --destructive: #b42318;
+  --surface-muted: #ebe6db;
+  --header-height: 3.5rem;
+  --radius: 0.25rem;
+  --shadow-sm: none;
+  --shadow-md: 0 2px 0 rgb(26 25 23 / 0.06);
+  --font-sans: var(--font-ibm-plex-sans), system-ui, sans-serif;
+  --font-serif: var(--font-ibm-plex-serif), Georgia, serif;
+  --font-mono: var(--font-ibm-plex-mono), ui-monospace, monospace;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #080d14;
-    --foreground: #e8edf3;
-    --primary: #5b9fd4;
-    --primary-foreground: #081018;
-    --accent: #2dd4bf;
-    --accent-foreground: #042f2e;
-    --muted: #8b9cb0;
-    --muted-foreground: #8b9cb0;
-    --card: #111927;
-    --card-foreground: #e8edf3;
-    --border: #243044;
-    --ring: #5b9fd4;
-    --success: #34d399;
-    --success-muted: rgb(52 211 153 / 0.12);
-    --warning: #fbbf24;
-    --warning-muted: rgb(251 191 36 / 0.12);
+    --background: #121110;
+    --foreground: #ece8df;
+    --primary: #ece8df;
+    --primary-foreground: #121110;
+    --accent: #e85d63;
+    --accent-foreground: #121110;
+    --muted: #9a948a;
+    --muted-foreground: #9a948a;
+    --card: #1a1917;
+    --card-foreground: #ece8df;
+    --border: #2f2c28;
+    --ring: #e85d63;
+    --success: #6fcf97;
+    --success-muted: rgb(111 207 151 / 0.12);
+    --warning: #f0c14b;
+    --warning-muted: rgb(240 193 75 / 0.12);
     --destructive: #f87171;
-    --surface-muted: #161f2e;
-    --shadow-sm: 0 1px 2px rgb(0 0 0 / 0.24);
-    --shadow-md: 0 8px 24px rgb(0 0 0 / 0.32);
+    --surface-muted: #23211f;
+    --shadow-md: 0 2px 0 rgb(0 0 0 / 0.35);
   }
 }
 
@@ -86,7 +86,7 @@
     color: var(--foreground);
     font-family: var(--font-sans);
     font-size: 1rem;
-    line-height: 1.6;
+    line-height: 1.55;
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
     overflow-x: hidden;
@@ -94,10 +94,16 @@
 
   h1,
   h2,
-  h3,
+  h3 {
+    font-family: var(--font-serif);
+    font-weight: 600;
+    letter-spacing: -0.015em;
+    line-height: 1.15;
+  }
+
   h4 {
-    letter-spacing: -0.02em;
-    line-height: 1.2;
+    letter-spacing: -0.01em;
+    line-height: 1.25;
   }
 
   :focus-visible {
@@ -106,7 +112,7 @@
   }
 
   ::selection {
-    background: color-mix(in srgb, var(--accent) 28%, transparent);
+    background: color-mix(in srgb, var(--accent) 22%, transparent);
   }
 }
 
@@ -115,10 +121,14 @@
     font-family: var(--font-mono);
   }
 
+  .font-serif {
+    font-family: var(--font-serif);
+  }
+
   .page-shell {
-    @apply max-w-7xl mx-auto px-3 xs:px-4 sm:px-6 lg:px-8;
-    padding-left: max(0.75rem, env(safe-area-inset-left));
-    padding-right: max(0.75rem, env(safe-area-inset-right));
+    @apply max-w-6xl mx-auto px-4 sm:px-6 lg:px-8;
+    padding-left: max(1rem, env(safe-area-inset-left));
+    padding-right: max(1rem, env(safe-area-inset-right));
   }
 
   .surface-card {
@@ -129,20 +139,24 @@
     box-shadow: var(--shadow-sm);
   }
 
-  .hero-grid {
-    background-image:
-      linear-gradient(to right, color-mix(in srgb, var(--border) 40%, transparent) 1px, transparent 1px),
-      linear-gradient(to bottom, color-mix(in srgb, var(--border) 40%, transparent) 1px, transparent 1px);
-    background-size: 48px 48px;
-    mask-image: radial-gradient(ellipse 80% 70% at 50% 0%, black 20%, transparent 100%);
+  .section-kicker {
+    @apply text-sm text-[var(--muted-foreground)] mb-2;
+  }
+
+  .section-title {
+    @apply font-serif text-2xl sm:text-3xl font-semibold tracking-tight text-[var(--foreground)];
+  }
+
+  .link-arrow {
+    @apply text-sm text-[var(--foreground)] hover:text-[var(--accent)] transition-colors;
   }
 
   .prose-docs h1 {
-    @apply text-3xl font-semibold tracking-tight mb-4;
+    @apply font-serif text-3xl font-semibold tracking-tight mb-4;
   }
 
   .prose-docs h2 {
-    @apply text-xl font-semibold tracking-tight mt-10 mb-3;
+    @apply font-serif text-xl font-semibold tracking-tight mt-10 mb-3;
   }
 
   .prose-docs p,
@@ -151,14 +165,14 @@
   }
 
   .prose-docs code {
-    @apply font-mono text-sm px-1.5 py-0.5 rounded-md bg-[var(--surface-muted)] text-[var(--foreground)];
+    @apply font-mono text-sm px-1 py-0.5 rounded-sm bg-[var(--surface-muted)] text-[var(--foreground)];
   }
 
   .prose-docs pre {
-    @apply font-mono text-sm p-4 rounded-xl bg-[var(--surface-muted)] overflow-x-auto border border-[var(--border)];
+    @apply font-mono text-sm p-4 rounded-sm bg-[var(--surface-muted)] overflow-x-auto border border-[var(--border)];
   }
 
   .prose-docs a {
-    @apply text-[var(--primary)] hover:underline underline-offset-4;
+    @apply text-[var(--accent)] hover:underline underline-offset-4;
   }
 }

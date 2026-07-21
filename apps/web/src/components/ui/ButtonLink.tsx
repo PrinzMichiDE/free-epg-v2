@@ -7,19 +7,19 @@ type ButtonSize = "sm" | "md" | "lg";
 
 const variants: Record<ButtonVariant, string> = {
   primary:
-    "bg-[var(--primary)] text-[var(--primary-foreground)] hover:opacity-90 shadow-sm",
+    "bg-[var(--primary)] text-[var(--primary-foreground)] hover:bg-[var(--foreground)] hover:text-[var(--background)] border border-[var(--primary)]",
   secondary:
-    "bg-[var(--surface-muted)] text-[var(--foreground)] hover:bg-[var(--border)]",
+    "bg-[var(--surface-muted)] text-[var(--foreground)] hover:bg-[var(--border)] border border-transparent",
   ghost:
-    "text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--surface-muted)]",
+    "text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--surface-muted)] border border-transparent",
   outline:
-    "border border-[var(--border)] bg-transparent text-[var(--foreground)] hover:bg-[var(--surface-muted)]",
+    "border border-[var(--border)] bg-transparent text-[var(--foreground)] hover:border-[var(--foreground)]",
 };
 
 const sizes: Record<ButtonSize, string> = {
-  sm: "h-9 px-3 text-sm gap-1.5",
-  md: "h-10 px-4 text-sm gap-2",
-  lg: "h-11 px-5 text-base gap-2",
+  sm: "h-8 px-3 text-sm gap-1.5",
+  md: "h-9 px-4 text-sm gap-2",
+  lg: "h-10 px-5 text-sm gap-2",
 };
 
 export function buttonStyles(
@@ -28,7 +28,7 @@ export function buttonStyles(
   className?: string
 ) {
   return cn(
-    "inline-flex items-center justify-center rounded-lg font-medium transition-opacity duration-200 cursor-pointer no-underline",
+    "inline-flex items-center justify-center rounded-sm font-medium transition-colors duration-150 cursor-pointer no-underline",
     variants[variant],
     sizes[size],
     className

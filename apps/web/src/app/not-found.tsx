@@ -9,10 +9,10 @@ export default function NotFound() {
 
   return (
     <div className="page-shell py-24 flex flex-col items-center text-center max-w-lg mx-auto">
-      <p className="text-6xl font-semibold text-[var(--muted-foreground)]/30 mb-4 tabular-nums">
+      <p className="font-serif text-6xl text-[var(--muted-foreground)]/40 mb-4 tabular-nums">
         404
       </p>
-      <h1 className="text-2xl font-semibold tracking-tight mb-3">
+      <h1 className="font-serif text-2xl font-semibold mb-3">
         {t("error.notFound.title")}
       </h1>
       <p className="text-[var(--muted-foreground)] mb-8 leading-relaxed">
