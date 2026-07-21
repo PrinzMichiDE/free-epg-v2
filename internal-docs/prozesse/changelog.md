@@ -36,6 +36,20 @@ Nicht im Scope: Jeder Einzel-Commit ohne betriebliche Relevanz.
 
 ## Detailbeschreibung
 
+### Eintrag CHG-2026-022: Analytics-Aktivierung, Programme-Cleanup, Admin-Login und EPG-Pfadvalidierung
+
+| Feld | Inhalt |
+|------|--------|
+| Datum | 2026-07-21 |
+| Version | App-Release (web, worker) |
+| Begründung | Tägliche Systemprüfung: Analytics-Tracker war implementiert aber nicht an Requests angebunden; Programme-Tabelle wuchs unbegrenzt durch fehlerhafte Cleanup-Logik; NextAuth `signIn`-Seite `/admin/login` fehlte; EPG-Country- und List-Routen validierten Pfade nicht vor Dateizugriff |
+| Auswirkung | `proxy.ts` (Next.js 16) ersetzt `middleware.ts`: JWT-Schutz für `/admin/*`, fire-and-forget `trackRequest` für Seiten/API; Worker löscht alle Preview-Programme pro Land vor Neuinsert; `/admin/login` als dedizierte Login-Seite; `isSupportedEpgCountry` / `isValidListId` blockieren Traversal |
+| Risiko | niedrig (Analytics-Fehler blockieren Requests nicht; Programme-Cleanup ist idempotent; Admin-Redirect betrifft nur unauthentifizierte Admin-UI) |
+| Betroffene Komponenten | `apps/web/src/proxy.ts`, `apps/web/src/lib/analytics-middleware.ts`, `apps/web/src/lib/epg-access.ts`, `apps/web/src/app/admin/login/`, `apps/worker/src/programme-preview.ts`, `apps/worker/src/index.ts` |
+| Prüfung | `npm test` (web, worker inkl. neue Tests); `npm run build -w @freeepg/web` |
+| Freigabe | Product Owner |
+| Rollback | Vorheriges Image; bei Analytics-Problemen `ANALYTICS_ENABLED=false` |
+
 ### Eintrag CHG-2026-021: Automatische EPG-Neugenerierung bei veralteter Pipeline-Version
 
 | Feld | Inhalt |
@@ -461,6 +475,7 @@ Auto-Migration beim Web-Start: `apps/web/docker-entrypoint.sh`.
 
 | Datum | Autor/Rolle | Änderung | Anlass |
 |-------|-------------|----------|--------|
+| 2026-07-21 | Cursor Agent / Daily Evolution | CHG-2026-022 Analytics, Programme-Cleanup, Admin-Login, EPG-Validierung | Daily Operational Pipeline |
 | 2026-07-20 | Cursor Agent / Entwicklung | CHG-2026-021 EPG-Stale-Refresh + Parser-Fix | Hofgeschichten statt IAF auf 76748 (Production) |
 | 2026-07-20 | Cursor Agent / Entwicklung | CHG-2026-020 XMLTV-Kompatibilität Dispatcharr/Emby | `[object Object]` in category/desc |
 | 2026-07-20 | Cursor Agent / Entwicklung | CHG-2026-019 NDR-Kanal-Alias und lokale XMLTV-Zeitzone | EPG-Fehlzeit NDRFernsehen.de |
