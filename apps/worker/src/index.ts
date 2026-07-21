@@ -5,7 +5,7 @@ import { gzip } from "node:zlib";
 import { promisify } from "node:util";
 import { Worker, Queue } from "bullmq";
 import cron from "node-cron";
-import { eq, and, gt, inArray } from "drizzle-orm";
+import { eq, inArray } from "drizzle-orm";
 import {
   getDb,
   epgJobs,
@@ -14,7 +14,7 @@ import {
   channels,
   programmes,
 } from "@freeepg/db";
-import { buildXmltv, parseXmltv, buildRytecXmltv, rytecXmlFileName, parseXmltvDateString } from "@freeepg/epg-core";
+import { buildXmltv, parseXmltv, buildRytecXmltv, rytecXmlFileName } from "@freeepg/epg-core";
 import {
   SUPPORTED_EPG_COUNTRIES,
   fetchMergedCountryEpg,
@@ -26,6 +26,7 @@ import { AnalyticsTracker } from "@freeepg/analytics";
 import { Redis } from "ioredis";
 import { runDockerInit } from "@freeepg/db/init";
 import { cleanupExpiredM3uPlaylists } from "./m3u-cleanup.js";
+import { buildProgrammePreviewBatch } from "./programme-preview.js";
 
 const redisUrl = process.env.REDIS_URL ?? "redis://localhost:6379";
 const redisClient = new Redis(redisUrl);
@@ -168,7 +169,6 @@ async function fetchCountryEpg(country: string) {
 async function storeProgrammePreview(country: string, doc: ReturnType<typeof parseXmltv>) {
   const db = getDb();
   const now = new Date();
-  const tomorrow = new Date(now.getTime() + 24 * 60 * 60 * 1000);
   const cc = country.toUpperCase();
 
   const countryChannels = await db
@@ -180,43 +180,10 @@ async function storeProgrammePreview(country: string, doc: ReturnType<typeof par
   const channelIds = countryChannels.map((c) => c.id);
 
   if (channelIds.length > 0) {
-    await db
-      .delete(programmes)
-      .where(and(inArray(programmes.channelId, channelIds), gt(programmes.stop, now)));
+    await db.delete(programmes).where(inArray(programmes.channelId, channelIds));
   }
 
-  const batch: Array<{
-    channelId: number;
-    start: Date;
-    stop: Date;
-    title: string;
-    description: string | null;
-    category: string | null;
-    source: string;
-  }> = [];
-
-  let scanned = 0;
-  for (const prog of doc.programmes) {
-    scanned += 1;
-    if (scanned % 5000 === 0) {
-      await yieldToEventLoop();
-    }
-
-    const channelId = chMap.get(prog.channel);
-    if (!channelId) continue;
-    const start = parseXmltvDate(prog.start);
-    const stop = parseXmltvDate(prog.stop);
-    if (!start || !stop || start > tomorrow) continue;
-    batch.push({
-      channelId,
-      start,
-      stop,
-      title: prog.title,
-      description: prog.desc ?? null,
-      category: prog.category ?? null,
-      source: "merged",
-    });
-  }
+  const batch = buildProgrammePreviewBatch(doc.programmes, chMap, now);
 
   const chunkSize = 200;
   for (let i = 0; i < batch.length; i += chunkSize) {
@@ -227,10 +194,6 @@ async function storeProgrammePreview(country: string, doc: ReturnType<typeof par
   }
 
   console.log(`[EPG] ${cc}: stored ${batch.length} programme previews`);
-}
-
-function parseXmltvDate(s: string): Date | null {
-  return parseXmltvDateString(s);
 }
 
 async function runIptvOrgGrab() {

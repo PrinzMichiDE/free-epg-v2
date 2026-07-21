@@ -2,6 +2,21 @@
 
 All notable changes to FreeEPG are documented here. Detailed compliance-oriented entries live in [`internal-docs/prozesse/changelog.md`](internal-docs/prozesse/changelog.md).
 
+## 2026-07-21 — Daily evolution (ops, analytics & security)
+
+### Added
+- Dedicated admin login page at `/admin/login` (NextAuth `signIn` target) with shared `AdminLoginForm` component.
+- Next.js 16 `proxy.ts` replacing deprecated middleware: server-side admin route protection via JWT, request analytics via `trackRequest`, and `X-Response-Time` headers.
+- EPG access helpers (`apps/web/src/lib/epg-access.ts`) with country whitelist and list-ID validation; unit tests for analytics middleware helpers and programme preview batching.
+
+### Fixed
+- Programme preview DB bloat: worker now replaces all preview rows per country refresh instead of deleting only future programmes (ended rows no longer accumulate).
+- Path traversal on `/api/epg/[country]` and `/api/epg/list/[id]` by validating against `SUPPORTED_EPG_COUNTRIES` and list ID pattern before filesystem access.
+- Dead analytics pipeline: web requests are tracked again (Redis buffer → worker flush → admin dashboard).
+
+### Changed
+- Admin UI unauthenticated users are redirected to `/admin/login` by proxy instead of inline login on `/admin`.
+
 ## 2026-07-20 — Daily evolution (security & lifecycle)
 
 ### Added

@@ -1,6 +1,6 @@
 "use client";
 
-import { signIn, useSession } from "next-auth/react";
+import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 
@@ -19,27 +19,7 @@ export default function AdminPage() {
   if (status === "loading") return <div className="p-12">Lade...</div>;
 
   if (!session) {
-    return (
-      <div className="max-w-md mx-auto px-4 py-12">
-        <h1 className="text-2xl font-bold mb-6">Admin Login</h1>
-        <form
-          onSubmit={(e) => {
-            e.preventDefault();
-            const fd = new FormData(e.currentTarget);
-            signIn("credentials", {
-              email: fd.get("email"),
-              password: fd.get("password"),
-              callbackUrl: "/admin",
-            });
-          }}
-          className="space-y-4"
-        >
-          <input name="email" type="email" placeholder="Email" required className="w-full px-4 py-3 rounded-lg border border-[var(--border)] bg-[var(--card)]" />
-          <input name="password" type="password" placeholder="Password" required className="w-full px-4 py-3 rounded-lg border border-[var(--border)] bg-[var(--card)]" />
-          <button type="submit" className="w-full py-3 rounded-lg bg-[var(--primary)] text-[var(--primary-foreground)]">Anmelden</button>
-        </form>
-      </div>
-    );
+    return <div className="p-12">Weiterleitung zum Login...</div>;
   }
 
   const stats = dashboard?.stats as Record<string, number> | undefined;
