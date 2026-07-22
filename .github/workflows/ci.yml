@@ -20,6 +20,11 @@ jobs:
       - name: Install
         run: npm ci
 
+      - name: Security audit
+        run: |
+          npm audit || true
+          node scripts/audit-gate.mjs
+
       - name: Build packages
         run: |
           npm run build -w @freeepg/db

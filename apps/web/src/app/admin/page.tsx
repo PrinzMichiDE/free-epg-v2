@@ -29,8 +29,10 @@ export default function AdminPage() {
       <div className="flex justify-between items-center mb-8">
         <h1 className="text-3xl font-bold">Admin Dashboard</h1>
         <div className="flex gap-4">
+          <Link href="/admin/health" className="text-[var(--primary)] hover:underline">Health</Link>
           <Link href="/admin/analytics" className="text-[var(--primary)] hover:underline">Analytics</Link>
           <Link href="/admin/jobs" className="text-[var(--primary)] hover:underline">Jobs</Link>
+          <Link href="/admin/audit" className="text-[var(--primary)] hover:underline">Audit</Link>
         </div>
       </div>
 
