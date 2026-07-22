@@ -2,6 +2,20 @@
 
 All notable changes to FreeEPG are documented here. Detailed compliance-oriented entries live in [`internal-docs/prozesse/changelog.md`](internal-docs/prozesse/changelog.md).
 
+## 2026-07-22 — Daily evolution (admin ops, UX & security)
+
+### Added
+- Admin **System Health** panel at `/admin/health` with JWT-protected `/api/admin/health` (DB, Redis, build info, auto-refresh).
+- Admin **Audit Log** at `/admin/audit` with `admin_audit_logs` table (migration `0001`) and logging on all job-trigger actions.
+- German display names for all 106 EPG countries via `Intl.DisplayNames('de')` fallback in `getCountryName`.
+- CI security audit step with `scripts/audit-gate.mjs` (fails on high/critical advisories in workspace direct deps).
+
+### Fixed
+- High severity `fast-xml-parser` entity-expansion advisory (GHSA-8r6m-32jq-jx6q) by upgrading to `^5.10.1` in `@freeepg/epg-core`.
+
+### Changed
+- Public `/api/health` refactored to shared `system-health` module; admin dashboard links to Health and Audit pages.
+
 ## 2026-07-21 — Daily evolution (ops, analytics & security)
 
 ### Added

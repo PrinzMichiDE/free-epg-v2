@@ -178,6 +178,20 @@ export const analyticsDaily = pgTable(
   ]
 );
 
+export const adminAuditLogs = pgTable(
+  "admin_audit_logs",
+  {
+    id: serial("id").primaryKey(),
+    actorEmail: text("actor_email").notNull(),
+    action: text("action").notNull(),
+    target: text("target"),
+    metadata: jsonb("metadata").$type<Record<string, unknown>>(),
+    ipHash: text("ip_hash"),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (t) => [index("idx_admin_audit_logs_created").on(t.createdAt)]
+);
+
 export type Channel = typeof channels.$inferSelect;
 export type Programme = typeof programmes.$inferSelect;
 export type EpgSource = typeof epgSources.$inferSelect;

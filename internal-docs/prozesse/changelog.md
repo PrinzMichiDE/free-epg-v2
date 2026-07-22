@@ -36,6 +36,20 @@ Nicht im Scope: Jeder Einzel-Commit ohne betriebliche Relevanz.
 
 ## Detailbeschreibung
 
+### Eintrag CHG-2026-023: Admin Health/Audit, Ländernamen, fast-xml-parser und CI-Audit-Gate
+
+| Feld | Inhalt |
+|------|--------|
+| Datum | 2026-07-22 |
+| Version | App-Release (web, db, epg-core) |
+| Begründung | Tägliche Pipeline: 86 fehlende deutsche Ländernamen in der UI; fehlende Admin-Sichtbarkeit für Systemstatus und Audit-Trail; High-Severity Advisory in `fast-xml-parser` (GHSA-8r6m-32jq-jx6q); npm-Audit nicht in CI |
+| Auswirkung | `getCountryName` nutzt `Intl.DisplayNames('de')` für alle 106 EPG-Länder; `/admin/health` + `/api/admin/health` (JWT-geschützt) zeigen DB/Redis/Build-Info; `admin_audit_logs`-Tabelle + `/admin/audit` protokolliert Job-Trigger; `fast-xml-parser` ≥5.10.1; CI `scripts/audit-gate.mjs` blockiert High/Critical in Workspace-Direct-Deps |
+| Risiko | niedrig (Migration `0001_admin_audit_logs` erforderlich; Audit-Logging blockiert Jobs nicht bei DB-Fehler nur wenn insert fehlschlägt — aktuell synchron vor Response) |
+| Betroffene Komponenten | `apps/web/src/lib/countries.ts`, `system-health*.ts`, `admin-audit.ts`, `apps/web/src/app/admin/{health,audit}/`, `apps/web/src/app/api/admin/{health,audit,jobs/trigger}/`, `packages/db/src/schema.ts`, `packages/epg-core/package.json`, `.github/workflows/ci.yml`, `scripts/audit-gate.mjs` |
+| Prüfung | `npm test` (22 web, worker, epg-core); `node scripts/audit-gate.mjs` |
+| Freigabe | Product Owner |
+| Rollback | Vorheriges Image; Migration optional (Tabelle bleibt leer) |
+
 ### Eintrag CHG-2026-022: Analytics-Aktivierung, Programme-Cleanup, Admin-Login und EPG-Pfadvalidierung
 
 | Feld | Inhalt |
