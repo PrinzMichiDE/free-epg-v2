@@ -36,6 +36,20 @@ Nicht im Scope: Jeder Einzel-Commit ohne betriebliche Relevanz.
 
 ## Detailbeschreibung
 
+### Eintrag CHG-2026-024: Next.js-Security-Patch, Admin-Rate-Limit und generated_files-Deduplizierung
+
+| Feld | Inhalt |
+|------|--------|
+| Datum | 2026-07-23 |
+| Version | App-Release (web, worker, db) |
+| Begründung | Tägliche Pipeline: mehrere High-Severity Next.js-Advisories (≥16.2.11); Admin-Job-Trigger ohne Rate-Limit; `generated_files` wuchs bei jedem Country-Refresh um eine Zeile und UI konnte veraltete Metadaten anzeigen |
+| Auswirkung | `next@16.2.11` via Root-Override; `/api/admin/jobs/trigger` limitiert auf 10 Requests/Minute pro Admin-E-Mail (Redis, HTTP 429, Audit-Log bei Limit); Worker nutzt `replaceCountryGeneratedFile`; Lese-Pfade nutzen `getLatestCountryFileMap` |
+| Risiko | niedrig (Rate-Limit erfordert Redis — bereits Betriebsvoraussetzung; Replace-Logik ist idempotent; Next-Patch semver-kompatibel) |
+| Betroffene Komponenten | `package.json`, `apps/web/package.json`, `apps/web/src/lib/admin-rate-limit.ts`, `apps/web/src/app/api/admin/jobs/trigger/route.ts`, `packages/db/src/generated-files.ts`, `apps/worker/src/index.ts`, `apps/web/src/app/{page,countries/page,api/countries/route}.tsx` |
+| Prüfung | `npm test` (web, worker, db, epg-core); `npm run build -w @freeepg/web`; `node scripts/audit-gate.mjs` |
+| Freigabe | Product Owner |
+| Rollback | Vorheriges Image; Rate-Limit entfällt mit Rollback; `generated_files`-Historie nicht automatisch wiederhergestellt |
+
 ### Eintrag CHG-2026-023: Admin Health/Audit, Ländernamen, fast-xml-parser und CI-Audit-Gate
 
 | Feld | Inhalt |

@@ -3,6 +3,8 @@
   "include": [
     "src/index.ts",
     "src/schema.ts",
+    "src/generated-files.ts",
+    "src/generated-files.test.ts",
     "src/docker-init.ts",
     "src/docker-migrate.ts",
     "src/seed.ts"
