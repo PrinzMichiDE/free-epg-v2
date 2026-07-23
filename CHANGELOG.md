@@ -2,6 +2,19 @@
 
 All notable changes to FreeEPG are documented here. Detailed compliance-oriented entries live in [`internal-docs/prozesse/changelog.md`](internal-docs/prozesse/changelog.md).
 
+## 2026-07-23 — Daily evolution (security, data hygiene & admin hardening)
+
+### Added
+- Redis-backed rate limiting on `/api/admin/jobs/trigger` (10 requests/minute per admin actor) with HTTP 429 and audit log on limit breach.
+- Shared `@freeepg/db` helpers `replaceCountryGeneratedFile` and `getLatestCountryFileMap` with unit tests.
+
+### Fixed
+- `generated_files` table no longer grows unbounded on every country EPG refresh; worker replaces prior country row before insert; UI/API reads resolve the latest row per country.
+- Multiple high-severity Next.js advisories (GHSA-6gpp-xcg3-4w24, GHSA-m99w-x7hq-7vfj, GHSA-89xv-2m56-2m9x, GHSA-p9j2-gv94-2wf4) by upgrading to `16.2.11` with root npm override.
+
+### Changed
+- Root `package.json` pins `next@16.2.11` via npm overrides to dedupe transitive versions from `next-auth`.
+
 ## 2026-07-22 — Daily evolution (admin ops, UX & security)
 
 ### Added
