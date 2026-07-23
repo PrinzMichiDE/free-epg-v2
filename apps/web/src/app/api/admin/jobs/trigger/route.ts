@@ -4,6 +4,14 @@ import { authOptions } from "@/lib/auth";
 import { getDatabase } from "@/lib/db";
 import { epgJobs } from "@freeepg/db";
 import { SUPPORTED_EPG_COUNTRIES } from "@freeepg/epg-sources";
+import { logAdminAction } from "@/lib/admin-audit";
+
+function clientIp(request: Request): string | null {
+  return (
+    request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ??
+    request.headers.get("x-real-ip")
+  );
+}
 
 export async function POST(request: Request) {
   const session = await getServerSession(authOptions);
@@ -23,6 +31,7 @@ export async function POST(request: Request) {
     maxRetriesPerRequest: null,
   };
   const queue = new Queue("epg-jobs", { connection });
+  const ip = clientIp(request);
 
   if (iptvOrg) {
     await queue.add("iptv-org-grab", {}, { attempts: 2 });
@@ -31,6 +40,7 @@ export async function POST(request: Request) {
       jobType: "iptv_org_grab",
       status: "pending",
     });
+    await logAdminAction(session, "jobs.trigger.iptv_org", { ip });
     await queue.close();
     return Response.json({ message: "iptv-org sync queued" });
   }
@@ -42,21 +52,29 @@ export async function POST(request: Request) {
       jobType: "fetch-all-countries",
       status: "pending",
     });
+    await logAdminAction(session, "jobs.trigger.all_countries", { ip });
     await queue.close();
     return Response.json({ message: "Fetch all countries queued" });
   }
 
   if (country && SUPPORTED_EPG_COUNTRIES.includes(country.toUpperCase())) {
-    await queue.add("fetch-country", { country: country.toUpperCase() }, { attempts: 2 });
+    const cc = country.toUpperCase();
+    await queue.add("fetch-country", { country: cc }, { attempts: 2 });
     const db = getDatabase();
     await db.insert(epgJobs).values({
-      country: country.toUpperCase(),
+      country: cc,
       jobType: "country_fetch",
       status: "pending",
+    });
+    await logAdminAction(session, "jobs.trigger.country", {
+      target: cc,
+      metadata: { country: cc },
+      ip,
     });
     await queue.close();
     return Response.json({ message: `Fetch ${country} queued` });
   }
 
+  await queue.close();
   return Response.json({ error: "Invalid country" }, { status: 400 });
 }
