@@ -108,7 +108,7 @@ Diese Audit-Dokumentation definiert Prüfumfang, Auditkriterien, Evidence-Pfade,
 
 | ID | Severity | Finding | Massnahme | Verantwortlich | Status |
 |----|----------|---------|-----------|----------------|--------|
-| F-001 | hoch | Keine LICENSE-Datei trotz README-Unlicense | LICENSE hinzufügen | Entwicklung | offen |
+| F-001 | hoch | Keine LICENSE-Datei trotz README-Unlicense | LICENSE hinzufügen | Entwicklung | geschlossen (2026-07-24) |
 | F-002 | hoch | M3U `expiresAt` ohne automatischen Cleanup-Job | Worker-Cron `m3u-cleanup` + HTTP 410 bei abgelaufenen Reads | Entwicklung | geschlossen (2026-07-20) |
 | F-009 | hoch | SSRF über M3U-URL-Import und Stream-Proxy | `url-safety` mit DNS-/Private-IP-Checks und Redirect-Revalidierung | Entwicklung | geschlossen (2026-07-20) |
 | F-010 | hoch | Unauthentifizierter Write in globale `m3u_match_overrides` | Rematch nur playlist-scoped | Entwicklung | geschlossen (2026-07-20) |
@@ -116,7 +116,7 @@ Diese Audit-Dokumentation definiert Prüfumfang, Auditkriterien, Evidence-Pfade,
 | F-004 | mittel | Admin-Login ohne Rate-Limit / MFA | Traefik rate limit + MFA-Roadmap | Betrieb/Entwicklung | offen |
 | F-005 | mittel | iptv-org/epg in DB registriert, nicht im Worker | Implementieren oder deaktivieren | Entwicklung | offen |
 | F-006 | mittel | Keine Privacy-Policy-Seite | Datenschutzerklärung veröffentlichen | Product/Legal | offen |
-| F-007 | niedrig | Kein npm audit in CI | CI-Step ergänzen | Entwicklung | offen |
+| F-007 | niedrig | Kein npm audit in CI | CI-Step ergänzen | Entwicklung | geschlossen (2026-07-22) |
 | F-008 | niedrig | analytics_daily ohne Retention-Policy | Cleanup definieren | Entwicklung | offen |
 
 ### Abweichungs-Management
