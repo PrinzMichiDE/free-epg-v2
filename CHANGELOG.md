@@ -2,6 +2,13 @@
 
 All notable changes to FreeEPG are documented here. Detailed compliance-oriented entries live in [`internal-docs/prozesse/changelog.md`](internal-docs/prozesse/changelog.md).
 
+## 2026-07-24 — Daily evolution (admin ops & compliance)
+
+### Added
+- **LICENSE** file (Unlicense) closing audit finding F-001; third-party EPG data explicitly excluded.
+- Dedicated admin jobs API at `/api/admin/jobs` with pagination, status filtering, and aggregate status counts (JWT-protected).
+- Enhanced `/admin/jobs` panel: status badges, duration column, error details, filter, pagination, and 30s auto-refresh.
+
 ## 2026-07-23 — Daily evolution (security, data hygiene & admin hardening)
 
 ### Added
