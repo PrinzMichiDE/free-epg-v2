@@ -36,6 +36,20 @@ Nicht im Scope: Jeder Einzel-Commit ohne betriebliche Relevanz.
 
 ## Detailbeschreibung
 
+### Eintrag CHG-2026-025: Admin Job-Ops-Panel und LICENSE (F-001)
+
+| Feld | Inhalt |
+|------|--------|
+| Datum | 2026-07-24 |
+| Version | App-Release (web) |
+| Begründung | Tägliche Pipeline: Audit F-001 (fehlende LICENSE); Admin-Job-Historie nur 10 Einträge ohne Filter, Fehlerdetails oder Pagination |
+| Auswirkung | `LICENSE` (Unlicense) im Repo-Root; `/api/admin/jobs` mit Pagination, Statusfilter und Aggregat-Zählern; `/admin/jobs` mit Badges, Dauer, Fehler, Auto-Refresh |
+| Risiko | niedrig (read-only Job-API; keine Schema-Änderung) |
+| Betroffene Komponenten | `LICENSE`, `apps/web/src/lib/admin-jobs-query.ts`, `apps/web/src/app/api/admin/jobs/route.ts`, `apps/web/src/app/admin/jobs/page.tsx` |
+| Prüfung | `npm test`; `node scripts/audit-gate.mjs` |
+| Freigabe | Product Owner |
+| Rollback | Vorheriges Image |
+
 ### Eintrag CHG-2026-024: Next.js-Security-Patch, Admin-Rate-Limit und generated_files-Deduplizierung
 
 | Feld | Inhalt |
