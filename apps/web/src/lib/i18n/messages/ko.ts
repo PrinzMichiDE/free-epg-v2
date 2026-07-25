@@ -35,6 +35,7 @@ export const ko = {
   "footer.api": "API",
   "footer.enigma2": "Enigma2 / Rytec",
   "footer.countryFeeds": "국가별 피드",
+  "footer.privacy": "Privacy",
   "footer.copyright": "오픈 소스 EPG 인프라",
   "common.details": "세부 정보",
   "common.m3u": "M3U",

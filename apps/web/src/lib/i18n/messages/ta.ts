@@ -35,6 +35,7 @@ export const ta = {
   "footer.api": "API",
   "footer.enigma2": "Enigma2 / Rytec",
   "footer.countryFeeds": "நாட்டு ஃபீட்கள்",
+  "footer.privacy": "Privacy",
   "footer.copyright": "வெளிப்புற மூல EPG உள்கட்டமைப்பு",
   "common.details": "விவரங்கள்",
   "common.m3u": "M3U",

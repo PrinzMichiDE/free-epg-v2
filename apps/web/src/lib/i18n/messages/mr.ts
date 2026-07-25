@@ -35,6 +35,7 @@ export const mr = {
   "footer.api": "API",
   "footer.enigma2": "Enigma2 / Rytec",
   "footer.countryFeeds": "देश-विशिष्ट फीड",
+  "footer.privacy": "Privacy",
   "footer.copyright": "ओपन सोर्स EPG पायाभूत सुविधा",
   "common.details": "तपशील",
   "common.m3u": "M3U",

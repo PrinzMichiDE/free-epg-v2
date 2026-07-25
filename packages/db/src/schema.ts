@@ -198,3 +198,4 @@ export type EpgSource = typeof epgSources.$inferSelect;
 export type EpgJob = typeof epgJobs.$inferSelect;
 export type M3uPlaylist = typeof m3uPlaylists.$inferSelect;
 export type M3uEntry = typeof m3uEntries.$inferSelect;
+export type GeneratedFile = typeof generatedFiles.$inferSelect;
