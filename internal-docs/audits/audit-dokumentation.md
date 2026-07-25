@@ -113,9 +113,9 @@ Diese Audit-Dokumentation definiert Prüfumfang, Auditkriterien, Evidence-Pfade,
 | F-009 | hoch | SSRF über M3U-URL-Import und Stream-Proxy | `url-safety` mit DNS-/Private-IP-Checks und Redirect-Revalidierung | Entwicklung | geschlossen (2026-07-20) |
 | F-010 | hoch | Unauthentifizierter Write in globale `m3u_match_overrides` | Rematch nur playlist-scoped | Entwicklung | geschlossen (2026-07-20) |
 | F-003 | mittel | Kein dokumentiertes Backup-Verfahren | pg_dump + Volume-Backup dokumentieren | Betrieb | offen |
-| F-004 | mittel | Admin-Login ohne Rate-Limit / MFA | Traefik rate limit + MFA-Roadmap | Betrieb/Entwicklung | offen |
+| F-004 | mittel | Admin-Login ohne Rate-Limit / MFA | Redis Login-Rate-Limit (5/15min) + MFA-Roadmap | Betrieb/Entwicklung | teilweise geschlossen (2026-07-25) |
 | F-005 | mittel | iptv-org/epg in DB registriert, nicht im Worker | Implementieren oder deaktivieren | Entwicklung | offen |
-| F-006 | mittel | Keine Privacy-Policy-Seite | Datenschutzerklärung veröffentlichen | Product/Legal | offen |
+| F-006 | mittel | Keine Privacy-Policy-Seite | Datenschutzerklärung veröffentlichen | Product/Legal | geschlossen (2026-07-25) |
 | F-007 | niedrig | Kein npm audit in CI | CI-Step ergänzen | Entwicklung | geschlossen (2026-07-22) |
 | F-008 | niedrig | analytics_daily ohne Retention-Policy | Cleanup definieren | Entwicklung | offen |
 

@@ -36,6 +36,20 @@ Nicht im Scope: Jeder Einzel-Commit ohne betriebliche Relevanz.
 
 ## Detailbeschreibung
 
+### Eintrag CHG-2026-026: Admin-Login-Rate-Limit und Datenschutzerklärung (F-004/F-006)
+
+| Feld | Inhalt |
+|------|--------|
+| Datum | 2026-07-25 |
+| Version | App-Release (web) |
+| Begründung | Tägliche Pipeline: Audit F-004 (Admin-Login ohne Rate-Limit); F-006 (keine Privacy-Policy-Seite); CHG-2026-024/025 aus Branch 888b noch nicht auf main |
+| Auswirkung | Redis-Rate-Limit für Admin-Login (5 Versuche / 15 Min. pro IP) in NextAuth `authorize`; öffentliche Datenschutzerklärung unter `/datenschutz` mit Footer-Link; Cherry-pick CHG-2026-024/025 (Next.js 16.2.11, Job-Trigger-Rate-Limit, generated_files-Dedup, LICENSE, Admin-Jobs-API) |
+| Risiko | niedrig (Login-Block bei Redis-Ausfall nicht explizit — gleiches Verhalten wie Job-Rate-Limit; Datenschutzseite ohne Formular) |
+| Betroffene Komponenten | `apps/web/src/lib/auth.ts`, `admin-rate-limit.ts`, `apps/web/src/app/datenschutz/page.tsx`, `Footer.tsx`, i18n-Messages, `LICENSE`, `apps/web/src/app/api/admin/jobs/` |
+| Prüfung | `npm test`; `node scripts/audit-gate.mjs` |
+| Freigabe | Product Owner |
+| Rollback | Vorheriges Image; `/datenschutz` entfernen optional |
+
 ### Eintrag CHG-2026-025: Admin Job-Ops-Panel und LICENSE (F-001)
 
 | Feld | Inhalt |

@@ -34,6 +34,7 @@ export const zh = {
   "footer.api": "API",
   "footer.enigma2": "Enigma2 / Rytec",
   "footer.countryFeeds": "国家/地区源",
+  "footer.privacy": "Privacy",
   "footer.copyright": "开源 EPG 基础设施",
   "common.details": "详情",
   "common.m3u": "M3U",

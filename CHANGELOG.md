@@ -2,6 +2,15 @@
 
 All notable changes to FreeEPG are documented here. Detailed compliance-oriented entries live in [`internal-docs/prozesse/changelog.md`](internal-docs/prozesse/changelog.md).
 
+## 2026-07-25 — Daily evolution (login security & privacy)
+
+### Added
+- **Admin login rate limiting** via Redis: 5 attempts per 15 minutes per IP in NextAuth `authorize` (partial close of audit F-004).
+- Public **privacy policy** at `/datenschutz` with footer link across all locales (closes audit F-006).
+
+### Security
+- Cherry-picked pending work from prior pipeline branch: Next.js **16.2.11**, job-trigger rate limit, `generated_files` deduplication, **LICENSE** (Unlicense), and paginated admin jobs API/panel (CHG-2026-024/025).
+
 ## 2026-07-24 — Daily evolution (admin ops & compliance)
 
 ### Added
