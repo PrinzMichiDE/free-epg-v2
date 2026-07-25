@@ -35,6 +35,7 @@ export const te = {
   "footer.api": "API",
   "footer.enigma2": "Enigma2 / Rytec",
   "footer.countryFeeds": "దేశ-ఫీడ్‌లు",
+  "footer.privacy": "Privacy",
   "footer.copyright": "ఓపెన్ సోర్స్ EPG మౌలిక సదుపాయం",
   "common.details": "వివరాలు",
   "common.m3u": "M3U",
