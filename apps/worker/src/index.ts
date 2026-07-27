@@ -267,9 +267,16 @@ const worker = new Worker(
         await analytics.aggregateDaily(yesterday.toISOString().slice(0, 10));
         break;
       }
-      case "analytics-cleanup":
-        await analytics.cleanupOldEvents(90);
+      case "analytics-cleanup": {
+        const eventRetention = Number(process.env.ANALYTICS_EVENT_RETENTION_DAYS ?? 90);
+        const dailyRetention = Number(process.env.ANALYTICS_DAILY_RETENTION_DAYS ?? 365);
+        const deletedEvents = await analytics.cleanupOldEvents(eventRetention);
+        const deletedDaily = await analytics.cleanupOldDailyAggregates(dailyRetention);
+        console.log(
+          `Analytics cleanup: removed ${deletedEvents} events (>${eventRetention}d), ${deletedDaily} daily rows (>${dailyRetention}d)`
+        );
         break;
+      }
       case "iptv-org-grab":
         await runIptvOrgGrab();
         break;
