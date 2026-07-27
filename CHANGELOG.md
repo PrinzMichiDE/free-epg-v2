@@ -2,6 +2,49 @@
 
 All notable changes to FreeEPG are documented here. Detailed compliance-oriented entries live in [`internal-docs/prozesse/changelog.md`](internal-docs/prozesse/changelog.md).
 
+## 2026-07-25 — Daily evolution (login security & privacy)
+
+### Added
+- **Admin login rate limiting** via Redis: 5 attempts per 15 minutes per IP in NextAuth `authorize` (partial close of audit F-004).
+- Public **privacy policy** at `/datenschutz` with footer link across all locales (closes audit F-006).
+
+### Security
+- Cherry-picked pending work from prior pipeline branch: Next.js **16.2.11**, job-trigger rate limit, `generated_files` deduplication, **LICENSE** (Unlicense), and paginated admin jobs API/panel (CHG-2026-024/025).
+
+## 2026-07-24 — Daily evolution (admin ops & compliance)
+
+### Added
+- **LICENSE** file (Unlicense) closing audit finding F-001; third-party EPG data explicitly excluded.
+- Dedicated admin jobs API at `/api/admin/jobs` with pagination, status filtering, and aggregate status counts (JWT-protected).
+- Enhanced `/admin/jobs` panel: status badges, duration column, error details, filter, pagination, and 30s auto-refresh.
+
+## 2026-07-23 — Daily evolution (security, data hygiene & admin hardening)
+
+### Added
+- Redis-backed rate limiting on `/api/admin/jobs/trigger` (10 requests/minute per admin actor) with HTTP 429 and audit log on limit breach.
+- Shared `@freeepg/db` helpers `replaceCountryGeneratedFile` and `getLatestCountryFileMap` with unit tests.
+
+### Fixed
+- `generated_files` table no longer grows unbounded on every country EPG refresh; worker replaces prior country row before insert; UI/API reads resolve the latest row per country.
+- Multiple high-severity Next.js advisories (GHSA-6gpp-xcg3-4w24, GHSA-m99w-x7hq-7vfj, GHSA-89xv-2m56-2m9x, GHSA-p9j2-gv94-2wf4) by upgrading to `16.2.11` with root npm override.
+
+### Changed
+- Root `package.json` pins `next@16.2.11` via npm overrides to dedupe transitive versions from `next-auth`.
+
+## 2026-07-27 — Daily evolution (ops retention, admin UX & backup)
+
+### Added
+- **`analytics_daily` retention cleanup** — worker `analytics-cleanup` job now prunes daily aggregates older than 365 days (configurable via `ANALYTICS_DAILY_RETENTION_DAYS`); raw events remain at 90 days (`ANALYTICS_EVENT_RETENTION_DAYS`).
+- **Shared admin shell** — `AdminHeader` with consistent navigation and **Abmelden** (sign-out) across all admin pages.
+- **EPG refresh UX** — country picker for single-country refresh plus loading/success/error feedback on job triggers.
+- **Backup script** — `scripts/backup.sh` for PostgreSQL dumps and `epg-data` volume archives (closes audit F-003).
+
+### Fixed
+- Cherry-picked prior pipeline work: Next.js 16.2.11, admin login rate limit, privacy policy, jobs API/panel, LICENSE, job-trigger rate limit.
+
+### Changed
+- Admin pages use unified header navigation instead of per-page back links.
+
 ## 2026-07-22 — Daily evolution (admin ops, UX & security)
 
 ### Added

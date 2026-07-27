@@ -35,6 +35,7 @@ export const sw = {
   "footer.api": "API",
   "footer.enigma2": "Enigma2 / Rytec",
   "footer.countryFeeds": "Milisho ya nchi",
+  "footer.privacy": "Privacy",
   "footer.copyright": "Miundombinu ya EPG ya Chanzo Huria",
   "common.details": "Maelezo",
   "common.m3u": "M3U",

@@ -2,7 +2,6 @@
 
 import { useSession } from "next-auth/react";
 import { useCallback, useEffect, useState } from "react";
-import Link from "next/link";
 
 interface HealthCheck {
   name: string;
@@ -41,9 +40,12 @@ export default function AdminHealthPage() {
 
   useEffect(() => {
     if (!session) return;
-    void loadHealth();
+    const initial = setTimeout(() => void loadHealth(), 0);
     const timer = setInterval(() => void loadHealth(), 30_000);
-    return () => clearInterval(timer);
+    return () => {
+      clearTimeout(initial);
+      clearInterval(timer);
+    };
   }, [session, loadHealth]);
 
   if (!session) return <div className="p-12">Bitte anmelden</div>;
@@ -52,11 +54,8 @@ export default function AdminHealthPage() {
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-12">
-      <Link href="/admin" className="text-[var(--primary)] hover:underline mb-4 inline-block">
-        ← Dashboard
-      </Link>
       <div className="flex flex-wrap items-center justify-between gap-4 mb-8">
-        <h1 className="text-3xl font-bold">System Health</h1>
+        <p className="text-[var(--muted)]">Auto-Refresh alle 30s</p>
         <button
           type="button"
           onClick={() => void loadHealth()}

@@ -39,7 +39,7 @@ Dieses Dokument erfasst alle im FreeEPG-Projekt eingesetzten Open-Source-Kompone
 | Aspekt | Status |
 |--------|--------|
 | README-Angabe | „Unlicense (EPG data from third-party sources)" |
-| LICENSE-Datei im Repository | **Nicht vorhanden** (Offener Punkt) |
+| LICENSE-Datei im Repository | **Vorhanden** (`LICENSE`, Unlicense, 2026-07-24) |
 | Empfehlung | `LICENSE`-Datei mit Unlicense-Text ergänzen; EPG-Daten separat als Drittinhalte kennzeichnen |
 
 ### Direkte npm-Abhängigkeiten (Produktion)

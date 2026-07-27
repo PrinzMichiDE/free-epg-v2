@@ -2,7 +2,6 @@
 
 import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
-import Link from "next/link";
 
 interface AuditLogRow {
   id: number;
@@ -29,10 +28,6 @@ export default function AdminAuditPage() {
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-12">
-      <Link href="/admin" className="text-[var(--primary)] hover:underline mb-4 inline-block">
-        ← Dashboard
-      </Link>
-      <h1 className="text-3xl font-bold mb-2">Audit-Log</h1>
       <p className="text-[var(--muted)] mb-8">
         Protokollierte Administrator-Aktionen (Job-Trigger, Syncs).
       </p>

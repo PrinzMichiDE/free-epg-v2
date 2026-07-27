@@ -2,6 +2,16 @@ import { createHash } from "node:crypto";
 import { Redis } from "ioredis";
 import { getDb, analyticsEvents, analyticsDaily } from "@freeepg/db";
 import { sql, lt, eq, and } from "drizzle-orm";
+import {
+  dailyAggregateCutoffDate,
+  DEFAULT_DAILY_RETENTION_DAYS,
+} from "./retention.js";
+
+export {
+  dailyAggregateCutoffDate,
+  DEFAULT_DAILY_RETENTION_DAYS,
+  DEFAULT_EVENT_RETENTION_DAYS,
+} from "./retention.js";
 
 export interface AnalyticsEvent {
   type: "page_view" | "api_request" | "custom_event";
@@ -123,6 +133,17 @@ export class AnalyticsTracker {
     const result = await db
       .delete(analyticsEvents)
       .where(lt(analyticsEvents.createdAt, cutoff));
+    return result.count ?? 0;
+  }
+
+  async cleanupOldDailyAggregates(
+    retentionDays = DEFAULT_DAILY_RETENTION_DAYS
+  ): Promise<number> {
+    const db = getDb();
+    const cutoffDate = dailyAggregateCutoffDate(retentionDays);
+    const result = await db
+      .delete(analyticsDaily)
+      .where(lt(analyticsDaily.date, cutoffDate));
     return result.count ?? 0;
   }
 

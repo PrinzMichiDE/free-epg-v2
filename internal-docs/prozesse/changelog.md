@@ -36,6 +36,62 @@ Nicht im Scope: Jeder Einzel-Commit ohne betriebliche Relevanz.
 
 ## Detailbeschreibung
 
+### Eintrag CHG-2026-027: Analytics-Daily-Retention, Admin-Shell, Backup-Script (F-003/F-008)
+
+| Feld | Inhalt |
+|------|--------|
+| Datum | 2026-07-27 |
+| Autor/Rolle | Cursor Daily Pipeline / Entwicklung |
+| Begründung | Audit-Findings F-003 (Backup-Dokumentation) und F-008 (`analytics_daily` ohne Retention) schließen; Admin-UX für täglichen Betrieb verbessern |
+| Auswirkung | Worker löscht alte Daily-Aggregate; Operatoren können sich abmelden und Job-Trigger-Feedback sehen; Backup-Prozedur im Repo dokumentiert |
+| Risiko | niedrig — reine Erweiterung bestehender Cleanup-Jobs und UI |
+| Betroffene Komponenten | `packages/analytics`, `apps/worker`, `apps/web` Admin-UI, `scripts/backup.sh`, `internal-docs` |
+| Prüfung | `npm run build -w @freeepg/analytics && npm test`; `npm test` Web/Worker; manuell Admin-Nav + Job-Trigger |
+| Freigabe | Automatisierter Daily-Pipeline-Lauf |
+| Rollback | Revert Commit; Env-Variablen optional — Defaults entsprechen bisherigem Verhalten für Events (90d) |
+
+### Eintrag CHG-2026-026: Admin-Login-Rate-Limit und Datenschutzerklärung (F-004/F-006)
+
+| Feld | Inhalt |
+|------|--------|
+| Datum | 2026-07-25 |
+| Version | App-Release (web) |
+| Begründung | Tägliche Pipeline: Audit F-004 (Admin-Login ohne Rate-Limit); F-006 (keine Privacy-Policy-Seite); CHG-2026-024/025 aus Branch 888b noch nicht auf main |
+| Auswirkung | Redis-Rate-Limit für Admin-Login (5 Versuche / 15 Min. pro IP) in NextAuth `authorize`; öffentliche Datenschutzerklärung unter `/datenschutz` mit Footer-Link; Cherry-pick CHG-2026-024/025 (Next.js 16.2.11, Job-Trigger-Rate-Limit, generated_files-Dedup, LICENSE, Admin-Jobs-API) |
+| Risiko | niedrig (Login-Block bei Redis-Ausfall nicht explizit — gleiches Verhalten wie Job-Rate-Limit; Datenschutzseite ohne Formular) |
+| Betroffene Komponenten | `apps/web/src/lib/auth.ts`, `admin-rate-limit.ts`, `apps/web/src/app/datenschutz/page.tsx`, `Footer.tsx`, i18n-Messages, `LICENSE`, `apps/web/src/app/api/admin/jobs/` |
+| Prüfung | `npm test`; `node scripts/audit-gate.mjs` |
+| Freigabe | Product Owner |
+| Rollback | Vorheriges Image; `/datenschutz` entfernen optional |
+
+### Eintrag CHG-2026-025: Admin Job-Ops-Panel und LICENSE (F-001)
+
+| Feld | Inhalt |
+|------|--------|
+| Datum | 2026-07-24 |
+| Version | App-Release (web) |
+| Begründung | Tägliche Pipeline: Audit F-001 (fehlende LICENSE); Admin-Job-Historie nur 10 Einträge ohne Filter, Fehlerdetails oder Pagination |
+| Auswirkung | `LICENSE` (Unlicense) im Repo-Root; `/api/admin/jobs` mit Pagination, Statusfilter und Aggregat-Zählern; `/admin/jobs` mit Badges, Dauer, Fehler, Auto-Refresh |
+| Risiko | niedrig (read-only Job-API; keine Schema-Änderung) |
+| Betroffene Komponenten | `LICENSE`, `apps/web/src/lib/admin-jobs-query.ts`, `apps/web/src/app/api/admin/jobs/route.ts`, `apps/web/src/app/admin/jobs/page.tsx` |
+| Prüfung | `npm test`; `node scripts/audit-gate.mjs` |
+| Freigabe | Product Owner |
+| Rollback | Vorheriges Image |
+
+### Eintrag CHG-2026-024: Next.js-Security-Patch, Admin-Rate-Limit und generated_files-Deduplizierung
+
+| Feld | Inhalt |
+|------|--------|
+| Datum | 2026-07-23 |
+| Version | App-Release (web, worker, db) |
+| Begründung | Tägliche Pipeline: mehrere High-Severity Next.js-Advisories (≥16.2.11); Admin-Job-Trigger ohne Rate-Limit; `generated_files` wuchs bei jedem Country-Refresh um eine Zeile und UI konnte veraltete Metadaten anzeigen |
+| Auswirkung | `next@16.2.11` via Root-Override; `/api/admin/jobs/trigger` limitiert auf 10 Requests/Minute pro Admin-E-Mail (Redis, HTTP 429, Audit-Log bei Limit); Worker nutzt `replaceCountryGeneratedFile`; Lese-Pfade nutzen `getLatestCountryFileMap` |
+| Risiko | niedrig (Rate-Limit erfordert Redis — bereits Betriebsvoraussetzung; Replace-Logik ist idempotent; Next-Patch semver-kompatibel) |
+| Betroffene Komponenten | `package.json`, `apps/web/package.json`, `apps/web/src/lib/admin-rate-limit.ts`, `apps/web/src/app/api/admin/jobs/trigger/route.ts`, `packages/db/src/generated-files.ts`, `apps/worker/src/index.ts`, `apps/web/src/app/{page,countries/page,api/countries/route}.tsx` |
+| Prüfung | `npm test` (web, worker, db, epg-core); `npm run build -w @freeepg/web`; `node scripts/audit-gate.mjs` |
+| Freigabe | Product Owner |
+| Rollback | Vorheriges Image; Rate-Limit entfällt mit Rollback; `generated_files`-Historie nicht automatisch wiederhergestellt |
+
 ### Eintrag CHG-2026-023: Admin Health/Audit, Ländernamen, fast-xml-parser und CI-Audit-Gate
 
 | Feld | Inhalt |

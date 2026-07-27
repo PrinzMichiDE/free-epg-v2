@@ -35,6 +35,7 @@ export const bn = {
   "footer.api": "API",
   "footer.enigma2": "Enigma2 / Rytec",
   "footer.countryFeeds": "দেশভিত্তিক ফিড",
+  "footer.privacy": "Privacy",
   "footer.copyright": "ওপেন সোর্স EPG অবকাঠামো",
   "common.details": "বিবরণ",
   "common.m3u": "M3U",
