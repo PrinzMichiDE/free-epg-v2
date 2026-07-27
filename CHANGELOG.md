@@ -31,6 +31,20 @@ All notable changes to FreeEPG are documented here. Detailed compliance-oriented
 ### Changed
 - Root `package.json` pins `next@16.2.11` via npm overrides to dedupe transitive versions from `next-auth`.
 
+## 2026-07-27 — Daily evolution (ops retention, admin UX & backup)
+
+### Added
+- **`analytics_daily` retention cleanup** — worker `analytics-cleanup` job now prunes daily aggregates older than 365 days (configurable via `ANALYTICS_DAILY_RETENTION_DAYS`); raw events remain at 90 days (`ANALYTICS_EVENT_RETENTION_DAYS`).
+- **Shared admin shell** — `AdminHeader` with consistent navigation and **Abmelden** (sign-out) across all admin pages.
+- **EPG refresh UX** — country picker for single-country refresh plus loading/success/error feedback on job triggers.
+- **Backup script** — `scripts/backup.sh` for PostgreSQL dumps and `epg-data` volume archives (closes audit F-003).
+
+### Fixed
+- Cherry-picked prior pipeline work: Next.js 16.2.11, admin login rate limit, privacy policy, jobs API/panel, LICENSE, job-trigger rate limit.
+
+### Changed
+- Admin pages use unified header navigation instead of per-page back links.
+
 ## 2026-07-22 — Daily evolution (admin ops, UX & security)
 
 ### Added

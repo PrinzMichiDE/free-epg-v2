@@ -46,6 +46,7 @@ jobs:
         run: |
           npm run test -w @freeepg/epg-core
           npm run test -w @freeepg/m3u-matcher
+          npm run test -w @freeepg/analytics
           npm run test -w @freeepg/web
           npm run test -w @freeepg/worker
 

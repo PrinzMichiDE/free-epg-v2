@@ -36,6 +36,20 @@ Nicht im Scope: Jeder Einzel-Commit ohne betriebliche Relevanz.
 
 ## Detailbeschreibung
 
+### Eintrag CHG-2026-027: Analytics-Daily-Retention, Admin-Shell, Backup-Script (F-003/F-008)
+
+| Feld | Inhalt |
+|------|--------|
+| Datum | 2026-07-27 |
+| Autor/Rolle | Cursor Daily Pipeline / Entwicklung |
+| Begründung | Audit-Findings F-003 (Backup-Dokumentation) und F-008 (`analytics_daily` ohne Retention) schließen; Admin-UX für täglichen Betrieb verbessern |
+| Auswirkung | Worker löscht alte Daily-Aggregate; Operatoren können sich abmelden und Job-Trigger-Feedback sehen; Backup-Prozedur im Repo dokumentiert |
+| Risiko | niedrig — reine Erweiterung bestehender Cleanup-Jobs und UI |
+| Betroffene Komponenten | `packages/analytics`, `apps/worker`, `apps/web` Admin-UI, `scripts/backup.sh`, `internal-docs` |
+| Prüfung | `npm run build -w @freeepg/analytics && npm test`; `npm test` Web/Worker; manuell Admin-Nav + Job-Trigger |
+| Freigabe | Automatisierter Daily-Pipeline-Lauf |
+| Rollback | Revert Commit; Env-Variablen optional — Defaults entsprechen bisherigem Verhalten für Events (90d) |
+
 ### Eintrag CHG-2026-026: Admin-Login-Rate-Limit und Datenschutzerklärung (F-004/F-006)
 
 | Feld | Inhalt |

@@ -147,7 +147,20 @@ Docker Healthchecks: web, postgres, redis in Compose.
 | EPG-Dateien | Volume `epg-data` |
 | Redis | Volume `redisdata` (ephemeral-freundlich) |
 
-**Offener Punkt:** Kein dokumentiertes Backup-/Restore-Script.
+**Backup-Script:** `scripts/backup.sh` erstellt komprimierte PostgreSQL-Dumps und ein tar.gz-Archiv des `epg-data`-Volumes. Standard-Ausgabe: `./backups/` mit 14-Tage-Lokale-Retention (`BACKUP_RETENTION_DAYS`).
+
+```bash
+# Produktion (Host mit Docker-Zugriff)
+BACKUP_DIR=/var/backups/freeepg ./scripts/backup.sh
+
+# Variablen: COMPOSE_FILE, ENV_FILE, BACKUP_DIR, BACKUP_RETENTION_DAYS
+```
+
+**Restore (PostgreSQL):** `gunzip -c backups/freeepg-pg-*.sql.gz | docker compose --env-file stack.env -f docker-compose.prod.yml exec -T postgres psql -U freeepg -d freeepg`
+
+**Restore (EPG-Volume):** `docker run --rm -v freeepg_epg-data:/data -v ./backups:/backup alpine tar -xzf /backup/freeepg-epg-data-*.tar.gz -C /data`
+
+Empfohlener Zeitplan: täglicher pg_dump (Cron), wöchentliches Volume-Archiv; quartalsweise Restore-Tests auf Staging.
 
 ### Patch- und Vulnerability-Management
 
