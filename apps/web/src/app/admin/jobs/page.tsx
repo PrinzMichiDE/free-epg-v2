@@ -2,7 +2,6 @@
 
 import { useSession } from "next-auth/react";
 import { useCallback, useEffect, useState } from "react";
-import Link from "next/link";
 import { Badge } from "@/components/ui/Badge";
 import {
   formatJobDuration,
@@ -57,14 +56,13 @@ export default function AdminJobsPage() {
 
   useEffect(() => {
     if (!session) return;
-    void loadJobs();
+    const initial = setTimeout(() => void loadJobs(), 0);
     const timer = setInterval(() => void loadJobs(), 30_000);
-    return () => clearInterval(timer);
+    return () => {
+      clearTimeout(initial);
+      clearInterval(timer);
+    };
   }, [session, loadJobs]);
-
-  useEffect(() => {
-    setPage(1);
-  }, [statusFilter]);
 
   if (!session) return <div className="p-12">Bitte anmelden</div>;
   if (error) return <div className="p-12 text-[var(--destructive)]">{error}</div>;
@@ -74,13 +72,8 @@ export default function AdminJobsPage() {
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-12">
-      <Link href="/admin" className="text-[var(--primary)] hover:underline mb-4 inline-block">
-        ← Dashboard
-      </Link>
-
       <div className="flex flex-wrap items-center justify-between gap-4 mb-8">
         <div>
-          <h1 className="text-3xl font-bold">Job-Historie</h1>
           <p className="text-[var(--muted)] mt-1">
             EPG-Worker-Jobs mit Status, Dauer und Fehlerdetails. Auto-Refresh alle 30s.
           </p>
@@ -106,7 +99,10 @@ export default function AdminJobsPage() {
           Filter
           <select
             value={statusFilter}
-            onChange={(event) => setStatusFilter(event.target.value as JobStatus | "")}
+            onChange={(event) => {
+              setStatusFilter(event.target.value as JobStatus | "");
+              setPage(1);
+            }}
             className="ml-2 px-3 py-2 rounded-lg border border-[var(--border)] bg-[var(--background)]"
           >
             {STATUS_OPTIONS.map((option) => (
