@@ -28,7 +28,7 @@ export async function POST(request: Request) {
 
   const connection = {
     url: process.env.REDIS_URL ?? "redis://localhost:6379",
-    maxRetriesPerRequest: null,
+    maxRetriesPerRequest: 3,
   };
   const queue = new Queue("epg-jobs", { connection });
   const ip = clientIp(request);

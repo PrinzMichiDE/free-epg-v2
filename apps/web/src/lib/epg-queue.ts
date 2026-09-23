@@ -7,7 +7,7 @@ function getEpgQueue(): Queue {
     epgQueue = new Queue("epg-jobs", {
       connection: {
         url: process.env.REDIS_URL ?? "redis://localhost:6379",
-        maxRetriesPerRequest: null,
+        maxRetriesPerRequest: 3,
       },
     });
   }

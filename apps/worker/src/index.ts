@@ -5,7 +5,7 @@ import { gzip } from "node:zlib";
 import { promisify } from "node:util";
 import { Worker, Queue } from "bullmq";
 import cron from "node-cron";
-import { eq, inArray } from "drizzle-orm";
+import { eq, inArray, desc, and } from "drizzle-orm";
 import {
   getDb,
   epgJobs,
@@ -35,7 +35,7 @@ const epgDataDir = process.env.EPG_DATA_DIR ?? path.join(process.cwd(), "../../d
 
 const connection = {
   url: redisUrl,
-  maxRetriesPerRequest: null as null,
+  maxRetriesPerRequest: 3,
 };
 
 const gzipAsync = promisify(gzip);
@@ -99,15 +99,33 @@ async function saveXml(country: string, doc: ReturnType<typeof parseXmltv>) {
 
 async function fetchCountryEpg(country: string) {
   const db = getDb();
-  const [job] = await db
-    .insert(epgJobs)
-    .values({
-      country: country.toUpperCase(),
-      jobType: "country_fetch",
-      status: "running",
-      startedAt: new Date(),
-    })
-    .returning();
+  const pendingJobs = await db
+    .select()
+    .from(epgJobs)
+    .where(eq(epgJobs.status, "pending"))
+    .orderBy(desc(epgJobs.createdAt))
+    .limit(1);
+
+  let jobRow: typeof epgJobs.$inferSelect | undefined;
+
+  if (pendingJobs.length > 0 && pendingJobs[0]?.country === country.toUpperCase()) {
+    jobRow = pendingJobs[0];
+    await db
+      .update(epgJobs)
+      .set({ status: "running", startedAt: new Date() })
+      .where(eq(epgJobs.id, jobRow.id));
+  } else {
+    const [inserted] = await db
+      .insert(epgJobs)
+      .values({
+        country: country.toUpperCase(),
+        jobType: "country_fetch",
+        status: "running",
+        startedAt: new Date(),
+      })
+      .returning();
+    jobRow = inserted;
+  }
 
   try {
     console.log(`[EPG] ${country}: fetching merged sources...`);
@@ -142,7 +160,7 @@ async function fetchCountryEpg(country: string) {
           ...saved,
         },
       })
-      .where(eq(epgJobs.id, job.id));
+      .where(eq(epgJobs.id, jobRow.id));
 
     for (const src of result.sources) {
       await db
@@ -161,7 +179,7 @@ async function fetchCountryEpg(country: string) {
         finishedAt: new Date(),
         error: err instanceof Error ? err.message : String(err),
       })
-      .where(eq(epgJobs.id, job.id));
+      .where(eq(epgJobs.id, jobRow.id));
     throw err;
   }
 }
@@ -188,7 +206,7 @@ async function storeProgrammePreview(country: string, doc: ReturnType<typeof par
   const chunkSize = 200;
   for (let i = 0; i < batch.length; i += chunkSize) {
     await db.insert(programmes).values(batch.slice(i, i + chunkSize));
-    if (i % (chunkSize * 10) === 0) {
+    if (i > 0 && i % (chunkSize * 10) === 0) {
       await yieldToEventLoop();
     }
   }
@@ -198,14 +216,32 @@ async function storeProgrammePreview(country: string, doc: ReturnType<typeof par
 
 async function runIptvOrgGrab() {
   const db = getDb();
-  const [job] = await db
-    .insert(epgJobs)
-    .values({
-      jobType: "iptv_org_grab",
-      status: "running",
-      startedAt: new Date(),
-    })
-    .returning();
+  const pendingJobs = await db
+    .select()
+    .from(epgJobs)
+    .where(and(eq(epgJobs.status, "pending"), eq(epgJobs.jobType, "iptv_org_grab")))
+    .orderBy(desc(epgJobs.createdAt))
+    .limit(1);
+
+  let jobRow: typeof epgJobs.$inferSelect | undefined;
+
+  if (pendingJobs.length > 0) {
+    jobRow = pendingJobs[0];
+    await db
+      .update(epgJobs)
+      .set({ status: "running", startedAt: new Date() })
+      .where(eq(epgJobs.id, jobRow.id));
+  } else {
+    const [inserted] = await db
+      .insert(epgJobs)
+      .values({
+        jobType: "iptv_org_grab",
+        status: "running",
+        startedAt: new Date(),
+      })
+      .returning();
+    jobRow = inserted;
+  }
 
   try {
     const channelResult = await syncIptvOrgChannels();
@@ -218,7 +254,7 @@ async function runIptvOrgGrab() {
         finishedAt: new Date(),
         metadata: { ...channelResult, ...cacheResult },
       })
-      .where(eq(epgJobs.id, job.id));
+      .where(eq(epgJobs.id, jobRow.id));
 
     console.log(
       `[iptv-org] Sync complete: ${channelResult.channelCount} channels, ${cacheResult.streamCount} streams`
@@ -231,7 +267,7 @@ async function runIptvOrgGrab() {
         finishedAt: new Date(),
         error: err instanceof Error ? err.message : String(err),
       })
-      .where(eq(epgJobs.id, job.id));
+      .where(eq(epgJobs.id, jobRow.id));
     throw err;
   }
 }
@@ -290,7 +326,7 @@ async function main() {
     epgQueue.add("fetch-all-countries", {}, { attempts: 1 });
   });
 
-  cron.schedule("*/30 * * * * *", () => {
+  cron.schedule("*/5 * * * * *", () => {
     epgQueue.add("analytics-flush", {}, { removeOnComplete: true });
   });
 

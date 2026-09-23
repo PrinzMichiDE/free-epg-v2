@@ -57,7 +57,7 @@ export async function cleanupExpiredM3uPlaylists(epgDataDir: string, now = new D
         try {
           await rm(playlist.epgXmlPath, { force: true });
           await rm(`${playlist.epgXmlPath}.gz`, { force: true });
-          removedFiles += 1;
+          removedFiles += 2;
         } catch {
           // ignore missing files
         }
