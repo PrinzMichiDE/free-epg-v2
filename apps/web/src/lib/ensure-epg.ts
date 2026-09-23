@@ -1,4 +1,4 @@
-import { readFile, writeFile, mkdir } from "node:fs/promises";
+import { readFile, writeFile, mkdir, lstat } from "node:fs/promises";
 import { existsSync } from "node:fs";
 import { gzipSync } from "node:zlib";
 import {
@@ -36,6 +36,11 @@ function queueRefresh(country: string, priority = 1): void {
 async function isStaleCountryXml(country: string): Promise<boolean> {
   const filePath = countryXmlPath(country.toUpperCase());
   if (!existsSync(filePath)) return true;
+
+  const stats = await lstat(filePath);
+  const ageMs = Date.now() - stats.mtimeMs;
+  const maxAgeMs = 24 * 60 * 60 * 1000;
+  if (ageMs > maxAgeMs) return true;
 
   const head = await readFile(filePath, "utf-8");
   const sample = head.slice(0, 4096);
