@@ -26,12 +26,23 @@ export async function fetchMergedCountryEpg(
   adapters: EpgSourceAdapter[] = getDefaultAdapters()
 ): Promise<MergedEpgResult | null> {
   const sorted = [...adapters].sort((a, b) => a.priority - b.priority);
+
+  const fetched = await Promise.all(
+    sorted.map(async (adapter) => {
+      try {
+        const doc = await adapter.fetchCountry(countryCode);
+        return { adapter, doc: doc && doc.channels.length > 0 ? doc : null };
+      } catch (err) {
+        console.warn(`[epg-sources] adapter ${adapter.name} failed:`, err);
+        return { adapter, doc: null };
+      }
+    })
+  );
+
   let merged = emptyDoc();
   const sources: MergedEpgSourceStats[] = [];
-
-  for (const adapter of sorted.reverse()) {
-    const doc = await adapter.fetchCountry(countryCode);
-    if (!doc || doc.channels.length === 0) continue;
+  for (const { adapter, doc } of [...fetched].reverse()) {
+    if (!doc) continue;
     merged = mergeXmltvDocs(doc, merged, "primary");
     sources.push({
       name: adapter.name,

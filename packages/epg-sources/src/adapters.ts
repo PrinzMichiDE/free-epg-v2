@@ -130,10 +130,64 @@ export class XmltvSeAdapter implements EpgSourceAdapter {
   }
 }
 
+/** Adapter for the official IPTV-org EPG repository. */
+export class IptvOrgEpgAdapter implements EpgSourceAdapter {
+  name = "iptv-org/epg";
+  type = "http";
+  priority = 6;
+
+  async fetchCountry(countryCode: string): Promise<XmltvDocument | null> {
+    const cc = countryCode.toLowerCase();
+    const url = `https://iptv-org.github.io/epg/epg-${cc}.xml`;
+    try {
+      const res = await fetch(url, {
+        signal: AbortSignal.timeout(180_000),
+        headers: { "User-Agent": "FreeEPG/1.0" },
+        redirect: "follow",
+      });
+      if (!res.ok) return null;
+      return parseXmltv(await res.text());
+    } catch {
+      return null;
+    }
+  }
+}
+
+/** Adapter for xmltvx.de EPG sources. */
+export class XmltvxAdapter implements EpgSourceAdapter {
+  name = "xmltv.de";
+  type = "http";
+  priority = 7;
+
+  private countryUrls: Record<string, string> = {
+    DE: "https://www.xmltv.de/data/de.xml",
+    AT: "https://www.xmltv.de/data/at.xml",
+    CH: "https://www.xmltv.de/data/ch.xml",
+  };
+
+  async fetchCountry(countryCode: string): Promise<XmltvDocument | null> {
+    const url = this.countryUrls[countryCode.toUpperCase()];
+    if (!url) return null;
+    try {
+      const res = await fetch(url, {
+        signal: AbortSignal.timeout(120_000),
+        headers: { "User-Agent": "FreeEPG/1.0" },
+        redirect: "follow",
+      });
+      if (!res.ok) return null;
+      return parseXmltv(await res.text());
+    } catch {
+      return null;
+    }
+  }
+}
+
 export function getDefaultAdapters(): EpgSourceAdapter[] {
   return [
     new GlobetvAppAdapter(),
     new IptvEpgOrgAdapter(),
+    new IptvOrgEpgAdapter(),
+    new XmltvxAdapter(),
     new EpgPwAdapter(),
     new XmltvSeAdapter(),
   ];

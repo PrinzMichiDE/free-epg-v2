@@ -3,7 +3,9 @@ export {
   EpgPwAdapter,
   GlobetvAppAdapter,
   IptvEpgOrgAdapter,
+  IptvOrgEpgAdapter,
   XmltvSeAdapter,
+  XmltvxAdapter,
   getDefaultAdapters,
 } from "./adapters.js";
 

@@ -1,8 +1,91 @@
 import { describe, it } from "node:test";
 import assert from "node:assert/strict";
 import { applyChannelAliases } from "./channel-aliases.js";
-import { localizeXmltvTimestamps } from "@freeepg/epg-core";
+import { fetchMergedCountryEpg } from "./merge.js";
+import type { EpgSourceAdapter } from "./types.js";
+import { localizeXmltvTimestamps, type XmltvDocument } from "@freeepg/epg-core";
 import { getCountryOutputTimeZone } from "./country-timezones.js";
+
+function fakeAdapter(
+  name: string,
+  priority: number,
+  doc: XmltvDocument | null,
+  delayMs = 0,
+  fail = false
+): EpgSourceAdapter {
+  return {
+    name,
+    type: "http",
+    priority,
+    async fetchCountry() {
+      if (delayMs) await new Promise((resolve) => setTimeout(resolve, delayMs));
+      if (fail) throw new Error("adapter failure");
+      return doc;
+    },
+  };
+}
+
+describe("fetchMergedCountryEpg", () => {
+  it("lets lower priority numbers win regardless of fetch order", async () => {
+    const adapters = [
+      fakeAdapter(
+        "slow-base",
+        5,
+        {
+          channels: [{ id: "CH1", displayName: "Base" }],
+          programmes: [],
+        },
+        40
+      ),
+      fakeAdapter(
+        "fast-refined",
+        2,
+        {
+          channels: [{ id: "CH1", displayName: "Refined" }, { id: "CH2", displayName: "Only" }],
+          programmes: [
+            {
+              channel: "CH1",
+              start: "20260923120000 +0000",
+              stop: "20260923130000 +0000",
+              title: "Only in refined",
+            },
+          ],
+        },
+        5
+      ),
+    ];
+
+    const result = await fetchMergedCountryEpg("XX", adapters);
+    assert.ok(result);
+    assert.equal(result.doc.channels.find((c) => c.id === "CH1")?.displayName, "Refined");
+    assert.ok(result.doc.channels.some((c) => c.id === "CH2"));
+    assert.ok(result.doc.programmes.some((p) => p.title === "Only in refined"));
+    assert.deepEqual(
+      result.sources.map((s) => s.name),
+      ["slow-base", "fast-refined"]
+    );
+  });
+
+  it("continues when an adapter throws", async () => {
+    const adapters = [
+      fakeAdapter("broken", 2, null, 0, true),
+      fakeAdapter("good", 5, { channels: [{ id: "CH1", displayName: "Good" }], programmes: [] }),
+    ];
+
+    const result = await fetchMergedCountryEpg("XX", adapters);
+    assert.ok(result);
+    assert.equal(result.doc.channels.length, 1);
+    assert.deepEqual(result.sources, [{ name: "good", channels: 1, programmes: 0 }]);
+  });
+
+  it("returns null when no adapter yields channels", async () => {
+    const result = await fetchMergedCountryEpg("XX", [
+      fakeAdapter("broken", 1, null, 0, true),
+      fakeAdapter("empty", 2, { channels: [], programmes: [] }),
+    ]);
+    assert.equal(result, null);
+  });
+});
 
 describe("merged DE output for NDR.de", () => {
   it("localizes In aller Freundschaft to 12:20–13:10 CEST on 2026-07-20", () => {
