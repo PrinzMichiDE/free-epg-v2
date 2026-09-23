@@ -1,0 +1,11 @@
+{
+  "extends": "./tsconfig.json",
+  "include": [
+    "src/index.ts",
+    "src/xmltv.ts",
+    "src/xmltv-dates.ts",
+    "src/epg-version.ts",
+    "src/matcher.ts",
+    "src/rytec.ts"
+  ]
+}

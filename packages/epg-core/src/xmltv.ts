@@ -128,10 +128,5 @@ export function filterXmltvByChannelIds(
   channelIds: string[]
 ): XmltvDocument {
   const idSet = new Set(channelIds);
-  return {
-    channels: doc.channels.filter((c) => idSet.has(c.id)),
-    programmes: doc.programmes.filter((p) => idSet.has(p.channel)),
-  };
+  return { channels: doc.channels.filter((c) => idSet.has(c.id)), programmes: doc.programmes.filter((p) => idSet.has(p.channel)) };
 }
-
-export * from "./matcher.js";
