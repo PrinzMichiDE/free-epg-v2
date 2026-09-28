@@ -35,6 +35,7 @@ export const ar = {
   "footer.api": "API",
   "footer.enigma2": "Enigma2 / Rytec",
   "footer.countryFeeds": "خلاصات البلدان",
+  "footer.privacy": "Privacy",
   "footer.copyright": "بنية EPG مفتوحة المصدر",
   "common.details": "التفاصيل",
   "common.m3u": "M3U",

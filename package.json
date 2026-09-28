@@ -24,7 +24,8 @@
   },
   "packageManager": "npm@10.9.2",
   "overrides": {
-    "drizzle-orm": "0.45.2"
+    "drizzle-orm": "0.45.2",
+    "next": "16.2.11"
   },
   "allowScripts": {
     "esbuild@0.25.12": true,

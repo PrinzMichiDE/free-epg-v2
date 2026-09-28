@@ -5,6 +5,7 @@ import { getDatabase } from "@/lib/db";
 import { epgJobs } from "@freeepg/db";
 import { SUPPORTED_EPG_COUNTRIES } from "@freeepg/epg-sources";
 import { logAdminAction } from "@/lib/admin-audit";
+import { checkAdminRateLimit } from "@/lib/admin-rate-limit";
 
 function clientIp(request: Request): string | null {
   return (
@@ -17,6 +18,27 @@ export async function POST(request: Request) {
   const session = await getServerSession(authOptions);
   if (!session) {
     return Response.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  const actorKey = session.user?.email ?? "unknown";
+  const rateLimit = await checkAdminRateLimit(actorKey);
+  if (!rateLimit.allowed) {
+    await logAdminAction(session, "jobs.trigger.rate_limited", {
+      ip: clientIp(request),
+      metadata: { retryAfterSec: rateLimit.retryAfterSec },
+    });
+    return Response.json(
+      {
+        error: "Too many admin job triggers. Please wait before retrying.",
+        retryAfterSec: rateLimit.retryAfterSec,
+      },
+      {
+        status: 429,
+        headers: rateLimit.retryAfterSec
+          ? { "Retry-After": String(rateLimit.retryAfterSec) }
+          : undefined,
+      }
+    );
   }
 
   const body = await request.json();

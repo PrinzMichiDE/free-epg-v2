@@ -35,6 +35,7 @@ export const tr = {
   "footer.api": "API",
   "footer.enigma2": "Enigma2 / Rytec",
   "footer.countryFeeds": "Ülke akışları",
+  "footer.privacy": "Privacy",
   "footer.copyright": "Açık Kaynak EPG Altyapısı",
   "common.details": "Ayrıntılar",
   "common.m3u": "M3U",

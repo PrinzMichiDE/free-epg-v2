@@ -10,6 +10,7 @@ const footerLinks: { href: string; labelKey: MessageKey }[] = [
   { href: "/docs/api", labelKey: "footer.api" },
   { href: "/docs/enigma2", labelKey: "footer.enigma2" },
   { href: "/countries", labelKey: "footer.countryFeeds" },
+  { href: "/datenschutz", labelKey: "footer.privacy" },
 ];
 
 export function Footer({ versionSlot }: { versionSlot: ReactNode }) {

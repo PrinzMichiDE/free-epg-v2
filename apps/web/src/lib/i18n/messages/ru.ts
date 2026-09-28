@@ -35,6 +35,7 @@ export const ru = {
   "footer.api": "API",
   "footer.enigma2": "Enigma2 / Rytec",
   "footer.countryFeeds": "Фиды по странам",
+  "footer.privacy": "Privacy",
   "footer.copyright": "EPG-инфраструктура с открытым исходным кодом",
   "common.details": "Подробности",
   "common.m3u": "M3U",

@@ -9,7 +9,14 @@ import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
-const FRAMEWORK_DEPS = new Set(["next", "next-auth", "react", "react-dom", "eslint-config-next"]);
+const FRAMEWORK_DEPS = new Set([
+  "next",
+  "next-auth",
+  "react",
+  "react-dom",
+  "eslint",
+  "eslint-config-next",
+]);
 
 function workspaceManifestPaths() {
   const paths = [];

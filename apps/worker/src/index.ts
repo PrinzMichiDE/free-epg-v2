@@ -10,7 +10,7 @@ import {
   getDb,
   epgJobs,
   epgSources,
-  generatedFiles,
+  replaceCountryGeneratedFile,
   channels,
   programmes,
 } from "@freeepg/db";
@@ -79,7 +79,7 @@ async function saveXml(country: string, doc: ReturnType<typeof parseXmltv>) {
 
   const checksum = createHash("md5").update(xml).digest("hex");
   const db = getDb();
-  await db.insert(generatedFiles).values({
+  await replaceCountryGeneratedFile(db, {
     country: country.toUpperCase(),
     path: filePath,
     gzipPath,

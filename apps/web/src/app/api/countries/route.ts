@@ -1,6 +1,6 @@
 import { sql, eq, lt } from "drizzle-orm";
 import { getDatabase } from "@/lib/db";
-import { channels, generatedFiles } from "@freeepg/db";
+import { channels, getLatestCountryFileMap } from "@freeepg/db";
 import { SUPPORTED_EPG_COUNTRIES } from "@freeepg/epg-sources";
 import { countryEpgPaths } from "@/lib/utils";
 import { queueCountryEpgRefresh } from "@/lib/epg-queue";
@@ -26,8 +26,7 @@ export async function GET() {
     .from(channels)
     .groupBy(channels.country);
 
-  const files = await db.select().from(generatedFiles);
-  const fileMap = new Map(files.map((f) => [f.country, f]));
+  const fileMap = await getLatestCountryFileMap(db);
 
   const now = Date.now();
   const staleCountries = new Set<string>();

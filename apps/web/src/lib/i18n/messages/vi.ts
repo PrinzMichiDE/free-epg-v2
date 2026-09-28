@@ -35,6 +35,7 @@ export const vi = {
   "footer.api": "API",
   "footer.enigma2": "Enigma2 / Rytec",
   "footer.countryFeeds": "Nguồn cấp theo quốc gia",
+  "footer.privacy": "Privacy",
   "footer.copyright": "Hạ tầng EPG mã nguồn mở",
   "common.details": "Chi tiết",
   "common.m3u": "M3U",

@@ -35,6 +35,7 @@ export const ur = {
   "footer.api": "API",
   "footer.enigma2": "Enigma2 / Rytec",
   "footer.countryFeeds": "ملکی فیڈز",
+  "footer.privacy": "Privacy",
   "footer.copyright": "اوپن سورس EPG انفراسٹرکچر",
   "common.details": "تفصیلات",
   "common.m3u": "M3U",

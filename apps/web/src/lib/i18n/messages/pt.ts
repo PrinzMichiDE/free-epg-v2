@@ -35,6 +35,7 @@ export const pt = {
   "footer.api": "API",
   "footer.enigma2": "Enigma2 / Rytec",
   "footer.countryFeeds": "Feeds por país",
+  "footer.privacy": "Privacidade",
   "footer.copyright": "Infraestrutura EPG de código aberto",
   "common.details": "Detalhes",
   "common.m3u": "M3U",

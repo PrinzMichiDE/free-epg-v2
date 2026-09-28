@@ -35,6 +35,7 @@ export const hi = {
   "footer.api": "API",
   "footer.enigma2": "Enigma2 / Rytec",
   "footer.countryFeeds": "देश-विशिष्ट फ़ीड",
+  "footer.privacy": "Privacy",
   "footer.copyright": "ओपन सोर्स EPG इन्फ्रास्ट्रक्चर",
   "common.details": "विवरण",
   "common.m3u": "M3U",
