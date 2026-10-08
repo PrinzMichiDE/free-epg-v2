@@ -1,9 +1,10 @@
 import { cn } from "@/lib/utils";
 import { type HTMLAttributes } from "react";
 
-export function Card({ className, ...props }: HTMLAttributes<HTMLDivElement>) {
+export function Card({ className, role = "article", ...props }: HTMLAttributes<HTMLDivElement>) {
   return (
-    <div
+    <article
+      role={role}
       className={cn("surface-card p-5 transition-colors hover:border-[var(--foreground)]/20", className)}
       {...props}
     />

@@ -17,6 +17,8 @@ const variants: Record<BadgeVariant, string> = {
 export function Badge({ className, variant = "default", ...props }: BadgeProps) {
   return (
     <span
+      role="status"
+      aria-label={props["aria-label"] || `Badge: ${props.children}`}
       className={cn(
         "inline-flex items-center rounded-sm px-2 py-0.5 text-[11px] font-medium uppercase tracking-wide tabular-nums",
         variants[variant],
