@@ -17,8 +17,10 @@ RUN --mount=type=cache,target=/root/.npm \
 
 FROM base AS builder
 ENV NPM_CONFIG_PRODUCTION=false
-COPY --from=deps /app/node_modules ./node_modules
-COPY --from=deps /app/package.json /app/package-lock.json* /app/tsconfig.base.json /app/turbo.json ./
+# Copy the whole /app from the deps stage, not just the root node_modules:
+# npm can place dependencies under packages/*/node_modules instead of hoisting
+# them (e.g. fast-xml-parser in packages/epg-core), and those would be lost.
+COPY --from=deps /app /app
 COPY . .
 RUN npm run build -w @freeepg/db
 RUN npm run build -w @freeepg/epg-core
