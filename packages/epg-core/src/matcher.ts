@@ -4,6 +4,17 @@ export interface XmltvChannel {
   icon?: string;
 }
 
+export interface ChannelRecord {
+  lineNumber: number;
+  tvgName?: string;
+  tvgId?: string;
+  tvgLogo?: string;
+  groupTitle?: string;
+  displayName?: string;
+  streamUrl: string;
+  rawExtinf: string;
+}
+
 export interface XmltvProgramme {
   channel: string;
   start: string;
@@ -18,17 +29,95 @@ export interface XmltvDocument {
   programmes: XmltvProgramme[];
 }
 
+/**
+ * Matches a parsed M3U channel record against an XmltvChannel.
+ * Returns a similarity score in the range 0–100 (100 = perfect match).
+ */
+export function matchChannel(
+  channel: ChannelRecord,
+  xmltv: XmltvChannel,
+): number {
+  let bestScore = 0;
+
+  // Collect all name-like fields from the M3U record.
+  const names: string[] = [];
+  if (channel.displayName) names.push(channel.displayName);
+  if (channel.tvgName) names.push(channel.tvgName);
+
+  const xmltvName = xmltv.displayName;
+  if (typeof xmltvName === "string") {
+    for (const name of names) {
+      const score = similarityScore(name, xmltvName);
+      if (score > bestScore) bestScore = score;
+    }
+  }
+
+  return bestScore;
+}
+
+/**
+ * LRU-Cache (Least Recently Used) ohne externe Dependencies.
+ * Einfache Map-basierte Implementierung mit konfigurierter Maximalgröße.
+ */
+export class LRUCache<K, V> {
+  private readonly max: number;
+  private readonly cache = new Map<K, V>();
+
+  constructor(maxSize: number) {
+    this.max = Math.max(1, maxSize);
+  }
+
+  get(key: K): V | undefined {
+    const value = this.cache.get(key);
+    if (value === undefined) return undefined;
+    // Refresh: remove and re-insert to mark as most recently used
+    this.cache.delete(key);
+    this.cache.set(key, value);
+    return value;
+  }
+
+  set(key: K, value: V): void {
+    if (this.cache.has(key)) {
+      this.cache.delete(key);
+    } else if (this.cache.size >= this.max) {
+      // Evict least recently used (first entry in Map insertion order)
+      const firstKey = this.cache.keys().next().value;
+      if (firstKey !== undefined) {
+        this.cache.delete(firstKey);
+      }
+    }
+    this.cache.set(key, value);
+  }
+
+  get size(): number {
+    return this.cache.size;
+  }
+
+  clear(): void {
+    this.cache.clear();
+  }
+}
+
+// Globale Instance mit 8192 Einträgen für normalizeChannelName
+const normalizeCache = new LRUCache<string, string>(8192);
+
 export function normalizeXmltvId(id: string): string {
   return id.trim().replace(/[_\s]+/g, ".").replace(/\.+/g, ".");
 }
 
 export function normalizeChannelName(name: string): string {
-  return name
+  const cached = normalizeCache.get(name);
+  if (cached !== undefined) return cached;
+
+  const result = name
     .toLowerCase()
     .normalize("NFD")
     .replace(/[\u0300-\u036f]/g, "")
     .replace(/[^a-z0-9]+/g, " ")
     .trim();
+
+  normalizeCache.set(name, result);
+  return result;
 }
 
 export function similarityScore(a: string, b: string): number {
@@ -39,96 +128,9 @@ export function similarityScore(a: string, b: string): number {
 
   const setA = new Set(na.split(" "));
   const setB = new Set(nb.split(" "));
-  const intersection = [...setA].filter((x) => setB.has(x)).length;
-  const union = new Set([...setA, ...setB]).size;
-  return union === 0 ? 0 : intersection / union;
-}
+  const intersection = [...setA].filter((x) => setB.has(x));
+  const unionSize = new Set([...setA, ...setB]).size;
+  if (unionSize === 0) return 0;
 
-export interface ChannelRecord {
-  xmltvId: string;
-  name: string;
-  altNames?: string[];
-  country?: string;
-}
-
-export interface MatchResult {
-  xmltvId: string;
-  confidence: number;
-  method: string;
-}
-
-export function matchChannel(
-  tvgId: string | undefined,
-  tvgName: string | undefined,
-  groupTitle: string | undefined,
-  catalog: ChannelRecord[],
-  overrides?: Map<string, string>
-): MatchResult | null {
-  const normalizedName = tvgName ? normalizeChannelName(tvgName) : "";
-
-  if (normalizedName && overrides?.has(normalizedName)) {
-    return {
-      xmltvId: overrides.get(normalizedName)!,
-      confidence: 100,
-      method: "override",
-    };
-  }
-
-  if (tvgId) {
-    const exact = catalog.find((c) => c.xmltvId === tvgId);
-    if (exact) {
-      return { xmltvId: exact.xmltvId, confidence: 100, method: "exact_id" };
-    }
-
-    const normalized = normalizeXmltvId(tvgId);
-    const normMatch = catalog.find(
-      (c) => normalizeXmltvId(c.xmltvId).toLowerCase() === normalized.toLowerCase()
-    );
-    if (normMatch) {
-      return { xmltvId: normMatch.xmltvId, confidence: 95, method: "normalized_id" };
-    }
-  }
-
-  if (tvgName) {
-    const exactName = catalog.find(
-      (c) => normalizeChannelName(c.name) === normalizedName
-    );
-    if (exactName) {
-      return { xmltvId: exactName.xmltvId, confidence: 90, method: "exact_name" };
-    }
-
-    let best: MatchResult | null = null;
-    for (const ch of catalog) {
-      const names = [ch.name, ...(ch.altNames ?? [])];
-      for (const n of names) {
-        const score = similarityScore(tvgName, n);
-        if (score >= 0.6 && (!best || score > best.confidence / 100)) {
-          best = {
-            xmltvId: ch.xmltvId,
-            confidence: Math.round(score * 100),
-            method: "fuzzy_name",
-          };
-        }
-      }
-    }
-    if (best) return best;
-
-    if (groupTitle) {
-      const countryHint = groupTitle.slice(0, 2).toUpperCase();
-      for (const ch of catalog) {
-        if (ch.country === countryHint) {
-          const score = similarityScore(tvgName, ch.name);
-          if (score >= 0.6) {
-            return {
-              xmltvId: ch.xmltvId,
-              confidence: Math.round(score * 85),
-              method: "group_name",
-            };
-          }
-        }
-      }
-    }
-  }
-
-  return null;
+  return intersection.length / unionSize;
 }
