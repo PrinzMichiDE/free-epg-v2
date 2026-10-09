@@ -29,22 +29,28 @@ export default function AdminHealthPage() {
   const [health, setHealth] = useState<HealthPayload | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  const loadHealth = useCallback(async () => {
-    const response = await fetch("/api/admin/health");
-    if (!response.ok) {
-      setError("Health-Daten konnten nicht geladen werden.");
-      return;
-    }
-    setError(null);
-    setHealth(await response.json());
-  }, []);
-
   useEffect(() => {
     if (!session) return;
-    void loadHealth();
-    const timer = setInterval(() => void loadHealth(), 30_000);
-    return () => clearInterval(timer);
-  }, [session, loadHealth]);
+    let cancelled = false;
+    const run = async () => {
+      if (cancelled) return;
+      const response = await fetch("/api/admin/health");
+      if (!response.ok) {
+        if (!cancelled) setError("Health-Daten konnten nicht geladen werden.");
+        return;
+      }
+      if (!cancelled) {
+        setError(null);
+        setHealth(await response.json());
+      }
+    };
+    void run();
+    const timer = setInterval(run, 30_000);
+    return () => {
+      cancelled = true;
+      clearInterval(timer);
+    };
+  }, [session]);
 
   if (!session) return <div className="p-12">Bitte anmelden</div>;
   if (error) return <div className="p-12 text-[var(--destructive)]">{error}</div>;
