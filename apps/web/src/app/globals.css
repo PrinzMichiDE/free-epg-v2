@@ -33,6 +33,28 @@
   --text-3xl--line-height: 2.25rem;
   --text-4xl: 2.25rem;
   --text-4xl--line-height: 2.5rem;
+
+  /* Border radius tokens */
+  --radius-sm: 0.25rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+  --radius-xl: 1rem;
+  --radius-full: 9999px;
+
+  /* Shadow tokens */
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+
+  /* Transition tokens */
+  --transition-duration-fast: 150ms;
+  --transition-duration-normal: 250ms;
+  --transition-duration-slow: 350ms;
+  --transition-timing-default: cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-timing-in: cubic-bezier(0.4, 0, 1, 1);
+  --transition-timing-out: cubic-bezier(0, 0, 0.2, 1);
+  --transition-timing-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 :root {
