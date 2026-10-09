@@ -162,8 +162,8 @@ export function getCountryName(
   worldNames?: Record<string, string>
 ): string {
   const cc = code.toUpperCase();
-  if (COUNTRY_NAMES[cc]) return COUNTRY_NAMES[cc];
   if (worldNames?.[cc]) return worldNames[cc];
+  if (COUNTRY_NAMES[cc]) return COUNTRY_NAMES[cc];
 
   const localized = getGermanRegionNames().of(cc);
   if (localized && localized !== cc) return localized;

@@ -24,24 +24,39 @@ interface HealthPayload {
   timestamp: string;
 }
 
+async function fetchHealth(): Promise<HealthPayload> {
+  const response = await fetch("/api/admin/health");
+  if (!response.ok) {
+    throw new Error("Health-Daten konnten nicht geladen werden.");
+  }
+  return response.json();
+}
+
 export default function AdminHealthPage() {
   const { data: session } = useSession();
   const [health, setHealth] = useState<HealthPayload | null>(null);
   const [error, setError] = useState<string | null>(null);
 
+  const loadHealth = useCallback(async () => {
+    try {
+      setHealth(await fetchHealth());
+      setError(null);
+    } catch {
+      setError("Health-Daten konnten nicht geladen werden.");
+    }
+  }, []);
+
   useEffect(() => {
     if (!session) return;
     let cancelled = false;
     const run = async () => {
-      if (cancelled) return;
-      const response = await fetch("/api/admin/health");
-      if (!response.ok) {
-        if (!cancelled) setError("Health-Daten konnten nicht geladen werden.");
-        return;
-      }
-      if (!cancelled) {
+      try {
+        const data = await fetchHealth();
+        if (cancelled) return;
+        setHealth(data);
         setError(null);
-        setHealth(await response.json());
+      } catch {
+        if (!cancelled) setError("Health-Daten konnten nicht geladen werden.");
       }
     };
     void run();
