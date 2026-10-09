@@ -3,7 +3,7 @@ import { Queue } from "bullmq";
 import { authOptions } from "@/lib/auth";
 import { getDatabase } from "@/lib/db";
 import { epgJobs } from "@freeepg/db";
-import { SUPPORTED_EPG_COUNTRIES } from "@freeepg/epg-sources";
+import { SUPPORTED_EPG_COUNTRIES, buildCountryRefreshJobOptions } from "@freeepg/epg-sources";
 import { logAdminAction } from "@/lib/admin-audit";
 
 function clientIp(request: Request): string | null {
@@ -46,7 +46,11 @@ export async function POST(request: Request) {
   }
 
   if (all) {
-    await queue.add("fetch-all-countries", {}, { attempts: 1 });
+    await queue.add(
+      "fetch-all-countries",
+      {},
+      { attempts: 1, removeOnComplete: true, removeOnFail: true }
+    );
     const db = getDatabase();
     await db.insert(epgJobs).values({
       jobType: "fetch-all-countries",
@@ -59,7 +63,11 @@ export async function POST(request: Request) {
 
   if (country && SUPPORTED_EPG_COUNTRIES.includes(country.toUpperCase())) {
     const cc = country.toUpperCase();
-    await queue.add("fetch-country", { country: cc }, { attempts: 2 });
+    await queue.add(
+      "fetch-country",
+      { country: cc },
+      buildCountryRefreshJobOptions(cc)
+    );
     const db = getDatabase();
     await db.insert(epgJobs).values({
       country: cc,

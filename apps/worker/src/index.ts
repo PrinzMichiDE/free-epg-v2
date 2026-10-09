@@ -17,6 +17,7 @@ import {
 import { buildXmltv, parseXmltv, buildRytecXmltv, rytecXmlFileName } from "@freeepg/epg-core";
 import {
   SUPPORTED_EPG_COUNTRIES,
+  buildCountryRefreshJobOptions,
   fetchMergedCountryEpg,
   refreshPlaylistCaches,
 } from "@freeepg/epg-sources";
@@ -290,7 +291,7 @@ async function main() {
             await epgQueue.add(
               "fetch-country",
               { country: cc },
-              { attempts: 2, jobId: `fetch-${cc}`, priority: 10 }
+              buildCountryRefreshJobOptions(cc, 10)
             );
           }
           break;
@@ -323,7 +324,11 @@ async function main() {
   worker.on("failed", (job, err) => console.error(`Job ${job?.name} failed:`, err));
 
   cron.schedule(process.env.CRON_COUNTRY_FETCH ?? "0 5 * * *", () => {
-    epgQueue.add("fetch-all-countries", {}, { attempts: 1 });
+    epgQueue.add(
+      "fetch-all-countries",
+      {},
+      { attempts: 1, removeOnComplete: true, removeOnFail: true }
+    );
   });
 
   cron.schedule("*/5 * * * * *", () => {
@@ -351,19 +356,23 @@ async function main() {
     await epgQueue.add(
       "fetch-country",
       { country: "DE" },
-      { attempts: 2, priority: 1, jobId: "fetch-DE" }
+      buildCountryRefreshJobOptions("DE", 1)
     );
     await epgQueue.add(
       "fetch-country",
       { country: "AT" },
-      { attempts: 2, priority: 2, jobId: "fetch-AT" }
+      buildCountryRefreshJobOptions("AT", 2)
     );
     await epgQueue.add(
       "fetch-country",
       { country: "CH" },
-      { attempts: 2, priority: 2, jobId: "fetch-CH" }
+      buildCountryRefreshJobOptions("CH", 2)
     );
-    epgQueue.add("fetch-all-countries", {}, { attempts: 1, priority: 20, jobId: "fetch-all" });
+    await epgQueue.add(
+      "fetch-all-countries",
+      {},
+      { attempts: 1, priority: 20, removeOnComplete: true, removeOnFail: true }
+    );
   }
 }
 

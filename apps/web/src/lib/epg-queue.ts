@@ -1,4 +1,5 @@
 import { Queue } from "bullmq";
+import { buildCountryRefreshJobOptions } from "@freeepg/epg-sources";
 
 let epgQueue: Queue | null = null;
 
@@ -14,21 +15,20 @@ function getEpgQueue(): Queue {
   return epgQueue;
 }
 
-/** Queue a background EPG refresh for one country (deduplicated per country). */
+/**
+ * Queue a background EPG refresh for one country.
+ *
+ * Uses a bounded deduplication window (see `buildCountryRefreshJobOptions`)
+ * instead of a persistent `jobId`, so a previously completed or failed job can
+ * no longer block every future refresh for that country.
+ */
 export async function queueCountryEpgRefresh(
   country: string,
   opts?: { priority?: number }
 ): Promise<void> {
-  const cc = country.toUpperCase();
   await getEpgQueue().add(
     "fetch-country",
-    { country: cc },
-    {
-      jobId: `refresh-${cc}`,
-      priority: opts?.priority ?? 5,
-      attempts: 2,
-      removeOnComplete: true,
-      removeOnFail: 50,
-    }
+    { country: country.toUpperCase() },
+    buildCountryRefreshJobOptions(country, opts?.priority ?? 5)
   );
 }

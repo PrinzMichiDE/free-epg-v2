@@ -94,3 +94,11 @@ export {
 export { fetchMergedCountryEpg } from "./merge.js";
 export type { MergedEpgResult, MergedEpgSourceStats } from "./merge.js";
 export { getPlaylistsCacheDir, refreshPlaylistCaches } from "./playlist-cache.js";
+export {
+  COUNTRY_FETCH_JOB_NAME,
+  COUNTRY_REFRESH_DEDUP_TTL_MS,
+  COUNTRY_REFRESH_JOB_PREFIX,
+  buildCountryRefreshJobOptions,
+  countryRefreshJobId,
+} from "./queue-jobs.js";
+export type { CountryRefreshJobOptions } from "./queue-jobs.js";
