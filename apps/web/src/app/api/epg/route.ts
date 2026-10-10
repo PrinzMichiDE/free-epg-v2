@@ -6,18 +6,23 @@ import path from "node:path";
 import { gzipSync } from "node:zlib";
 
 export async function GET() {
-  const globalPath = path.join(process.env.EPG_DATA_DIR ?? "../../data/epg", "global-lite.xml.gz");
-  const { existsSync } = await import("node:fs");
+  try {
+    const globalPath = path.join(process.env.EPG_DATA_DIR ?? "../../data/epg", "global-lite.xml.gz");
+    const { existsSync } = await import("node:fs");
 
-  if (!existsSync(globalPath)) {
-    const adapter = new EpgPwAdapter();
-    const doc = await adapter.fetchGlobal();
-    if (!doc) return new Response("Global EPG not available", { status: 404 });
-    const xml = buildXmltv(doc);
-    await mkdir(path.dirname(globalPath), { recursive: true });
-    await writeFile(globalPath.replace(".gz", ""), xml);
-    await writeFile(globalPath, gzipSync(Buffer.from(xml)));
+    if (!existsSync(globalPath)) {
+      const adapter = new EpgPwAdapter();
+      const doc = await adapter.fetchGlobal();
+      if (!doc) return new Response("Global EPG not available", { status: 404 });
+      const xml = buildXmltv(doc);
+      await mkdir(path.dirname(globalPath), { recursive: true });
+      await writeFile(globalPath.replace(".gz", ""), xml);
+      await writeFile(globalPath, gzipSync(Buffer.from(xml)));
+    }
+
+    return streamFileResponse(globalPath, "application/gzip", { gzip: true });
+  } catch (error) {
+    console.error("[EPG API] Failed to serve global EPG:", error);
+    return new Response("Internal Server Error", { status: 500 });
   }
-
-  return streamFileResponse(globalPath, "application/gzip", { gzip: true });
 }

@@ -1,5 +1,6 @@
 {
   "name": "freeepg",
+  "type": "module",
   "private": true,
   "workspaces": [
     "apps/*",

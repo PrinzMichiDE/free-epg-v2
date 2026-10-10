@@ -35,7 +35,7 @@ export function ProgrammesPageClient() {
     searchParams.get("country")?.toUpperCase() ?? ""
   );
   const [when, setWhen] = useState<WhenFilter>(
-    (searchParams.get("when") as WhenFilter) ?? "now"
+    (searchParams.get("when") as WhenFilter) ?? "all"
   );
   const [page, setPage] = useState(1);
   const [results, setResults] = useState<ProgrammeSearchResult[]>([]);
