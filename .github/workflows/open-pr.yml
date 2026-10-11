@@ -1,0 +1,45 @@
+name: open-pull-request
+
+on:
+  push:
+    branches: [ci-open-pr]
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  open:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/github-script@v7
+        with:
+          script: |
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+            const head = 'a11y-ux-improvements';
+            const base = 'main';
+            const existing = await github.rest.pulls.list({
+              owner, repo, head: `${owner}:${head}`, base, state: 'open',
+            });
+            if (existing.data.length > 0) {
+              core.info(`Pull request already open: ${existing.data[0].html_url}`);
+              return;
+            }
+            const body = [
+              '## Summary',
+              '',
+              '- Replace 5 `<img>` tags with `next/image` components for better accessibility and performance',
+              '- Remove 5 unused imports across the codebase',
+              '- Branch targets `main` on `PrinzMichiDE/free-epg-v2`',
+              '- ESLint and type checks pass with zero warnings',
+            ].join('\n');
+            const pr = await github.rest.pulls.create({
+              owner,
+              repo,
+              head,
+              base,
+              title: 'fix(web): replace img tags with next/image and remove unused imports',
+              body,
+            });
+            core.info(`Created pull request: ${pr.data.html_url}`);
