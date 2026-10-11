@@ -1,5 +1,4 @@
 import { SUPPORTED_EPG_COUNTRIES } from "@freeepg/epg-sources";
-import { getCountryName } from "./countries";
 
 export const EPG_FRESH_MAX_AGE_HOURS = 25;
 
@@ -7,7 +6,7 @@ export type EpgCountryStatus = "fresh" | "stale" | "missing";
 
 export interface EpgCountryFreshness {
   country: string;
-  name: string;
+  name?: string;
   lastUpdated: string | null;
   ageHours: number | null;
   status: EpgCountryStatus;
@@ -27,16 +26,18 @@ export function classifyEpgFreshness(
 export function buildEpgCountryStatuses(
   lastGeneratedByCountry: Map<string, Date>,
   countries: string[] = SUPPORTED_EPG_COUNTRIES,
-  now: Date = new Date()
+  now: Date = new Date(),
+  nameFor: (country: string) => string = (country) => country
 ): EpgCountryFreshness[] {
   return countries.map((country) => {
     const lastUpdated = lastGeneratedByCountry.get(country) ?? null;
     const ageHours = lastUpdated
       ? Math.max(0, (now.getTime() - lastUpdated.getTime()) / 3_600_000)
       : null;
+    const name = nameFor(country);
     return {
       country,
-      name: getCountryName(country),
+      name: name === country ? undefined : name,
       lastUpdated: lastUpdated ? lastUpdated.toISOString() : null,
       ageHours: ageHours !== null ? Math.round(ageHours * 10) / 10 : null,
       status: classifyEpgFreshness(lastUpdated, now),

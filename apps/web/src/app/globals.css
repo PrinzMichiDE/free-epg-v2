@@ -85,28 +85,26 @@
   --font-mono: var(--font-ibm-plex-mono), ui-monospace, monospace;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #121110;
-    --foreground: #ece8df;
-    --primary: #ece8df;
-    --primary-foreground: #121110;
-    --accent: #e85d63;
-    --accent-foreground: #121110;
-    --muted: #9a948a;
-    --muted-foreground: #9a948a;
-    --card: #1a1917;
-    --card-foreground: #ece8df;
-    --border: #2f2c28;
-    --ring: #e85d63;
-    --success: #6fcf97;
-    --success-muted: rgb(111 207 151 / 0.12);
-    --warning: #f0c14b;
-    --warning-muted: rgb(240 193 75 / 0.12);
-    --destructive: #f87171;
-    --surface-muted: #23211f;
-    --shadow-md: 0 2px 0 rgb(0 0 0 / 0.35);
-  }
+.dark {
+  --background: #121110;
+  --foreground: #ece8df;
+  --primary: #ece8df;
+  --primary-foreground: #121110;
+  --accent: #e85d63;
+  --accent-foreground: #121110;
+  --muted: #9a948a;
+  --muted-foreground: #9a948a;
+  --card: #1a1917;
+  --card-foreground: #ece8df;
+  --border: #2f2c28;
+  --ring: #e85d63;
+  --success: #6fcf97;
+  --success-muted: rgb(111 207 151 / 0.12);
+  --warning: #f0c14b;
+  --warning-muted: rgb(240 193 75 / 0.12);
+  --destructive: #f87171;
+  --surface-muted: #23211f;
+  --shadow-md: 0 2px 0 rgb(0 0 0 / 0.35);
 }
 
 @layer base {

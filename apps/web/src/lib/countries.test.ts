@@ -20,8 +20,8 @@ describe("countries", () => {
 
   it("prefers world playlist names over Intl fallback", () => {
     assert.equal(
-      getCountryName("AE", { AE: "Custom UAE" }),
-      "Custom UAE"
+      getCountryName("BD", { BD: "Custom BD" }),
+      "Custom BD"
     );
   });
 

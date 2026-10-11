@@ -141,8 +141,10 @@ Volumes: `pgdata`, `redisdata`, `epg-data` (XMLTV-Dateien unter `/data/epg`).
 
 | Methode | Pfad | Auth | Beschreibung |
 |---------|------|------|--------------|
-| GET | `/api/health` | nein | Healthcheck |
+| GET | `/api/health` | nein | Healthcheck (DB, Redis, EPG-Freshness) |
 | GET | `/api/epg/{country}.xml[.gz]` | nein | Land-EPG |
+| GET | `/api/epg/{country}/now-next` | nein | Läuft gerade + als Nächstes je Sender (24h-Preview) |
+| GET | `/api/epg/status` | nein | EPG-Freshness je Land (lastUpdated, ageHours, Status) |
 | GET | `/api/epg/m3u/{id}.xml` | nein | M3U-spezifisches EPG |
 | GET | `/api/epg/list/{id}` | nein | Custom-List-EPG |
 | POST | `/api/m3u/upload` | nein | M3U Matching |

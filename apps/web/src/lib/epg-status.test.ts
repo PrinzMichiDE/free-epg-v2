@@ -37,10 +37,12 @@ describe("classifyEpgFreshness", () => {
 
 describe("buildEpgCountryStatuses", () => {
   it("reports status for every requested country", () => {
+    const nameFor: Record<string, string> = { DE: "Deutschland" };
     const statuses = buildEpgCountryStatuses(
       new Map([["DE", new Date("2026-09-23T05:00:00Z")]]),
       ["DE", "AT"],
-      now
+      now,
+      (country) => nameFor[country] ?? country
     );
 
     assert.deepEqual(

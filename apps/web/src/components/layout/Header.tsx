@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/Button";
 import { DonateButton } from "@/components/layout/DonateButton";
 import { AffiliateLinks } from "@/components/layout/AffiliateLinks";
 import { LanguageSwitcher } from "@/components/layout/LanguageSwitcher";
+import { ThemeToggle } from "@/components/ui/ThemeToggle";
 import { NavMoreMenu } from "@/components/layout/NavMoreMenu";
 import { useI18n } from "@/lib/i18n/I18nProvider";
 import type { MessageKey } from "@/lib/i18n/messages";
@@ -76,8 +77,9 @@ export function Header() {
           <NavMoreMenu items={secondaryNav} />
         </nav>
 
-        <div className="hidden xl:flex items-center gap-2 shrink-0">
+        <div className="hidden xl:flex items-center gap-1 shrink-0">
           <LanguageSwitcher compact />
+          <ThemeToggle />
           <Link href="/docs/enigma2">
             <Button size="sm" variant="outline" className="whitespace-nowrap">
               <span className="hidden 2xl:inline">{t("header.enigma2Setup")}</span>
@@ -88,6 +90,7 @@ export function Header() {
 
         <div className="flex xl:hidden items-center gap-1 shrink-0">
           <LanguageSwitcher />
+          <ThemeToggle />
           <Button
             variant="ghost"
             size="sm"

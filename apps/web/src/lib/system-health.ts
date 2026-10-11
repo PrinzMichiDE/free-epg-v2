@@ -1,11 +1,11 @@
+import { existsSync, statSync } from "node:fs";
 import { Redis } from "ioredis";
 import { sql } from "drizzle-orm";
+import { SUPPORTED_EPG_COUNTRIES } from "@freeepg/epg-sources";
 import { getDatabase } from "@/lib/db";
 import { readBuildInfo, type BuildInfo } from "@/lib/app-version-server";
-import {
-  evaluateOverallHealth,
-  type HealthStatus,
-} from "@/lib/system-health-utils";
+import { countryXmlPath } from "./epg-paths";
+import { evaluateOverallHealth, type HealthStatus } from "@/lib/system-health-utils";
 
 export type { HealthStatus } from "@/lib/system-health-utils";
 export { evaluateOverallHealth } from "@/lib/system-health-utils";
@@ -15,6 +15,8 @@ export interface HealthCheckResult {
   status: HealthStatus;
   detail?: string;
 }
+
+const EPG_MAX_AGE_MS = 25 * 60 * 60 * 1000;
 
 async function checkDatabase(): Promise<HealthCheckResult> {
   try {
@@ -48,6 +50,30 @@ async function checkRedis(): Promise<HealthCheckResult> {
   }
 }
 
+function checkEpgFreshness(): HealthCheckResult {
+  let newestMtimeMs = 0;
+  let found = false;
+
+  for (const cc of SUPPORTED_EPG_COUNTRIES) {
+    const filePath = countryXmlPath(cc);
+    if (!existsSync(filePath)) continue;
+    const mtimeMs = statSync(filePath).mtimeMs;
+    if (mtimeMs > newestMtimeMs) newestMtimeMs = mtimeMs;
+    found = true;
+  }
+
+  if (!found) {
+    return { name: "epg", status: "error", detail: "no EPG files found" };
+  }
+
+  const ageMs = Date.now() - newestMtimeMs;
+  const ageHours = Math.round((ageMs / 3_600_000) * 10) / 10;
+  if (ageMs > EPG_MAX_AGE_MS) {
+    return { name: "epg", status: "error", detail: `newest EPG file is ${ageHours}h old` };
+  }
+  return { name: "epg", status: "ok", detail: `newest EPG file is ${ageHours}h old` };
+}
+
 export async function runSystemHealthChecks(): Promise<{
   status: "healthy" | "degraded";
   checks: Record<string, HealthStatus>;
@@ -55,7 +81,7 @@ export async function runSystemHealthChecks(): Promise<{
 }> {
   const results = await Promise.all([checkDatabase(), checkRedis()]);
   const checks: Record<string, HealthStatus> = { app: "ok" };
-  for (const result of results) {
+  for (const result of [...results, checkEpgFreshness()]) {
     checks[result.name] = result.status;
   }
 
@@ -84,6 +110,7 @@ export async function runDetailedSystemHealth(): Promise<{
     { name: "app", status: "ok" },
     dbCheck,
     redisCheck,
+    checkEpgFreshness(),
   ];
   const statusMap = Object.fromEntries(
     checks.map((c) => [c.name, c.status])

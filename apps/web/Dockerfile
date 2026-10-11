@@ -21,8 +21,10 @@ ARG GIT_SHA=dev
 ARG APP_VERSION=0.1.0
 ENV NEXT_PUBLIC_GIT_SHA=$GIT_SHA
 ENV NEXT_PUBLIC_APP_VERSION=$APP_VERSION
-COPY --from=deps /app/node_modules ./node_modules
-COPY --from=deps /app/package.json /app/package-lock.json* /app/tsconfig.base.json /app/turbo.json ./
+# Copy the whole /app from the deps stage, not just the root node_modules:
+# npm can place dependencies under packages/*/node_modules instead of hoisting
+# them (e.g. fast-xml-parser in packages/epg-core), and those would be lost.
+COPY --from=deps /app /app
 COPY . .
 RUN node scripts/write-build-info.mjs
 RUN npm run build -w @freeepg/db
