@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { ExternalLink, Play, Tv } from "lucide-react";
 import { ChannelEpgPanel } from "@/components/player/ChannelEpgPanel";
@@ -33,10 +34,12 @@ export function ChannelDetailView({ channel }: ChannelDetailViewProps) {
       <header className="mb-10">
         <div className="flex flex-wrap items-start gap-4 mb-4">
           {channel.logoUrl ? (
-            <img
+            <Image
               src={channel.logoUrl}
               alt=""
               className="h-16 w-16 rounded-xl object-contain bg-[var(--surface-muted)] border border-[var(--border)] p-2"
+              width={64}
+              height={64}
             />
           ) : (
             <div className="h-16 w-16 rounded-xl bg-[var(--surface-muted)] border border-[var(--border)] flex items-center justify-center">

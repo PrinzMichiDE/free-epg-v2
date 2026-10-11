@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import {
   ChevronLeft,
@@ -44,10 +45,12 @@ function ChannelLogo({ entry }: { entry: PlaylistPlayerEntry }) {
   }
 
   return (
-    <img
+    <Image
       src={entry.logoUrl}
       alt=""
       className="h-7 w-7 shrink-0 rounded-md bg-[var(--surface-muted)] object-contain p-0.5"
+      width={28}
+      height={28}
     />
   );
 }

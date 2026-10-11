@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { Calendar, Radio, Search } from "lucide-react";
@@ -181,10 +182,12 @@ export function ProgrammesPageClient() {
                     className="flex items-center gap-2 text-sm font-medium text-[var(--primary)] hover:underline shrink-0"
                   >
                     {prog.channel.logoUrl ? (
-                      <img
+                      <Image
                         src={prog.channel.logoUrl}
                         alt=""
                         className="h-8 w-8 rounded object-contain bg-[var(--surface-muted)]"
+                        width={32}
+                        height={32}
                       />
                     ) : (
                       <Radio className="h-4 w-4" aria-hidden />

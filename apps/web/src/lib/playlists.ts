@@ -1,7 +1,7 @@
 import { existsSync, statSync } from "node:fs";
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
-import { eq } from "drizzle-orm";
+
 import {
   SUPPORTED_EPG_COUNTRIES,
   IptvOrgApiAdapter,

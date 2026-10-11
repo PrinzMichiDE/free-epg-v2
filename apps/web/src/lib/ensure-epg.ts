@@ -3,13 +3,13 @@ import { existsSync } from "node:fs";
 import { gzipSync } from "node:zlib";
 import {
   buildRytecXmltv,
-  buildXmltv,
+
   isCurrentEpgOutput,
   parseXmltv,
 } from "@freeepg/epg-core";
-import path from "node:path";
+
 import {
-  countryGzipPath,
+
   countryRytecGzipPath,
   countryRytecPath,
   countryXmlPath,

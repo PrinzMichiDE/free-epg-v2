@@ -101,7 +101,7 @@ function ChannelEpgPanelInner({
     if (!epg?.current) return;
     const timer = window.setInterval(() => setTick((value) => value + 1), 30_000);
     return () => window.clearInterval(timer);
-  }, [epg?.current?.start, epg?.current?.stop]);
+  }, [epg]);
 
   if (loading) {
     return (

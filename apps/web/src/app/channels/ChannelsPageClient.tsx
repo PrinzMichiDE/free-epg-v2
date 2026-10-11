@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { useSearchParams } from "next/navigation";
+import Image from "next/image";
 import Link from "next/link";
 import { Check, Radio } from "lucide-react";
 import { CountryFlag } from "@/components/country/CountryFlag";
@@ -108,9 +109,11 @@ export default function ChannelsPageClient() {
                 className="flex items-center gap-4 p-4 rounded-lg border border-[var(--border)] bg-[var(--card)] hover:shadow-md transition-shadow"
               >
                 {ch.logoUrl ? (
-                  <img
+                  <Image
                     src={ch.logoUrl}
                     alt=""
+                    width={40}
+                    height={40}
                     className="h-10 w-10 rounded object-contain bg-[var(--surface-muted)] shrink-0"
                   />
                 ) : (
