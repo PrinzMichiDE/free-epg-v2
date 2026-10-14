@@ -1,6 +1,6 @@
 import { sql } from "drizzle-orm";
 import { getDatabase } from "@/lib/db";
-import { channels, generatedFiles } from "@freeepg/db";
+import { channels, getLatestCountryFileMap } from "@freeepg/db";
 import { SUPPORTED_EPG_COUNTRIES } from "@freeepg/epg-sources";
 import { HomePageContent } from "@/components/home/HomePageContent";
 import { countryEpgPaths } from "@/lib/utils";
@@ -18,8 +18,7 @@ async function getCountriesData() {
     .from(channels)
     .groupBy(channels.country);
 
-  const files = await db.select().from(generatedFiles);
-  const fileMap = new Map(files.map((f) => [f.country, f]));
+  const fileMap = await getLatestCountryFileMap(db);
 
   return SUPPORTED_EPG_COUNTRIES.map((code) => {
     const stat = stats.find((s) => s.country === code);
