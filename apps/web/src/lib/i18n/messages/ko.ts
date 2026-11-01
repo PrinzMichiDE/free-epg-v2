@@ -23,8 +23,8 @@ export const ko = {
   "donate.shoop": "Shoop",
   "donate.tradere": "trade.re",
   "donate.affiliateTitle": "Affiliate support",
-  "donate.banner.message": "Support FreeEPG — via Amazon wishlist",
-  "donate.banner.cta": "View on Amazon",
+  "donate.banner.message": "Support FreeEPG — via PayPal",
+  "donate.banner.cta": "Donate now",
   "donate.hint":
     "PayPal 또는 Ko-fi를 통한 자발적 기부로 운영 및 지속적인 개발을 지원합니다.",
   "footer.tagline":

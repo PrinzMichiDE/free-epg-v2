@@ -24,8 +24,8 @@ export const de = {
   "donate.tradere": "trade.re",
   "donate.affiliateTitle": "Affiliate-Unterstützung",
   "donate.hint": "Freiwillige Spende oder Affiliate-Link — unterstützt Betrieb und Weiterentwicklung.",
-  "donate.banner.message": "FreeEPG unterstützen — über Amazon Wunschzettel",
-  "donate.banner.cta": "Auf Amazon ansehen",
+  "donate.banner.message": "FreeEPG unterstützen — über PayPal",
+  "donate.banner.cta": "Jetzt spenden",
   "footer.tagline":
     "Self-hosted EPG-Plattform für XMLTV und Rytec — ohne Garantie auf Vollständigkeit.",
   "footer.resources": "Ressourcen",

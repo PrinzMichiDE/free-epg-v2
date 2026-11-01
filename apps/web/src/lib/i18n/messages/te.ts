@@ -23,8 +23,8 @@ export const te = {
   "donate.shoop": "Shoop",
   "donate.tradere": "trade.re",
   "donate.affiliateTitle": "Affiliate support",
-  "donate.banner.message": "Support FreeEPG — via Amazon wishlist",
-  "donate.banner.cta": "View on Amazon",
+  "donate.banner.message": "Support FreeEPG — via PayPal",
+  "donate.banner.cta": "Donate now",
   "donate.hint":
     "నిర్వహణ మరియు అభివృద్ధికి PayPal లేదా Ko-fi ద్వారా స్వచ్ఛంద దానం.",
   "footer.tagline":

@@ -23,8 +23,8 @@ export const sw = {
   "donate.shoop": "Shoop",
   "donate.tradere": "trade.re",
   "donate.affiliateTitle": "Affiliate support",
-  "donate.banner.message": "Support FreeEPG — via Amazon wishlist",
-  "donate.banner.cta": "View on Amazon",
+  "donate.banner.message": "Support FreeEPG — via PayPal",
+  "donate.banner.cta": "Donate now",
   "donate.hint":
     "Mchango wa hiari kupitia PayPal au Ko-fi kwa uendeshaji na maendeleo endelevu.",
   "footer.tagline":

@@ -23,8 +23,8 @@ export const id = {
   "donate.shoop": "Shoop",
   "donate.tradere": "trade.re",
   "donate.affiliateTitle": "Affiliate support",
-  "donate.banner.message": "Support FreeEPG — via Amazon wishlist",
-  "donate.banner.cta": "View on Amazon",
+  "donate.banner.message": "Support FreeEPG — via PayPal",
+  "donate.banner.cta": "Donate now",
   "donate.hint":
     "Donasi sukarela via PayPal atau Ko-fi untuk operasional dan pengembangan berkelanjutan.",
   "footer.tagline":

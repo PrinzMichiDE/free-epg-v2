@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { AMAZON_SUPPORT_URL } from "@/lib/site";
+import { PAYPAL_DONATE_URL } from "@/lib/site";
 import { useI18n } from "@/lib/i18n/I18nProvider";
 
 export function AmazonSupportBanner() {
@@ -13,9 +13,9 @@ export function AmazonSupportBanner() {
         <p className="text-xs sm:text-sm text-[var(--muted-foreground)] text-center sm:text-left">
           {t("donate.banner.message")}{" "}
           <Link
-            href={AMAZON_SUPPORT_URL}
+            href={PAYPAL_DONATE_URL}
             target="_blank"
-            rel="noopener noreferrer sponsored"
+            rel="noopener noreferrer"
             className="text-[var(--foreground)] underline underline-offset-4 decoration-[var(--border)] hover:decoration-[var(--accent)] transition-colors"
           >
             {t("donate.banner.cta")}
