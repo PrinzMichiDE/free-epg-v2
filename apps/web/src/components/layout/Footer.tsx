@@ -5,11 +5,17 @@ import { useI18n } from "@/lib/i18n/I18nProvider";
 import type { MessageKey } from "@/lib/i18n/messages";
 import type { ReactNode } from "react";
 
-const footerLinks: { href: string; labelKey: MessageKey }[] = [
+const footerLinks: { href: string; labelKey?: MessageKey; label?: string }[] = [
   { href: "/docs", labelKey: "footer.docs" },
   { href: "/docs/api", labelKey: "footer.api" },
   { href: "/docs/enigma2", labelKey: "footer.enigma2" },
   { href: "/countries", labelKey: "footer.countryFeeds" },
+];
+
+const legalLinks = [
+  { href: "/impressum", label: "Impressum" },
+  { href: "/datenschutz", label: "Datenschutz" },
+  { href: "/takedown", label: "Takedown" },
 ];
 
 export function Footer({ versionSlot }: { versionSlot: ReactNode }) {
@@ -37,7 +43,7 @@ export function Footer({ versionSlot }: { versionSlot: ReactNode }) {
                     href={link.href}
                     className="text-[var(--muted-foreground)] hover:text-[var(--accent)] transition-colors"
                   >
-                    {t(link.labelKey)}
+                    {link.labelKey ? t(link.labelKey) : link.label}
                   </Link>
                 </li>
               ))}
@@ -73,11 +79,24 @@ export function Footer({ versionSlot }: { versionSlot: ReactNode }) {
       </div>
 
       <div className="border-t border-[var(--border)]">
-        <div className="page-shell py-4 flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between text-xs text-[var(--muted-foreground)] font-mono">
-          <p>
-            © {new Date().getFullYear()} FreeEPG · {t("footer.copyright")}
-          </p>
-          {versionSlot}
+        <div className="page-shell py-4 flex flex-col gap-2 text-xs text-[var(--muted-foreground)] font-mono">
+          <div className="flex flex-wrap items-center gap-3">
+            {legalLinks.map((link) => (
+              <Link
+                key={link.href}
+                href={link.href}
+                className="hover:text-[var(--accent)] transition-colors"
+              >
+                {link.label}
+              </Link>
+            ))}
+          </div>
+          <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
+            <p>
+              © {new Date().getFullYear()} FreeEPG · {t("footer.copyright")}
+            </p>
+            {versionSlot}
+          </div>
         </div>
       </div>
     </footer>

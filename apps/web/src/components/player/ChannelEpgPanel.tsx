@@ -40,8 +40,8 @@ function ProgrammeRow({
   return (
     <li
       className={cn(
-        "rounded-lg px-3 py-2.5",
-        highlight ? "bg-[var(--primary)]/10 border border-[var(--primary)]/20" : "bg-[var(--surface-muted)]/60"
+        "rounded-sm px-3 py-2.5",
+        highlight ? "bg-[var(--accent)]/10 border border-[var(--accent)]/30" : "bg-[var(--surface-muted)]/60"
       )}
     >
       <p className="text-xs text-[var(--muted-foreground)] tabular-nums">
@@ -115,14 +115,14 @@ function ChannelEpgPanelInner({
   const hasData = epg?.current || (epg?.upcoming.length ?? 0) > 0;
 
   return (
-    <div className={cn("rounded-xl border border-[var(--border)] bg-[var(--card)] overflow-hidden", className)}>
+    <div className={cn("rounded-sm border border-[var(--border)] bg-[var(--card)] overflow-hidden shadow-[var(--shadow-md)]", className)}>
       <div className="px-4 py-3 border-b border-[var(--border)] flex items-center gap-2">
         <Calendar className="h-4 w-4 text-[var(--accent)] shrink-0" aria-hidden />
         <div className="min-w-0">
           <p className="text-xs font-semibold uppercase tracking-wider text-[var(--muted-foreground)]">
             {t("player.epg.title")}
           </p>
-          <p className="font-semibold tracking-tight truncate">{channelTitle}</p>
+          <p className="font-semibold tracking-tight truncate font-serif">{channelTitle}</p>
         </div>
       </div>
 

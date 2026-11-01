@@ -1,0 +1,31 @@
+{
+  "imprint": {
+    "name": "",
+    "street": "",
+    "postalCode": "",
+    "city": "",
+    "country": "Deutschland",
+    "email": "",
+    "phone": "",
+    "representative": "",
+    "registerNumber": "",
+    "registerCourt": "",
+    "vatId": "",
+    "responsibleForContent": {
+      "name": "",
+      "address": ""
+    }
+  },
+  "contact": {
+    "email": ""
+  },
+  "takedown": {
+    "email": "",
+    "formUrl": "/api/legal/takedown",
+    "responseTimeHours": 24
+  },
+  "privacy": {
+    "dataController": "",
+    "dpoEmail": ""
+  }
+}

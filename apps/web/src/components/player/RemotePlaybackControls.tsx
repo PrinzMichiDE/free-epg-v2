@@ -26,7 +26,7 @@ interface RemotePlaybackControlsProps {
 }
 
 const controlButtonClass =
-  "inline-flex h-9 w-9 items-center justify-center rounded-lg bg-black/55 text-white backdrop-blur-sm transition-colors hover:bg-black/75 disabled:opacity-40 disabled:pointer-events-none";
+  "inline-flex h-9 w-9 items-center justify-center rounded-sm bg-black/55 text-white backdrop-blur-sm transition-colors hover:bg-black/75 active:bg-black/85 disabled:opacity-40 disabled:pointer-events-none";
 
 export function RemotePlaybackControls({
   channel,

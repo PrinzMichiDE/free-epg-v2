@@ -10,6 +10,38 @@ import { GLOBETV_FOLDERS_BY_COUNTRY } from "./globetv-countries.js";
 const GLOBETV_RAW_BASE = "https://raw.githubusercontent.com/globetvapp/epg/main";
 const FETCH_HEADERS = { "User-Agent": "FreeEPG/1.0" };
 
+async function fetchWithRetry(
+  url: string,
+  options: RequestInit = {},
+  maxRetries = 3,
+  initialDelayMs = 1000
+): Promise<Response | null> {
+  for (let attempt = 0; attempt <= maxRetries; attempt++) {
+    try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 120000);
+
+      const res = await fetch(url, {
+        ...options,
+        signal: controller.signal,
+      });
+
+      clearTimeout(timeoutId);
+
+      if (res.ok) return res;
+      if (res.status >= 400 && res.status < 500 && res.status !== 429) return res;
+    } catch {
+      // continue to retry
+    }
+
+    if (attempt < maxRetries) {
+      const delay = initialDelayMs * Math.pow(2, attempt) * (0.9 + Math.random() * 0.2);
+      await new Promise((resolve) => setTimeout(resolve, delay));
+    }
+  }
+  return null;
+}
+
 export class EpgPwAdapter implements EpgSourceAdapter {
   name = "epg.pw";
   type = "http";
@@ -19,11 +51,10 @@ export class EpgPwAdapter implements EpgSourceAdapter {
     const cc = countryCode.toUpperCase();
     const url = `https://epg.pw/xmltv/epg_${cc}.xml`;
     try {
-      const res = await fetch(url, {
-        signal: AbortSignal.timeout(120_000),
+      const res = await fetchWithRetry(url, {
         headers: { "User-Agent": "FreeEPG/1.0" },
       });
-      if (!res.ok) return null;
+      if (!res?.ok) return null;
       return normalizeEpgPwDocument(parseXmltv(await res.text()));
     } catch {
       return null;
@@ -32,11 +63,15 @@ export class EpgPwAdapter implements EpgSourceAdapter {
 
   async fetchGlobal(): Promise<XmltvDocument | null> {
     try {
-      const res = await fetch("https://epg.pw/xmltv/epg_lite.xml", {
-        signal: AbortSignal.timeout(180_000),
-        headers: { "User-Agent": "FreeEPG/1.0" },
-      });
-      if (!res.ok) return null;
+      const res = await fetchWithRetry(
+        "https://epg.pw/xmltv/epg_lite.xml",
+        {
+          headers: { "User-Agent": "FreeEPG/1.0" },
+        },
+        3,
+        2000
+      );
+      if (!res?.ok) return null;
       return normalizeEpgPwDocument(parseXmltv(await res.text()));
     } catch {
       return null;

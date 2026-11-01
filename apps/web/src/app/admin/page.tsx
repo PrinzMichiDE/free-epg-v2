@@ -33,6 +33,7 @@ export default function AdminPage() {
           <Link href="/admin/analytics" className="text-[var(--primary)] hover:underline">Analytics</Link>
           <Link href="/admin/jobs" className="text-[var(--primary)] hover:underline">Jobs</Link>
           <Link href="/admin/audit" className="text-[var(--primary)] hover:underline">Audit</Link>
+          <Link href="/admin/takedowns" className="text-[var(--primary)] hover:underline">Takedowns</Link>
         </div>
       </div>
 

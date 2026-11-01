@@ -192,9 +192,36 @@ export const adminAuditLogs = pgTable(
   (t) => [index("idx_admin_audit_logs_created").on(t.createdAt)]
 );
 
+export const takedownRequests = pgTable(
+  "takedown_requests",
+  {
+    id: serial("id").primaryKey(),
+    requesterName: text("requester_name"),
+    requesterEmail: text("requester_email").notNull(),
+    requesterOrg: text("requester_org"),
+    requestType: text("request_type").notNull(), // "copyright" | "illegal" | "other"
+    targetUrl: text("target_url"),
+    targetContent: text("target_content"),
+    description: text("description").notNull(),
+    signature: text("signature"),
+    status: text("status").default("pending").notNull(), // "pending" | "in_review" | "resolved" | "rejected"
+    actionTaken: text("action_taken"),
+    resolvedBy: text("resolved_by"),
+    resolvedAt: timestamp("resolved_at"),
+    ipHash: text("ip_hash"),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  },
+  (t) => [
+    index("idx_takedown_requests_status").on(t.status),
+    index("idx_takedown_requests_created").on(t.createdAt),
+  ]
+);
+
 export type Channel = typeof channels.$inferSelect;
 export type Programme = typeof programmes.$inferSelect;
 export type EpgSource = typeof epgSources.$inferSelect;
 export type EpgJob = typeof epgJobs.$inferSelect;
 export type M3uPlaylist = typeof m3uPlaylists.$inferSelect;
 export type M3uEntry = typeof m3uEntries.$inferSelect;
+export type TakedownRequest = typeof takedownRequests.$inferSelect;
