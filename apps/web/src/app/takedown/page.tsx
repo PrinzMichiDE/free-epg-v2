@@ -195,9 +195,9 @@ export default function TakedownPage() {
         </form>
       )}
 
-      {takedown.email && (
+      {legal.takedown?.email && (
         <p className="mt-6 text-sm text-[var(--muted-foreground)]">
-          Alternativ können Sie auch eine E-Mail senden an: {takedown.email}
+          Alternativ können Sie auch eine E-Mail senden an: {legal.takedown.email}
         </p>
       )}
     </article>
