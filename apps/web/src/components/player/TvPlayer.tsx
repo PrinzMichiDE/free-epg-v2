@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { AlertCircle, Loader2, Maximize, Minimize, PictureInPicture2, RotateCcw, Volume2, VolumeX } from "lucide-react";
+import { AlertCircle, ChevronLeft, ChevronRight, Loader2, Maximize, Minimize, PictureInPicture2, RotateCcw, Volume2, VolumeX } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { buildProxyUrl } from "@/lib/player/stream-proxy";
 import { IPTV_HLS_CONFIG } from "@/lib/player/hls-config";
@@ -17,10 +17,12 @@ interface TvPlayerProps {
   channel: PlaylistPlayerEntry | null;
   className?: string;
   onError?: (message: string) => void;
+  onPrevChannel?: () => void;
   onNextChannel?: () => void;
   errorLabel: string;
   loadingLabel: string;
   retryLabel: string;
+  prevChannelLabel?: string;
   nextChannelLabel?: string;
   pipLabel: string;
   fullscreenLabel?: string;
@@ -50,10 +52,12 @@ function TvPlayerInner({
   channel,
   className,
   onError,
+  onPrevChannel,
   onNextChannel,
   errorLabel,
   loadingLabel,
   retryLabel,
+  prevChannelLabel,
   nextChannelLabel,
   pipLabel,
   fullscreenLabel,
@@ -64,6 +68,7 @@ function TvPlayerInner({
   const containerRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const hlsRef = useRef<Hls | null>(null);
+  const lastTapRef = useRef(0);
   const [loading, setLoading] = useState(() => Boolean(channel?.url));
   const [buffering, setBuffering] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -74,6 +79,8 @@ function TvPlayerInner({
   const [volume, setVolume] = useState(1);
   const [muted, setMuted] = useState(false);
   const [volumeReady, setVolumeReady] = useState(false);
+  const [showMobileControls, setShowMobileControls] = useState(true);
+  const mobileControlsTimerRef = useRef<number | null>(null);
   const pipSupported =
     typeof document !== "undefined" &&
     "pictureInPictureEnabled" in document &&
@@ -355,6 +362,37 @@ function TvPlayerInner({
     }
   };
 
+  const showControlsTemporarily = () => {
+    setShowMobileControls(true);
+    if (mobileControlsTimerRef.current) {
+      window.clearTimeout(mobileControlsTimerRef.current);
+    }
+    mobileControlsTimerRef.current = window.setTimeout(() => {
+      setShowMobileControls(false);
+    }, 3000);
+  };
+
+  useEffect(() => {
+    return () => {
+      if (mobileControlsTimerRef.current) {
+        window.clearTimeout(mobileControlsTimerRef.current);
+      }
+    };
+  }, []);
+
+  const handleContainerTap = (e: React.MouseEvent | React.TouchEvent) => {
+    const target = e.target as HTMLElement;
+    if (target.closest("button, input, select, a, [role='button']")) return;
+    const now = Date.now();
+    if (now - lastTapRef.current < 300) {
+      void toggleFullscreen();
+      lastTapRef.current = 0;
+      return;
+    }
+    lastTapRef.current = now;
+    showControlsTemporarily();
+  };
+
   const formatTime = (iso: string) => {
     return new Intl.DateTimeFormat(locale === "de" ? "de-DE" : locale, { timeStyle: "short" }).format(
       new Date(iso)
@@ -365,10 +403,12 @@ function TvPlayerInner({
     <div
       ref={containerRef}
       className={cn(
-        "relative aspect-video w-full overflow-hidden rounded-sm bg-black group",
-        isFullscreen && "aspect-auto h-screen",
+        "relative aspect-video w-full overflow-hidden rounded-sm bg-black group touch-manipulation",
+        isFullscreen && "aspect-auto h-screen rounded-none",
         className
       )}
+      onClick={handleContainerTap}
+      onTouchStart={showControlsTemporarily}
     >
       <video
         ref={videoRef}
@@ -412,11 +452,11 @@ function TvPlayerInner({
       )}
 
       {currentProgramme && !loading && !error && !isFullscreen && (
-        <div className="pointer-events-none absolute inset-x-0 bottom-16 px-4">
+        <div className="pointer-events-none absolute inset-x-0 bottom-16 px-4 hidden sm:block">
           <div className="max-w-md rounded-sm bg-black/70 backdrop-blur-sm px-3 py-2">
             <div className="flex items-center justify-between text-xs text-white/80 mb-1">
-              <span className="font-medium">{currentProgramme.title}</span>
-              <span className="tabular-nums">{formatTime(currentProgramme.start)}–{formatTime(currentProgramme.stop)}</span>
+              <span className="font-medium truncate pr-2">{currentProgramme.title}</span>
+              <span className="tabular-nums shrink-0">{formatTime(currentProgramme.start)}–{formatTime(currentProgramme.stop)}</span>
             </div>
             <div className="h-1 rounded-full bg-white/20 overflow-hidden">
               <div
@@ -428,7 +468,43 @@ function TvPlayerInner({
         </div>
       )}
 
-      <div className="absolute bottom-12 right-2 z-10 flex items-center gap-1.5 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
+      {channel && !loading && !error && onPrevChannel && (
+        <button
+          type="button"
+          onClick={(e) => { e.stopPropagation(); onPrevChannel(); }}
+          className={cn(
+            "absolute left-2 top-1/2 -translate-y-1/2 z-10 flex h-11 w-11 items-center justify-center rounded-full bg-black/45 text-white backdrop-blur-sm transition-all hover:bg-black/65 active:scale-95",
+            "sm:opacity-0 sm:group-hover:opacity-100",
+            showMobileControls ? "opacity-100" : "opacity-0"
+          )}
+          aria-label={prevChannelLabel || "Previous channel"}
+          title={prevChannelLabel || "Previous channel"}
+        >
+          <ChevronLeft className="h-6 w-6" aria-hidden />
+        </button>
+      )}
+
+      {channel && !loading && !error && onNextChannel && (
+        <button
+          type="button"
+          onClick={(e) => { e.stopPropagation(); onNextChannel(); }}
+          className={cn(
+            "absolute right-2 top-1/2 -translate-y-1/2 z-10 flex h-11 w-11 items-center justify-center rounded-full bg-black/45 text-white backdrop-blur-sm transition-all hover:bg-black/65 active:scale-95",
+            "sm:opacity-0 sm:group-hover:opacity-100",
+            showMobileControls ? "opacity-100" : "opacity-0"
+          )}
+          aria-label={nextChannelLabel || "Next channel"}
+          title={nextChannelLabel || "Next channel"}
+        >
+          <ChevronRight className="h-6 w-6" aria-hidden />
+        </button>
+      )}
+
+      <div className={cn(
+        "absolute bottom-12 right-2 z-10 flex items-center gap-1.5 transition-opacity",
+        "sm:opacity-0 sm:group-hover:opacity-100",
+        showMobileControls ? "opacity-100" : "opacity-0 sm:opacity-0"
+      )}>
         {channel && !error && (
           <div className="group/vol flex items-center rounded-sm bg-black/55 backdrop-blur-sm overflow-hidden">
             <button

@@ -146,7 +146,14 @@ export function PlaylistWatchView({ playlist, backHref, defaultCountry }: Playli
     return filtered[0] ?? null;
   }, [activeId, filtered, playlist.entries]);
 
+  const vibrate = (ms = 10) => {
+    try {
+      if (typeof navigator !== "undefined" && navigator.vibrate) navigator.vibrate(ms);
+    } catch {}
+  };
+
   const selectChannel = (entryId: string) => {
+    vibrate(8);
     setActiveId(entryId);
     writeLastChannelId(playlist.code, entryId);
     setMobileDrawerOpen(false);
@@ -209,6 +216,16 @@ export function PlaylistWatchView({ playlist, backHref, defaultCountry }: Playli
   useEffect(() => {
     activeItemRef.current?.scrollIntoView({ block: "nearest" });
   }, [activeChannel?.id]);
+
+  useEffect(() => {
+    if (mobileDrawerOpen) {
+      const prev = document.body.style.overflow;
+      document.body.style.overflow = "hidden";
+      return () => {
+        document.body.style.overflow = prev;
+      };
+    }
+  }, [mobileDrawerOpen]);
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -577,10 +594,12 @@ export function PlaylistWatchView({ playlist, backHref, defaultCountry }: Playli
           <div className="lg:static sticky top-[var(--header-height,56px)] z-10 -mx-4 sm:mx-0 px-4 sm:px-0 bg-[var(--background)] sm:bg-transparent pt-2 sm:pt-0 pb-2 sm:pb-0">
             <TvPlayer
               channel={activeChannel}
+              onPrevChannel={selectPrevious}
               onNextChannel={selectNext}
               errorLabel={t("player.playbackError")}
               loadingLabel={t("player.loading")}
               retryLabel={t("player.retry")}
+              prevChannelLabel={t("player.prevChannel")}
               nextChannelLabel={t("player.nextChannel")}
               pipLabel={t("player.pip")}
               fullscreenLabel={t("player.fullscreen")}
@@ -588,6 +607,45 @@ export function PlaylistWatchView({ playlist, backHref, defaultCountry }: Playli
               nowPlayingLabel={t("player.nowPlaying")}
             />
           </div>
+
+          {favorites.size > 0 && (
+            <div className="lg:hidden -mx-1 px-1">
+              <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none snap-x snap-mandatory">
+                {playlist.entries
+                  .filter((e) => favorites.has(e.id))
+                  .slice(0, 12)
+                  .map((entry) => {
+                    const isActive = entry.id === activeChannel?.id;
+                    const prog = epgCache.get(entry.tvgId);
+                    return (
+                      <button
+                        key={`quick-${entry.id}`}
+                        type="button"
+                        onClick={() => selectChannel(entry.id)}
+                        className={cn(
+                          "shrink-0 snap-start flex items-center gap-2 rounded-sm border px-2.5 py-2 min-h-[44px] max-w-[180px] transition-colors",
+                          isActive
+                            ? "border-[var(--accent)] bg-[var(--accent)]/10 text-[var(--foreground)]"
+                            : "border-[var(--border)] bg-[var(--card)] hover:bg-[var(--surface-muted)]"
+                        )}
+                      >
+                        {entry.logoUrl ? (
+                          <img src={entry.logoUrl} alt="" className="h-6 w-6 rounded-sm object-contain bg-[var(--surface-muted)]" />
+                        ) : (
+                          <span className="h-6 w-6 rounded-sm bg-[var(--surface-muted)] flex items-center justify-center text-[10px] font-medium">
+                            {entry.title.slice(0, 2)}
+                          </span>
+                        )}
+                        <span className="min-w-0 text-left">
+                          <span className="block text-xs font-medium truncate">{entry.title}</span>
+                          {prog && <span className="block text-[10px] text-[var(--muted-foreground)] truncate">{prog.title}</span>}
+                        </span>
+                      </button>
+                    );
+                  })}
+              </div>
+            </div>
+          )}
 
           <button
             type="button"
@@ -659,8 +717,11 @@ export function PlaylistWatchView({ playlist, backHref, defaultCountry }: Playli
             onClick={() => setMobileDrawerOpen(false)}
             aria-hidden
           />
-          <div className="absolute inset-x-0 bottom-0 max-h-[85vh] flex flex-col rounded-t-sm border-t border-[var(--border)] bg-[var(--card)] shadow-xl">
-            <div className="flex items-center justify-between p-4 border-b border-[var(--border)]">
+          <div className="absolute inset-x-0 bottom-0 max-h-[88vh] flex flex-col rounded-t-sm border-t border-[var(--border)] bg-[var(--card)] shadow-xl pb-[env(safe-area-inset-bottom)]">
+            <div className="flex justify-center pt-2 pb-1">
+              <div className="h-1.5 w-12 rounded-full bg-[var(--border)]" aria-hidden />
+            </div>
+            <div className="flex items-center justify-between px-4 pb-3 pt-1 border-b border-[var(--border)]">
               <div className="flex items-center gap-2">
                 <Tv className="h-5 w-5 text-[var(--accent)]" aria-hidden />
                 <h2 className="font-semibold">{t("player.badge")}</h2>
