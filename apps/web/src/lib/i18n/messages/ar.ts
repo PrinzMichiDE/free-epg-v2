@@ -69,6 +69,18 @@ export const ar = {
   "home.playlistsTeaser":
     "لا حاجة للبحث يدويًا عن روابط البث: FreeEPG ينشئ M3U لكل بلد بأفضل البث المتاح ويربطها تلقائيًا بـ EPG.",
   "home.playlistsCta": "الانتقال إلى فهرس قوائم التشغيل",
+  "home.quickTitle": "Quick start",
+  "home.howTitle": "How it works",
+  "home.howDesc": "EPG and playlists from public sources — automatically processed and available via stable URLs.",
+  "home.how1Title": "Pick a country or format",
+  "home.how1Desc": "Choose a country feed, a worldwide M3U, or the right format for your app.",
+  "home.how2Title": "Add the URL to your app",
+  "home.how2Desc": "Paste XMLTV, Rytec, or M3U into Kodi, VLC, Jellyfin, Plex, or Enigma2.",
+  "home.how3Title": "Stay up to date automatically",
+  "home.how3Desc": "FreeEPG refreshes channel data and programme previews regularly in the background.",
+  "home.formatsTitle": "Formats & compatibility",
+  "home.formatsDesc": "One service, multiple outputs — for IPTV players, receivers, and media centers.",
+
   "playlists.badge": "قوائم IPTV",
   "playlists.title": "قوائم تشغيل عالمية",
   "playlists.subtitle":
@@ -147,6 +159,8 @@ export const ar = {
   "player.hideEpg": "Hide EPG",
   "player.channelNumber": "Channel {number}",
   "player.recent": "Recent",
+  "player.allCountries": "All countries",
+  "player.filterCountry": "Filter country",
   "programmes.badge": "TV guide",
   "programmes.title": "What's on now?",
   "programmes.subtitle": "Live and upcoming shows — searchable by title, description or channel.",

@@ -69,6 +69,18 @@ export const te = {
   "home.playlistsTeaser":
     "స్ట్రీమ్ URL లను మాన్యువల్‌గా వెతకాల్సిన అవసరం లేదు: FreeEPG ప్రతి దేశానికి అందుబాటులో ఉన్న ఉత్తమ స్ట్రీమ్‌లతో M3U ను నిర్మిస్తుంది మరియు EPG కు స్వయంచాలకంగా లింక్ చేస్తుంది.",
   "home.playlistsCta": "ప్లేజాబితా క్యాటలాగ్‌కు వెళ్లండి",
+  "home.quickTitle": "Quick start",
+  "home.howTitle": "How it works",
+  "home.howDesc": "EPG and playlists from public sources — automatically processed and available via stable URLs.",
+  "home.how1Title": "Pick a country or format",
+  "home.how1Desc": "Choose a country feed, a worldwide M3U, or the right format for your app.",
+  "home.how2Title": "Add the URL to your app",
+  "home.how2Desc": "Paste XMLTV, Rytec, or M3U into Kodi, VLC, Jellyfin, Plex, or Enigma2.",
+  "home.how3Title": "Stay up to date automatically",
+  "home.how3Desc": "FreeEPG refreshes channel data and programme previews regularly in the background.",
+  "home.formatsTitle": "Formats & compatibility",
+  "home.formatsDesc": "One service, multiple outputs — for IPTV players, receivers, and media centers.",
+
   "playlists.badge": "IPTV ప్లేజాబితాలు",
   "playlists.title": "ప్రపంచ ప్లేజాబితాలు",
   "playlists.subtitle":
@@ -147,6 +159,8 @@ export const te = {
   "player.hideEpg": "Hide EPG",
   "player.channelNumber": "Channel {number}",
   "player.recent": "Recent",
+  "player.allCountries": "All countries",
+  "player.filterCountry": "Filter country",
   "programmes.badge": "TV guide",
   "programmes.title": "What's on now?",
   "programmes.subtitle": "Live and upcoming shows — searchable by title, description or channel.",

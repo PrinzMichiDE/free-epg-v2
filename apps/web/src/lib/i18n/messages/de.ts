@@ -68,6 +68,18 @@ export const de = {
   "home.playlistsTeaser":
     "Kein manuelles Suchen von Stream-URLs: FreeEPG baut pro Land eine M3U mit den besten verfügbaren Streams und verknüpft sie automatisch mit dem EPG.",
   "home.playlistsCta": "Zum Playlist-Katalog",
+  "home.quickTitle": "Schnellstart",
+  "home.howTitle": "So funktioniert’s",
+  "home.howDesc": "EPG und Playlisten aus öffentlichen Quellen — automatisch aufbereitet und per stabiler URL abrufbar.",
+  "home.how1Title": "Land oder Format wählen",
+  "home.how1Desc": "Wähle einen Länder-Feed, eine weltweite M3U oder das passende Format für deine App.",
+  "home.how2Title": "URL in deine App eintragen",
+  "home.how2Desc": "Füge XMLTV, Rytec oder M3U in Kodi, VLC, Jellyfin, Plex oder Enigma2 ein.",
+  "home.how3Title": "Automatisch aktuell bleiben",
+  "home.how3Desc": "FreeEPG aktualisiert Senderdaten und Programmvorschauen regelmäßig im Hintergrund.",
+  "home.formatsTitle": "Formate & Kompatibilität",
+  "home.formatsDesc": "Ein Dienst, mehrere Ausgaben — passend für IPTV-Player, Receiver und Media-Center.",
+
   "playlists.badge": "IPTV Playlists",
   "playlists.title": "Playlisten weltweit",
   "playlists.subtitle":
@@ -143,6 +155,8 @@ export const de = {
   "player.hideEpg": "EPG ausblenden",
   "player.channelNumber": "Kanal {number}",
   "player.recent": "Zuletzt",
+  "player.allCountries": "Alle Länder",
+  "player.filterCountry": "Land filtern",
   "programmes.badge": "TV-Programm",
   "programmes.title": "Was läuft gerade?",
   "programmes.subtitle":

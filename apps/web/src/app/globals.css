@@ -226,4 +226,83 @@
   .prose-docs a {
     @apply text-[var(--accent)] hover:underline underline-offset-4;
   }
+
+  .home-hero-glow {
+    background:
+      radial-gradient(ellipse 55% 45% at 85% 15%, color-mix(in srgb, var(--accent) 14%, transparent), transparent 70%),
+      radial-gradient(ellipse 40% 35% at 10% 80%, color-mix(in srgb, var(--foreground) 6%, transparent), transparent 65%);
+  }
+
+  .home-ticker {
+    --home-ticker-duration: 38s;
+    display: flex;
+    overflow: hidden;
+    user-select: none;
+    border-block: 1px solid var(--border);
+    background: color-mix(in srgb, var(--surface-muted) 55%, var(--background));
+  }
+
+  .home-ticker-track {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    min-width: 100%;
+    flex-shrink: 0;
+    padding-block: 0.625rem;
+    animation: home-ticker-scroll var(--home-ticker-duration) linear infinite;
+  }
+
+  .home-ticker:hover .home-ticker-track,
+  .home-ticker:focus-within .home-ticker-track {
+    animation-play-state: paused;
+  }
+
+  .home-ticker-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.625rem;
+    padding-inline: 1rem;
+    white-space: nowrap;
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.01em;
+    color: var(--muted-foreground);
+  }
+
+  .home-ticker-dot {
+    width: 0.25rem;
+    height: 0.25rem;
+    border-radius: 9999px;
+    background: var(--accent);
+    opacity: 0.7;
+    flex-shrink: 0;
+  }
+
+  .home-reveal {
+    animation: home-reveal-in 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+
+  .home-reveal-delay {
+    animation: home-reveal-in 0.7s cubic-bezier(0.16, 1, 0.3, 1) 0.12s both;
+  }
+}
+
+@keyframes home-ticker-scroll {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-100%);
+  }
+}
+
+@keyframes home-reveal-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
