@@ -10,15 +10,18 @@ import type { PlaylistPlayerEntry } from "@/lib/playlists";
 import type Hls from "hls.js";
 import { RemotePlaybackControls } from "@/components/player/RemotePlaybackControls";
 import { useI18n } from "@/lib/i18n/I18nProvider";
+import { readPlayerPreferences, writePlayerPreferences } from "@/lib/player/preferences";
 import type { ChannelEpgProgramme } from "@/lib/player/channel-epg";
 
 interface TvPlayerProps {
   channel: PlaylistPlayerEntry | null;
   className?: string;
   onError?: (message: string) => void;
+  onNextChannel?: () => void;
   errorLabel: string;
   loadingLabel: string;
   retryLabel: string;
+  nextChannelLabel?: string;
   pipLabel: string;
   fullscreenLabel?: string;
   exitFullscreenLabel?: string;
@@ -47,9 +50,11 @@ function TvPlayerInner({
   channel,
   className,
   onError,
+  onNextChannel,
   errorLabel,
   loadingLabel,
   retryLabel,
+  nextChannelLabel,
   pipLabel,
   fullscreenLabel,
   exitFullscreenLabel,
@@ -60,6 +65,7 @@ function TvPlayerInner({
   const videoRef = useRef<HTMLVideoElement>(null);
   const hlsRef = useRef<Hls | null>(null);
   const [loading, setLoading] = useState(() => Boolean(channel?.url));
+  const [buffering, setBuffering] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [reloadToken, setReloadToken] = useState(0);
   const [isFullscreen, setIsFullscreen] = useState(false);
@@ -67,10 +73,18 @@ function TvPlayerInner({
   const [programmeProgress, setProgrammeProgress] = useState(0);
   const [volume, setVolume] = useState(1);
   const [muted, setMuted] = useState(false);
+  const [volumeReady, setVolumeReady] = useState(false);
   const pipSupported =
     typeof document !== "undefined" &&
     "pictureInPictureEnabled" in document &&
     document.pictureInPictureEnabled;
+
+  useEffect(() => {
+    const prefs = readPlayerPreferences();
+    if (typeof prefs.volume === "number") setVolume(Math.min(1, Math.max(0, prefs.volume)));
+    if (typeof prefs.muted === "boolean") setMuted(prefs.muted);
+    setVolumeReady(true);
+  }, []);
 
   useEffect(() => {
     const handleFullscreenChange = () => {
@@ -86,6 +100,11 @@ function TvPlayerInner({
     video.volume = muted ? 0 : volume;
     video.muted = muted;
   }, [volume, muted]);
+
+  useEffect(() => {
+    if (!volumeReady) return;
+    writePlayerPreferences({ volume, muted });
+  }, [volume, muted, volumeReady]);
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -175,6 +194,22 @@ function TvPlayerInner({
   useEffect(() => {
     const video = videoRef.current;
     if (!video) return;
+    const onWaiting = () => setBuffering(true);
+    const onPlaying = () => { setBuffering(false); setLoading(false); };
+    const onCanPlay = () => setBuffering(false);
+    video.addEventListener("waiting", onWaiting);
+    video.addEventListener("playing", onPlaying);
+    video.addEventListener("canplay", onCanPlay);
+    return () => {
+      video.removeEventListener("waiting", onWaiting);
+      video.removeEventListener("playing", onPlaying);
+      video.removeEventListener("canplay", onCanPlay);
+    };
+  }, []);
+
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
 
     hlsRef.current?.destroy();
     hlsRef.current = null;
@@ -182,6 +217,7 @@ function TvPlayerInner({
     configureAirPlayVideo(video);
     setError(null);
     setLoading(Boolean(channel?.url));
+    setBuffering(false);
 
     if (!channel?.url) {
       return;
@@ -394,15 +430,31 @@ function TvPlayerInner({
 
       <div className="absolute bottom-12 right-2 z-10 flex items-center gap-1.5 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
         {channel && !error && (
-          <button
-            type="button"
-            className="inline-flex h-9 w-9 items-center justify-center rounded-sm bg-black/55 text-white backdrop-blur-sm transition-colors hover:bg-black/75 active:bg-black/85"
-            aria-label={muted ? (pipLabel ? "Unmute" : "Unmute") : "Mute"}
-            title={muted ? "Unmute (M)" : "Mute (M)"}
-            onClick={() => setMuted((m) => !m)}
-          >
-            {muted || volume === 0 ? <VolumeX className="h-4 w-4" aria-hidden /> : <Volume2 className="h-4 w-4" aria-hidden />}
-          </button>
+          <div className="group/vol flex items-center rounded-sm bg-black/55 backdrop-blur-sm overflow-hidden">
+            <button
+              type="button"
+              className="inline-flex h-9 w-9 items-center justify-center text-white transition-colors hover:bg-black/20 active:bg-black/30"
+              aria-label={muted ? "Unmute" : "Mute"}
+              title={muted ? "Unmute (M)" : "Mute (M)"}
+              onClick={() => setMuted((m) => !m)}
+            >
+              {muted || volume === 0 ? <VolumeX className="h-4 w-4" aria-hidden /> : <Volume2 className="h-4 w-4" aria-hidden />}
+            </button>
+            <input
+              type="range"
+              min={0}
+              max={1}
+              step={0.05}
+              value={muted ? 0 : volume}
+              onChange={(e) => {
+                const v = Number(e.target.value);
+                setVolume(v);
+                if (v > 0 && muted) setMuted(false);
+              }}
+              className="w-0 group-hover/vol:w-20 sm:group-hover/vol:w-24 transition-all duration-150 h-1 mr-0 group-hover/vol:mr-2 accent-white cursor-pointer"
+              aria-label="Volume"
+            />
+          </div>
         )}
         {channel && !error && (
           <button
@@ -437,6 +489,14 @@ function TvPlayerInner({
         </div>
       )}
 
+      {!loading && buffering && !error && (
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-10">
+          <div className="rounded-full bg-black/60 p-3 backdrop-blur-sm">
+            <Loader2 className="h-6 w-6 animate-spin text-white" aria-hidden />
+          </div>
+        </div>
+      )}
+
       {error && (
         <div className="absolute inset-x-0 bottom-0 flex items-center justify-between gap-3 bg-black/90 px-4 py-3 text-sm text-white">
           <div className="flex items-center gap-2 min-w-0">
@@ -444,18 +504,32 @@ function TvPlayerInner({
             <span className="truncate">{error}</span>
           </div>
           {channel && (
-            <button
-              type="button"
-              className="inline-flex shrink-0 items-center gap-1.5 rounded-sm bg-white/15 px-3 py-1.5 text-xs font-medium hover:bg-white/25 transition-colors"
-              onClick={() => {
-                setError(null);
-                setLoading(true);
-                setReloadToken((value) => value + 1);
-              }}
-            >
-              <RotateCcw className="h-3.5 w-3.5" aria-hidden />
-              {retryLabel}
-            </button>
+            <div className="flex items-center gap-2 shrink-0">
+              <button
+                type="button"
+                className="inline-flex items-center gap-1.5 rounded-sm bg-white/15 px-3 py-1.5 text-xs font-medium hover:bg-white/25 transition-colors"
+                onClick={() => {
+                  setError(null);
+                  setLoading(true);
+                  setReloadToken((value) => value + 1);
+                }}
+              >
+                <RotateCcw className="h-3.5 w-3.5" aria-hidden />
+                {retryLabel}
+              </button>
+              {onNextChannel && nextChannelLabel && (
+                <button
+                  type="button"
+                  className="inline-flex items-center gap-1.5 rounded-sm bg-[var(--accent)] px-3 py-1.5 text-xs font-medium text-white hover:opacity-90 transition-opacity"
+                  onClick={() => {
+                    setError(null);
+                    onNextChannel();
+                  }}
+                >
+                  {nextChannelLabel}
+                </button>
+              )}
+            </div>
           )}
         </div>
       )}

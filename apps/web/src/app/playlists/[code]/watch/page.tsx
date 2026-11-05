@@ -17,6 +17,7 @@ export default async function CountryPlaylistWatchPage({
     <PlaylistWatchLoader
       playlistCode={cc.toLowerCase()}
       backHref={`/playlists/${cc.toLowerCase()}`}
+      defaultCountry={cc}
     />
   );
 }

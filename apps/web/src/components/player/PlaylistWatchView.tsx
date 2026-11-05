@@ -24,11 +24,13 @@ import { usePlaylistFavorites } from "@/lib/player/favorites";
 import { readLastChannelId, writeLastChannelId } from "@/lib/player/last-channel";
 import { useChannelNavigation } from "@/lib/player/use-channel-navigation";
 import { writeRecentChannel } from "@/lib/player/recent-channels";
+import { readPlayerPreferences, writePlayerPreferences } from "@/lib/player/preferences";
 import type { ChannelEpgProgramme } from "@/lib/player/channel-epg";
 
 interface PlaylistWatchViewProps {
   playlist: PlaylistPlayerData;
   backHref: string;
+  defaultCountry?: string | null;
 }
 
 function resolveInitialChannelId(
@@ -59,7 +61,7 @@ function ChannelLogo({ entry }: { entry: PlaylistPlayerEntry }) {
   );
 }
 
-export function PlaylistWatchView({ playlist, backHref }: PlaylistWatchViewProps) {
+export function PlaylistWatchView({ playlist, backHref, defaultCountry }: PlaylistWatchViewProps) {
   const { t } = useI18n();
   const [query, setQuery] = useState("");
   const [favoritesOnly, setFavoritesOnly] = useState(false);
@@ -67,6 +69,8 @@ export function PlaylistWatchView({ playlist, backHref }: PlaylistWatchViewProps
   const [mobileDrawerOpen, setMobileDrawerOpen] = useState(false);
   const [theaterMode, setTheaterMode] = useState(false);
   const [showEpgPanel, setShowEpgPanel] = useState(true);
+  const [countryFilter, setCountryFilter] = useState<string>("all");
+  const [prefsLoaded, setPrefsLoaded] = useState(false);
   const [activeId, setActiveId] = useState<string | null>(() =>
     resolveInitialChannelId(playlist)
   );
@@ -77,10 +81,49 @@ export function PlaylistWatchView({ playlist, backHref }: PlaylistWatchViewProps
     playlist.code
   );
 
+  useEffect(() => {
+    const prefs = readPlayerPreferences();
+    if (prefs.viewMode) setViewMode(prefs.viewMode);
+    if (typeof prefs.showEpgPanel === "boolean") setShowEpgPanel(prefs.showEpgPanel);
+    if (typeof prefs.theaterMode === "boolean") setTheaterMode(prefs.theaterMode);
+    // Don't restore saved country filter if we have a defaultCountry from server - user's location takes priority as default
+    if (!defaultCountry && prefs.countryFilter && prefs.countryFilter !== "all") {
+      setCountryFilter(prefs.countryFilter);
+    }
+    setPrefsLoaded(true);
+  }, [defaultCountry]);
+
+  useEffect(() => {
+    if (!prefsLoaded) return;
+    writePlayerPreferences({ viewMode, showEpgPanel, theaterMode, countryFilter });
+  }, [viewMode, showEpgPanel, theaterMode, countryFilter, prefsLoaded]);
+
+  const countries = useMemo(() => {
+    const seen = new Map<string, string>();
+    for (const entry of playlist.entries) {
+      const code = entry.countryCode;
+      if (code && !seen.has(code)) {
+        seen.set(code, entry.groupTitle || code);
+      }
+    }
+    return [...seen.entries()]
+      .map(([code, name]) => ({ code, name }))
+      .sort((a, b) => a.name.localeCompare(b.name, "de"));
+  }, [playlist.entries]);
+
+  useEffect(() => {
+    if (!defaultCountry) return;
+    const code = defaultCountry.toUpperCase();
+    if (countries.some((c) => c.code === code)) {
+      setCountryFilter(code);
+    }
+  }, [defaultCountry, countries]);
+
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
     return playlist.entries.filter((entry) => {
       if (favoritesOnly && !favorites.has(entry.id)) return false;
+      if (countryFilter !== "all" && entry.countryCode !== countryFilter) return false;
       if (!q) return true;
       const prog = epgCache.get(entry.tvgId);
       return (
@@ -91,7 +134,7 @@ export function PlaylistWatchView({ playlist, backHref }: PlaylistWatchViewProps
         false
       );
     });
-  }, [favorites, favoritesOnly, playlist.entries, query, epgCache]);
+  }, [favorites, favoritesOnly, playlist.entries, query, epgCache, countryFilter]);
 
   const activeChannel: PlaylistPlayerEntry | null = useMemo(() => {
     const selected = activeId
@@ -166,6 +209,33 @@ export function PlaylistWatchView({ playlist, backHref }: PlaylistWatchViewProps
   useEffect(() => {
     activeItemRef.current?.scrollIntoView({ block: "nearest" });
   }, [activeChannel?.id]);
+
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      const target = event.target;
+      if (
+        target instanceof HTMLElement &&
+        (target.isContentEditable ||
+          target.tagName === "INPUT" ||
+          target.tagName === "TEXTAREA" ||
+          target.tagName === "SELECT")
+      ) {
+        return;
+      }
+      if (event.key === "t" || event.key === "T") {
+        event.preventDefault();
+        setTheaterMode((v) => !v);
+      } else if (event.key === "e" || event.key === "E") {
+        event.preventDefault();
+        setShowEpgPanel((v) => !v);
+      } else if (event.key === "c" || event.key === "C") {
+        event.preventDefault();
+        setMobileDrawerOpen(true);
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, []);
 
   useEffect(() => {
     const toFetch = filtered.slice(0, 20).filter((entry) => !epgCache.has(entry.tvgId));
@@ -335,22 +405,39 @@ export function PlaylistWatchView({ playlist, backHref }: PlaylistWatchViewProps
               </div>
             </div>
 
-            <button
-              type="button"
-              onClick={() => setFavoritesOnly((value) => !value)}
-              className={cn(
-                "inline-flex items-center gap-2 rounded-sm px-3 py-2 text-xs font-medium transition-colors",
-                favoritesOnly
-                  ? "bg-[var(--accent)]/15 text-[var(--accent)]"
-                  : "bg-[var(--surface-muted)] text-[var(--muted-foreground)] hover:text-[var(--foreground)]"
+            <div className="flex items-center gap-2 flex-wrap">
+              {countries.length > 1 && (
+                <select
+                  value={countryFilter}
+                  onChange={(e) => setCountryFilter(e.target.value)}
+                  className="flex-1 min-w-[140px] h-10 rounded-sm border border-[var(--border)] bg-[var(--surface-muted)] px-2 text-xs text-[var(--foreground)] focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/30"
+                  aria-label={t("player.filterCountry")}
+                >
+                  <option value="all">{t("player.allCountries")}</option>
+                  {countries.map((c) => (
+                    <option key={c.code} value={c.code}>
+                      {c.name}
+                    </option>
+                  ))}
+                </select>
               )}
-            >
-              <Star
-                className={cn("h-3.5 w-3.5", favoritesOnly && "fill-current")}
-                aria-hidden
-              />
-              {t("player.favoritesOnly")}
-            </button>
+              <button
+                type="button"
+                onClick={() => setFavoritesOnly((value) => !value)}
+                className={cn(
+                  "inline-flex items-center gap-2 rounded-sm px-3 py-2 text-xs font-medium transition-colors min-h-[40px]",
+                  favoritesOnly
+                    ? "bg-[var(--accent)]/15 text-[var(--accent)]"
+                    : "bg-[var(--surface-muted)] text-[var(--muted-foreground)] hover:text-[var(--foreground)]"
+                )}
+              >
+                <Star
+                  className={cn("h-3.5 w-3.5", favoritesOnly && "fill-current")}
+                  aria-hidden
+                />
+                {t("player.favoritesOnly")}
+              </button>
+            </div>
           </div>
 
           <div className="flex-1 overflow-y-auto p-2 overscroll-contain">
@@ -369,7 +456,7 @@ export function PlaylistWatchView({ playlist, backHref }: PlaylistWatchViewProps
                 )}
                 {viewMode === "list" ? (
                   <ul className="space-y-0.5">
-                    {entries.map((entry) => {
+                    {entries.map((entry, idx) => {
                       const isActive = entry.id === activeChannel?.id;
                       const currentProg = epgCache.get(entry.tvgId);
                       return (
@@ -482,21 +569,39 @@ export function PlaylistWatchView({ playlist, backHref }: PlaylistWatchViewProps
         </aside>
 
         <div
-          className="space-y-4 min-w-0 order-1 lg:order-none"
+          className="space-y-3 sm:space-y-4 min-w-0 order-1 lg:order-none"
           onTouchStart={handleTouchStart}
           onTouchMove={handleTouchMove}
           onTouchEnd={handleTouchEnd}
         >
-          <TvPlayer
-            channel={activeChannel}
-            errorLabel={t("player.playbackError")}
-            loadingLabel={t("player.loading")}
-            retryLabel={t("player.retry")}
-            pipLabel={t("player.pip")}
-            fullscreenLabel={t("player.fullscreen")}
-            exitFullscreenLabel={t("player.exitFullscreen")}
-            nowPlayingLabel={t("player.nowPlaying")}
-          />
+          <div className="lg:static sticky top-[var(--header-height,56px)] z-10 -mx-4 sm:mx-0 px-4 sm:px-0 bg-[var(--background)] sm:bg-transparent pt-2 sm:pt-0 pb-2 sm:pb-0">
+            <TvPlayer
+              channel={activeChannel}
+              onNextChannel={selectNext}
+              errorLabel={t("player.playbackError")}
+              loadingLabel={t("player.loading")}
+              retryLabel={t("player.retry")}
+              nextChannelLabel={t("player.nextChannel")}
+              pipLabel={t("player.pip")}
+              fullscreenLabel={t("player.fullscreen")}
+              exitFullscreenLabel={t("player.exitFullscreen")}
+              nowPlayingLabel={t("player.nowPlaying")}
+            />
+          </div>
+
+          <button
+            type="button"
+            onClick={() => setMobileDrawerOpen(true)}
+            className="lg:hidden w-full flex items-center justify-between gap-3 rounded-sm border border-[var(--border)] bg-[var(--card)] px-4 py-3 text-sm hover:bg-[var(--surface-muted)] min-h-[48px]"
+          >
+            <span className="flex items-center gap-2 min-w-0">
+              <Menu className="h-4 w-4 shrink-0 text-[var(--accent)]" aria-hidden />
+              <span className="truncate font-medium">{activeChannel?.title || t("player.openChannels")}</span>
+            </span>
+            <span className="text-xs text-[var(--muted-foreground)] shrink-0">
+              {t("player.channelCount", { count: filtered.length })}
+            </span>
+          </button>
 
           <div className="flex items-center justify-between gap-3">
             <button
@@ -520,14 +625,14 @@ export function PlaylistWatchView({ playlist, backHref }: PlaylistWatchViewProps
           </div>
 
           <div className="flex items-center justify-between flex-wrap gap-2">
-            <p className="text-xs text-[var(--muted-foreground)]">
-              {t("player.keyboardHint")} • F: {t("player.fullscreen")}, M: {t("player.mute")}/{t("player.unmute")}, Space: Play/Pause, ←/→: {t("player.prevChannel")}/{t("player.nextChannel")}
+            <p className="text-xs text-[var(--muted-foreground)] hidden sm:block">
+              {t("player.keyboardHint")} • F: {t("player.fullscreen")}, M: {t("player.mute")}/{t("player.unmute")}, Space: Play/Pause, T: {t("player.theaterMode")}, E: EPG
             </p>
             {activeChannel && (
               <button
                 type="button"
                 onClick={() => setShowEpgPanel((v) => !v)}
-                className="text-xs text-[var(--accent)] hover:underline"
+                className="text-xs text-[var(--accent)] hover:underline ml-auto"
               >
                 {showEpgPanel ? t("player.hideEpg") : t("player.showEpg")}
               </button>
@@ -586,12 +691,27 @@ export function PlaylistWatchView({ playlist, backHref }: PlaylistWatchViewProps
                   className="w-full h-11 pl-9 pr-3 rounded-sm text-base border border-[var(--border)] bg-[var(--surface-muted)] text-[var(--foreground)] placeholder:text-[var(--muted-foreground)] focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/30"
                 />
               </label>
+              {countries.length > 1 && (
+                <select
+                  value={countryFilter}
+                  onChange={(e) => setCountryFilter(e.target.value)}
+                  className="w-full h-11 rounded-sm border border-[var(--border)] bg-[var(--surface-muted)] px-3 text-sm text-[var(--foreground)] focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/30"
+                  aria-label={t("player.filterCountry")}
+                >
+                  <option value="all">{t("player.allCountries")}</option>
+                  {countries.map((c) => (
+                    <option key={c.code} value={c.code}>
+                      {c.name}
+                    </option>
+                  ))}
+                </select>
+              )}
               <div className="flex items-center gap-2">
                 <button
                   type="button"
                   onClick={() => setFavoritesOnly((value) => !value)}
                   className={cn(
-                    "inline-flex items-center gap-2 rounded-sm px-3 py-2 text-xs font-medium transition-colors flex-1 justify-center",
+                    "inline-flex items-center gap-2 rounded-sm px-3 py-2 text-xs font-medium transition-colors flex-1 justify-center min-h-[44px]",
                     favoritesOnly
                       ? "bg-[var(--accent)]/15 text-[var(--accent)]"
                       : "bg-[var(--surface-muted)] text-[var(--muted-foreground)]"
@@ -603,7 +723,7 @@ export function PlaylistWatchView({ playlist, backHref }: PlaylistWatchViewProps
                 <button
                   type="button"
                   onClick={() => setViewMode(viewMode === "list" ? "grid" : "list")}
-                  className="inline-flex items-center gap-2 rounded-sm px-3 py-2 text-xs font-medium bg-[var(--surface-muted)] text-[var(--muted-foreground)]"
+                  className="inline-flex items-center gap-2 rounded-sm px-3 py-2 text-xs font-medium bg-[var(--surface-muted)] text-[var(--muted-foreground)] min-h-[44px]"
                 >
                   {viewMode === "list" ? <Grid3x3 className="h-3.5 w-3.5" /> : <LayoutList className="h-3.5 w-3.5" />}
                   {viewMode === "list" ? t("player.channelGrid") : t("player.channelList")}

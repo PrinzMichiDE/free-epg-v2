@@ -11,11 +11,13 @@ import type { PlaylistPlayerData } from "@/lib/playlists";
 interface PlaylistWatchLoaderProps {
   playlistCode: string;
   backHref: string;
+  defaultCountry?: string | null;
 }
 
 export function PlaylistWatchLoader({
   playlistCode,
   backHref,
+  defaultCountry,
 }: PlaylistWatchLoaderProps) {
   const { t } = useI18n();
   const [playlist, setPlaylist] = useState<PlaylistPlayerData | null>(null);
@@ -90,6 +92,7 @@ export function PlaylistWatchLoader({
       key={playlist.code}
       playlist={playlist}
       backHref={backHref}
+      defaultCountry={defaultCountry}
     />
   );
 }

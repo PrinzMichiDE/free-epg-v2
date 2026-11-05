@@ -299,6 +299,7 @@ export interface PlaylistPlayerEntry {
   tvgId: string;
   title: string;
   url: string;
+  countryCode?: string;
   groupTitle?: string;
   logoUrl?: string;
   referrer?: string;
@@ -345,16 +346,20 @@ function pickBestEnrichedStreams(
 
 function toPlayerEntries(
   streams: EnrichedStreamCandidate[],
-  groupTitleFor?: (channelId: string) => string | undefined,
-  metaFor?: (channelId: string) => { logoUrl?: string } | undefined
+  opts?: {
+    groupTitleFor?: (channelId: string) => string | undefined;
+    metaFor?: (channelId: string) => { logoUrl?: string } | undefined;
+    countryCodeFor?: (channelId: string) => string | undefined;
+  }
 ): PlaylistPlayerEntry[] {
   return streams.map((stream, index) => ({
     id: `${stream.channelId}-${index}`,
     tvgId: stream.channelId,
     title: stream.title,
     url: stream.url,
-    groupTitle: groupTitleFor?.(stream.channelId),
-    logoUrl: metaFor?.(stream.channelId)?.logoUrl ?? undefined,
+    countryCode: opts?.countryCodeFor?.(stream.channelId),
+    groupTitle: opts?.groupTitleFor?.(stream.channelId),
+    logoUrl: opts?.metaFor?.(stream.channelId)?.logoUrl ?? undefined,
     referrer: stream.referrer ?? undefined,
     userAgent: stream.userAgent ?? undefined,
   }));
@@ -396,13 +401,13 @@ export async function getCountryPlaylistPlayerData(
     name: countryLabel,
     epgUrl: resolveEpgUrl(cc),
     m3uUrl: `/api/playlists/${cc.toLowerCase()}.m3u`,
-    entries: toPlayerEntries(
-      picked,
-      () => countryLabel,
-      (channelId) => ({
+    entries: toPlayerEntries(picked, {
+      groupTitleFor: () => countryLabel,
+      countryCodeFor: () => cc,
+      metaFor: (channelId) => ({
         logoUrl: channelMeta.get(channelId)?.logoUrl ?? undefined,
-      })
-    ),
+      }),
+    }),
   };
 }
 
@@ -443,13 +448,13 @@ export async function getWorldPlaylistPlayerData(): Promise<PlaylistPlayerData |
     name: "Weltweit — alle Länder",
     epgUrl: `${BASE_URL}/api/epg`,
     m3uUrl: `/api/playlists/${WORLD_PLAYLIST_SLUG}.m3u`,
-    entries: toPlayerEntries(
-      sorted,
-      (channelId) => playlistName(channelMeta.get(channelId)!.country, worldNames),
-      (channelId) => ({
+    entries: toPlayerEntries(sorted, {
+      groupTitleFor: (channelId) => playlistName(channelMeta.get(channelId)!.country, worldNames),
+      countryCodeFor: (channelId) => channelMeta.get(channelId)?.country ?? undefined,
+      metaFor: (channelId) => ({
         logoUrl: channelMeta.get(channelId)?.logoUrl ?? undefined,
-      })
-    ),
+      }),
+    }),
   };
 }
 
